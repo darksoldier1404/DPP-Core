@@ -57,7 +57,7 @@ shadowJar {
         include(dependency('com.github.ben-manes.caffeine:caffeine::2.9.3'))
         include(dependency('io.reactivex:rxjava::1.2.0'))
         include(dependency('com.github.outstanding1301:donation-alert-api::1.0.0'))
-        include(dependency('io.socket:socket.io-client::1.0.0'))
+        include(dependency('io.socket:socket.io-client::2.1.0'))
         include(dependency('io.reactivex.rxjava2:rxjava::2.1.16'))
         include(dependency('org.jsoup:jsoup::1.13.1'))
         include(dependency('com.googlecode.json-simple:json-simple::1.1.1'))
