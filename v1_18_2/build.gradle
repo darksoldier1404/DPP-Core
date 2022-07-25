@@ -21,7 +21,7 @@ shadowJar {
         include(dependency('com.github.philippheuer.events4j:events4j-api::0.10.0'))
         include(dependency('com.github.philippheuer.events4j:events4j-core::0.10.0'))
         include(dependency('com.github.philippheuer.events4j:events4j-handler-simple::0.10.0'))
-        include(dependency('com.github.vladimir-bukhtoyarov:bucket4j-core::7.5.0'))
+        include(dependency('com.github.vladimir-bukhtoyarov:bucket4j-core::7.6.0'))
         include(dependency('com.github.philippheuer.credentialmanager:credentialmanager::0.1.2'))
         include(dependency('io.github.openfeign:feign-core::11.8'))
         include(dependency('io.github.openfeign:feign-hystrix::11.8'))
