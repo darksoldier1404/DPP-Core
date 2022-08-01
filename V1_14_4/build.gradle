@@ -17,7 +17,7 @@ jar {
 }
 shadowJar {
     dependencies {
-        include(dependency('com.github.twitch4j::1.10.0'))
+        include(dependency('com.github.twitch4j::1.11.0'))
         include(dependency('com.github.philippheuer.events4j:events4j-api::0.10.0'))
         include(dependency('com.github.philippheuer.events4j:events4j-core::0.10.0'))
         include(dependency('com.github.philippheuer.events4j:events4j-handler-simple::0.10.0'))
