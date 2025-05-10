@@ -48,3 +48,4 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           files: jars/*.jar
           prerelease: false
+
