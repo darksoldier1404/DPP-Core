@@ -1,0 +1,12 @@
+name: DPP-Core
+version: 4.0.2.15
+main: com.darksoldier1404.dppc.DPPCore
+authors: [ DEAD_POOLIO_ ]
+api-version: 1.17
+loadbefore:
+  - Essentials
+  - PlaceholderAPI
+  - ProtocolLib
+
+commands:
+  dppc:

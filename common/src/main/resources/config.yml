@@ -1,0 +1,13 @@
+Settings:
+  
+  update-check: true
+  
+  update-check-interval: 3600
+
+  use-metrics: true
+
+  update-check-excluded: [ ]
+
+  # ex)
+#  update-check-excluded:
+#    - DPP-Core

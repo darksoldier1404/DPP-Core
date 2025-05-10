@@ -1,0 +1,14 @@
+dependencies {
+    implementation project(':common')
+    implementation 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'com.bukkit:craftbukkit:1.18.2'
+    compileOnly 'com.bukkit:spigot:1.18.2'
+}
+
+jar {
+    from project(':common').sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': 'com.darksoldier1404.dppc.DPPCore'
+    }
+}

@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+
+tasks.named('jar').configure {
+    enabled = false
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'com.bukkit:craftbukkit:1.21.5'
+    compileOnly 'com.bukkit:spigot:1.21.5'
+}

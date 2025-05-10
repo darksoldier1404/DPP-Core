@@ -1,0 +1,104 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+allprojects {
+    group = 'com.darksoldier1404'
+    version = '4.0.2.15'
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://nexus.dpnw.site:8081/repository/maven-public/'
+            allowInsecureProtocol = true
+        }
+        maven { url 'https://org.bstats/bstats-bukkit' }
+        maven { url 'https://repo.extendedclip.com/releases/' }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+
+    compileJava.options.encoding = 'UTF-8'
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        sourceCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        compileOnly 'org.bstats:bstats-bukkit:3.0.0'
+        compileOnly 'me.clip:placeholderapi:2.11.6'
+        compileOnly 'com.mojang.authlib:authlib:4.0.43@jar'
+        compileOnly 'com.mojang:brigadier:1.1.8@jar'
+        compileOnly 'com.mojang.datafixers:datafixerupper:6.0.8@jar'
+        compileOnly 'com.earth2me.essentials:EssentialsX:2.20.1@jar'
+        compileOnly 'net.luckperms:LuckPerms:5.4.134@jar'
+        compileOnly 'com.sk89q.worldedit:WorldEdit:7.3.1@jar'
+        compileOnly 'com.sk89q.worldguard:WorldGuard:7.0.9:dist@jar'
+        compileOnly 'com.github.philippheuer.events4j:events4j-api:0.10.0'
+        compileOnly 'com.github.philippheuer.events4j:events4j-core:0.10.0'
+        compileOnly 'com.github.philippheuer.events4j:events4j-handler-simple:0.10.0'
+        compileOnly 'com.github.vladimir-bukhtoyarov:bucket4j:7.5.0'
+        compileOnly 'io.socket:socket.io-client:1.0.0'
+        compileOnly 'io.reactivex.rxjava2:rxjava:2.1.16'
+        compileOnly 'org.jsoup:jsoup:1.13.1'
+        compileOnly 'com.googlecode.json-simple:json-simple:1.1.1'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    tasks.register('renameJar') {
+        def jarDir = file("$rootDir/jars")
+        def moduleName = project.name
+        def jarFileName = "DPP-Core-${mcversion}-${moduleName}-${version}-SNAPSHOT.jar"
+        def newJarFileName = "DPP-Core-${mcversion}-${moduleName}-SNAPSHOT.jar"
+        def originalJar = file("${jarDir}/${jarFileName}")
+        def newJar = file("${jarDir}/${newJarFileName}")
+        doLast {
+            if (originalJar.exists()) {
+                originalJar.renameTo(newJar)
+                println "JAR file renamed: ${newJarFileName}"
+            } else {
+                throw new GradleException("Original JAR file does not exist: ${jarFileName}")
+            }
+        }
+    }
+
+    jar {
+        destinationDirectory.set(file("$rootDir/jars"))
+        archiveFileName.set("DPP-Core-${project.name}-${version}-SNAPSHOT.jar")
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = 'com.darksoldier1404.dppc'
+                artifactId = "DPP-Core-${project.name}"
+                artifact file("$rootDir/jars/DPP-Core-${project.name}-SNAPSHOT.jar")
+                version = "${project.name}-SNAPSHOT"
+            }
+        }
+        repositories {
+            maven {
+                url 'http://nexus.dpnw.site:8081/repository/dpp/'
+                allowInsecureProtocol = true
+            }
+        }
+    }
+
+    tasks.named('publish') {
+        dependsOn 'renameJar'
+    }
+}
