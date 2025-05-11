@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     group = 'com.darksoldier1404'
-    version = '4.0.2.15'
+    version = '4.0.2.16'
 
     repositories {
         mavenCentral()
@@ -53,6 +53,7 @@ subprojects {
         compileOnly 'io.reactivex.rxjava2:rxjava:2.1.16'
         compileOnly 'org.jsoup:jsoup:1.13.1'
         compileOnly 'com.googlecode.json-simple:json-simple:1.1.1'
+        implementation 'com.darksoldier1404.dps:DP-Shop:Main-SNAPSHOT'
     }
 
     test {
