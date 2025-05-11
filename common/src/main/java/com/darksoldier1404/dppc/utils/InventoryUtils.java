@@ -39,4 +39,16 @@ public class InventoryUtils {
         leftover.putAll(inv.addItem(items));
         return leftover.isEmpty();
     }
+
+    public static int getSimlarItemCount(ItemStack[] content, ItemStack item) {
+        Inventory inv = Bukkit.createInventory(null, 54);
+        inv.setContents(content);
+        int count = 0;
+        for (ItemStack is : inv.getContents()) {
+            if (is != null && is.isSimilar(item)) {
+                count += is.getAmount();
+            }
+        }
+        return count;
+    }
 }

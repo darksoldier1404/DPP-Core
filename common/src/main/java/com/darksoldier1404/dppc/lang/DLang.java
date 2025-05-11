@@ -81,6 +81,7 @@ public class DLang {
         File f = new File(plugin.getDataFolder() + "/lang", "English.yml");
         if (!f.exists()) {
             plugin.saveResource("lang/English.yml", false);
+            plugin.saveResource("lang/Korean.yml", false);
         }
         for (YamlConfiguration data : ConfigUtils.loadCustomDataList(plugin, "lang")) {
             try {
