@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     group = 'com.darksoldier1404'
-    version = '4.0.2.16'
+    version = '4.0.2.17'
 
     repositories {
         mavenCentral()
@@ -63,8 +63,8 @@ subprojects {
     tasks.register('renameJar') {
         def jarDir = file("$rootDir/jars")
         def moduleName = project.name
-        def jarFileName = "DPP-Core-${mcversion}-${moduleName}-${version}-SNAPSHOT.jar"
-        def newJarFileName = "DPP-Core-${mcversion}-${moduleName}-SNAPSHOT.jar"
+        def jarFileName = "DPP-Core-${moduleName}-${version}-SNAPSHOT.jar"
+        def newJarFileName = "DPP-Core-${moduleName}-SNAPSHOT.jar"
         def originalJar = file("${jarDir}/${jarFileName}")
         def newJar = file("${jarDir}/${newJarFileName}")
         doLast {
@@ -72,7 +72,7 @@ subprojects {
                 originalJar.renameTo(newJar)
                 println "JAR file renamed: ${newJarFileName}"
             } else {
-                throw new GradleException("Original JAR file does not exist: ${jarFileName}")
+                throw new GradleException("Original JAR file does not exist: ${newJarFileName}")
             }
         }
     }
@@ -86,7 +86,7 @@ subprojects {
         publications {
             mavenJava(MavenPublication) {
                 groupId = 'com.darksoldier1404.dppc'
-                artifactId = "DPP-Core-${project.name}"
+                artifactId = "DPP-Core"
                 artifact file("$rootDir/jars/DPP-Core-${project.name}-SNAPSHOT.jar")
                 version = "${project.name}-SNAPSHOT"
             }
@@ -99,7 +99,7 @@ subprojects {
         }
     }
 
-    tasks.named('publish') {
-        dependsOn 'renameJar'
-    }
+//    tasks.named('publish') {
+//        dependsOn 'renameJar'
+//    }
 }
