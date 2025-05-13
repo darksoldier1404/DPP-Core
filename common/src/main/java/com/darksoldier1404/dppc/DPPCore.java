@@ -1,7 +1,10 @@
 package com.darksoldier1404.dppc;
 
+import com.darksoldier1404.dppc.action.ActionBuilder;
 import com.darksoldier1404.dppc.action.helper.ActionGUIHandler;
-import com.darksoldier1404.dppc.commands.DUpdateCheckCommand;
+import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
+import com.darksoldier1404.dppc.commands.DPPCACommand;
+import com.darksoldier1404.dppc.commands.DPPCCommand;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import com.earth2me.essentials.Essentials;
@@ -11,6 +14,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @SuppressWarnings("all")
@@ -21,9 +28,15 @@ public class DPPCore extends JavaPlugin {
     public static Essentials ess;
     public static LuckPerms lp;
     public static WorldGuard wg;
+    public static Set<PlaceholderBuilder.InternalExpansion> placeholders = new HashSet<PlaceholderBuilder.InternalExpansion>();
+    public static Map<String, ActionBuilder> actions = new HashMap<>();
 
     public static DPPCore getInstance() {
         return plugin;
+    }
+
+    public static Map<String, ActionBuilder> getActions() {
+        return actions;
     }
 
     @Override
@@ -65,11 +78,14 @@ public class DPPCore extends JavaPlugin {
         config = ConfigUtils.loadDefaultPluginConfig(plugin);
         PluginUtil.loadALLPlugins();
         PluginUtil.initializeSoftDependPlugins();
+        PluginUtil.loadALLAction();
         Bukkit.getScheduler().runTaskLater(this, () -> {
             PluginUtil.updateCheck();
         }, 100L);
-        getCommand("dppc").setExecutor(new DUpdateCheckCommand());
+        getCommand("dppc").setExecutor(new DPPCCommand());
+        getCommand("dppca").setExecutor(new DPPCACommand());
         getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
+
     }
 
     @Override

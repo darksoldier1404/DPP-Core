@@ -16,9 +16,13 @@ import java.util.List;
 public class ActionBuilder {
     private final JavaPlugin plugin;
     private final List<Action> actions = new ArrayList<>();
+    private String actionName;
+    private boolean isEditing = false;
+    private int currentEditIndex = 0;
 
-    public ActionBuilder(JavaPlugin plugin) {
+    public ActionBuilder(JavaPlugin plugin, String actionName) {
         this.plugin = plugin;
+        this.actionName = actionName;
     }
 
     public JavaPlugin getPlugin() {
@@ -29,28 +33,62 @@ public class ActionBuilder {
         return actions;
     }
 
+    public String getActionName() {
+        return actionName;
+    }
+
+    public boolean isEditing() {
+        return isEditing;
+    }
+
+    public void setEditing(boolean editing) {
+        isEditing = editing;
+    }
+
+    public int getCurrentEditIndex() {
+        return currentEditIndex;
+    }
+
+    public void setCurrentEditIndex(int currentEditIndex) {
+        this.currentEditIndex = currentEditIndex;
+    }
+
+    private void update(Action a) {
+        if(isEditing) {
+            if (currentEditIndex >= actions.size()) {
+                plugin.getLogger().warning("Invalid index for editing action.");
+                isEditing = false;
+                return;
+            }
+            actions.set(currentEditIndex, a);
+        } else {
+            actions.add(a);
+        }
+        isEditing = false;
+    }
+
     public ActionBuilder playSound(String soundName) {
-        actions.add(new PlaySoundAction(soundName, 1, 1, "None", "{player}"));
+        update(new PlaySoundAction(soundName, 1, 1, "None", "{player}"));
         return this;
     }
 
     public ActionBuilder playSound(String soundName, float volume, float pitch, String worldName, Object target) {
-        actions.add(new PlaySoundAction(soundName, volume, pitch, worldName, target));
+        update(new PlaySoundAction(soundName, volume, pitch, worldName, target));
         return this;
     }
 
     public ActionBuilder delay(long ticks) {
-        actions.add(new DelayAction(ticks));
+        update(new DelayAction(ticks));
         return this;
     }
 
     public ActionBuilder executeCommand(String command) {
-        actions.add(new ExecuteCommandAction(command));
+        update(new ExecuteCommandAction(command));
         return this;
     }
 
     public ActionBuilder teleport(String worldName, double x, double y, double z) {
-        actions.add(new TeleportAction(worldName, x, y, z));
+        update(new TeleportAction(worldName, x, y, z));
         return this;
     }
 
@@ -90,6 +128,7 @@ public class ActionBuilder {
 
     public YamlConfiguration exportToYaml() {
         YamlConfiguration file = new YamlConfiguration();
+        file.set("ACTION_NAME", actionName);
         List<String> serialized = new ArrayList<String>();
         for (Action action : actions) {
             serialized.add(action.serialize());
@@ -100,6 +139,7 @@ public class ActionBuilder {
 
     public ActionBuilder importFromYaml(YamlConfiguration file) {
         actions.clear();
+        actionName = file.getString("ACTION_NAME");
         List<String> serialized = file.getStringList("actions");
         for (String actionString : serialized) {
             if (actionString != null) {

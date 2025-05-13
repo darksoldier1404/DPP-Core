@@ -1,7 +1,7 @@
 package com.darksoldier1404.dppc.action.actions;
 
 import com.darksoldier1404.dppc.action.obj.Action;
-import com.darksoldier1404.dppc.action.obj.ActionName;
+import com.darksoldier1404.dppc.action.obj.ActionType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -30,8 +30,8 @@ public class TeleportAction implements Action {
     }
 
     @Override
-    public ActionName getActionName() {
-        return ActionName.TELEPORT_ACTION;
+    public ActionType getActionTypeName() {
+        return ActionType.TELEPORT_ACTION;
     }
 
     @Override

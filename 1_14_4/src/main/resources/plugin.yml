@@ -1,5 +1,5 @@
 name: DPP-Core
-version: 4.0.2.17
+version: 4.0.2.19
 main: com.darksoldier1404.dppc.DPPCore
 authors: [ DEAD_POOLIO_ ]
 api-version: 1.14
@@ -10,3 +10,4 @@ loadbefore:
 
 commands:
   dppc:
+  dppca:
