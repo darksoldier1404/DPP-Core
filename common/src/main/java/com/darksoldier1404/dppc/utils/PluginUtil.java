@@ -2,6 +2,10 @@ package com.darksoldier1404.dppc.utils;
 
 import com.darksoldier1404.dppc.DPPCore;
 import com.earth2me.essentials.Essentials;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sk89q.worldguard.WorldGuard;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -15,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,27 +106,31 @@ public class PluginUtil {
 
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
-                plugin.getLogger().warning("Warn : Unable to get version data. HTTP Response Code: " + responseCode);
-                plugin.getLogger().warning("Name : " + pluginName);
+                System.out.println("Warn : Unable to get version data. HTTP Response Code: " + responseCode);
+                System.out.println("Name : " + pluginName);
                 return null;
             }
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder response = new StringBuilder();
+            String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
             in.close();
 
-            return response.toString().lines()
-                    .filter(line -> line.contains(pluginName))
-                    .map(line -> line.split(":")[1].replaceAll("[\"{}]", "").trim())
-                    .findFirst()
-                    .orElse(null);
+            JsonArray array = JsonParser.parseString(response.toString()).getAsJsonArray();
+            for (JsonElement element : array) {
+                JsonObject obj = element.getAsJsonObject();
+                String repo = obj.get("repo").getAsString();
+                if (repo.equalsIgnoreCase("darksoldier1404/" + pluginName)) {
+                    return obj.get("tag").getAsString();
+                }
+            }
+            return "0.0.0.0";
         } catch (Exception e) {
             e.printStackTrace();
-            return "Unknown";
+            return "0.0.0.0";
         }
     }
 
@@ -154,10 +163,10 @@ public class PluginUtil {
                 if (latestVersion != null) {
                     String currentVersion = plugin.getDescription().getVersion();
                     if (isNewVersion(currentVersion, latestVersion)) {
-                        sender.sendMessage("A new version of " + plugin.getName() + " is available: " + latestVersion + ". You are running version " + currentVersion);
-                        sender.sendMessage("Download: https://dpnw.site/");
+                        sender.sendMessage("§f[ §bDPP-Core §f] §e" + plugin.getName() + " §f| §cA new version of " + plugin.getName() + " is available: " + latestVersion + ". You are running version " + currentVersion);
+                        sender.sendMessage("§fDownload: §ehttps://dpnw.site/");
                     } else {
-                        sender.sendMessage("No update available for " + plugin.getName() + ". You are running the latest version (" + currentVersion + ").");
+                        sender.sendMessage("§f[ §bDPP-Core §f] §e" + plugin.getName() + " §f| §aYou are running the latest version §f(§a" + currentVersion + "§f)");
                     }
                 }
             }
@@ -175,10 +184,10 @@ public class PluginUtil {
                 JavaPlugin plugin = loadedPlugins.keySet().stream().filter(p -> p.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
                 String currentVersion = plugin.getDescription().getVersion();
                 if (isNewVersion(currentVersion, latestVersion)) {
-                    sender.sendMessage("A new version of " + name + " is available: " + latestVersion + ". You are running version " + currentVersion);
-                    sender.sendMessage("Download: https://dpnw.site/");
+                    sender.sendMessage("§f[ §bDPP-Core §f] §e" + name + " §f| §cA new version of " + name + " is available: " + latestVersion + ". You are running version " + currentVersion);
+                    sender.sendMessage("§fDownload: §ehttps://dpnw.site/");
                 } else {
-                    sender.sendMessage("No update available for " + name + ". You are running the latest version (" + currentVersion + ").");
+                    sender.sendMessage("§f[ §bDPP-Core §f] §e" + name + " §f| §aYou are running the latest version §f(§a" + currentVersion + "§f)");
                 }
             }
         });
