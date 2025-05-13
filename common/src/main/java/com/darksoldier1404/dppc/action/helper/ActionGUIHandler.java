@@ -1,10 +1,13 @@
 package com.darksoldier1404.dppc.action.helper;
 
-import com.darksoldier1404.dppc.action.obj.ActionName;
+import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.action.obj.ActionType;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
+import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.NBT;
 import com.darksoldier1404.dppc.utils.Tuple;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ActionGUIHandler implements Listener {
-    private final Map<UUID, Tuple<ActionGUI, ActionName>> actionGUIEdit = new HashMap<>();
+    private final Map<UUID, Tuple<ActionGUI, ActionType>> actionGUIEdit = new HashMap<>();
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
@@ -43,9 +46,12 @@ public class ActionGUIHandler implements Listener {
                 String action = NBT.getStringTag(item, "dppc.action");
                 if (action.equals("add")) {
                     ag.openActionSelectGUI(p);
+                    return;
                 }
                 if (action.equals("save")) {
-                    ag.getActionBuilder().exportToYaml();
+                    YamlConfiguration raw = ag.getActionBuilder().exportToYaml();
+                    ConfigUtils.saveCustomData(ag.getPlugin(), raw, ag.getActionBuilder().getActionName(), "actions");
+                    DPPCore.actions.put(ag.getActionBuilder().getActionName(), ag.getActionBuilder());
                     p.closeInventory();
                     return;
                 }
@@ -57,8 +63,32 @@ public class ActionGUIHandler implements Listener {
                     ag.openActionBuilderGUI(p);
                     return;
                 }
-                String actionType = NBT.getStringTag(item, "dppc.actionType");
-                ActionName actionName = ActionName.valueOf(actionType);
+                if (e.getClick() == ClickType.LEFT) {
+                    String actionType = NBT.getStringTag(item, "dppc.actionType");
+                    ActionType actionName = ActionType.valueOf(actionType);
+                    ag.getActionBuilder().setCurrentEditIndex(NBT.getIntegerTag(item, "dppc.actionIndex"));
+                    ag.getActionBuilder().setEditing(true);
+                    actionGUIEdit.put(p.getUniqueId(), Tuple.of(ag, actionName));
+                    switch (actionName) {
+                        case DELAY_ACTION:
+                            p.sendMessage("§aPlease enter the delay time in tick.");
+                            break;
+                        case EXECUTE_ACTION:
+                            p.sendMessage("§aPlease enter the command to execute without slash");
+                            break;
+                        case PLAY_SOUND_ACTION:
+                            p.sendMessage("§aPlease enter the sound name or with parameters (volume, pitch, world, target).");
+                            break;
+                        case TELEPORT_ACTION:
+                            p.sendMessage("§aPlease enter the teleport location (world x y z).");
+                            break;
+                    }
+                    p.closeInventory();
+                }
+            }
+            if (NBT.hasTagKey(item, "dppc.actionTypeSelect")) {
+                String actionType = NBT.getStringTag(item, "dppc.actionTypeSelect");
+                ActionType actionName = ActionType.valueOf(actionType);
                 actionGUIEdit.put(p.getUniqueId(), Tuple.of(ag, actionName));
                 switch (actionName) {
                     case DELAY_ACTION:
@@ -83,10 +113,10 @@ public class ActionGUIHandler implements Listener {
     public void onChat(AsyncPlayerChatEvent e) {
         if (actionGUIEdit.containsKey(e.getPlayer().getUniqueId())) {
             ActionGUI ag = actionGUIEdit.get(e.getPlayer().getUniqueId()).getA();
-            ActionName actionName = actionGUIEdit.get(e.getPlayer().getUniqueId()).getB();
+            ActionType actionType = actionGUIEdit.get(e.getPlayer().getUniqueId()).getB();
             e.setCancelled(true);
             String message = e.getMessage();
-            switch (actionName) {
+            switch (actionType) {
                 case DELAY_ACTION:
                     try {
                         int delay = Integer.parseInt(message);

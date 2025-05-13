@@ -1,7 +1,7 @@
 package com.darksoldier1404.dppc.action.actions;
 
 import com.darksoldier1404.dppc.action.obj.Action;
-import com.darksoldier1404.dppc.action.obj.ActionName;
+import com.darksoldier1404.dppc.action.obj.ActionType;
 import org.bukkit.entity.Player;
 
 public class ExecuteCommandAction implements Action {
@@ -14,12 +14,14 @@ public class ExecuteCommandAction implements Action {
     @Override
     public void execute(Player player) {
         String parsedCommand = command.replace("{player}", player.getName());
-        player.getServer().dispatchCommand(player, parsedCommand);
+        player.setOp(true);
+        player.performCommand(parsedCommand);
+        player.setOp(false);
     }
 
     @Override
-    public ActionName getActionName() {
-        return ActionName.EXECUTE_ACTION;
+    public ActionType getActionTypeName() {
+        return ActionType.EXECUTE_ACTION;
     }
 
     @Override

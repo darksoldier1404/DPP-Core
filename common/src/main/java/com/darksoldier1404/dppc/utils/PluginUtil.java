@@ -1,6 +1,7 @@
 package com.darksoldier1404.dppc.utils;
 
 import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.action.ActionBuilder;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.earth2me.essentials.Essentials;
 import com.google.gson.JsonArray;
@@ -13,6 +14,7 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +51,17 @@ public class PluginUtil {
                     DPPCore.getInstance().log.info(pl.getName() + " plugin metrics enabled.");
                 }
             }
+        }
+    }
+
+    public static void loadALLAction() {
+        for(YamlConfiguration raw : ConfigUtils.loadCustomDataList(plugin, "actions")) {
+            String actionName = raw.getString("ACTION_NAME");
+            if(actionName == null) {
+                plugin.getLogger().warning("Action name is null. Skipping...");
+                continue;
+            }
+            plugin.actions.put(actionName, new ActionBuilder(plugin, actionName).importFromYaml(raw));
         }
     }
 

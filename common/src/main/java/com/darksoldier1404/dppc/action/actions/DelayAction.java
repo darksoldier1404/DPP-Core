@@ -1,7 +1,7 @@
 package com.darksoldier1404.dppc.action.actions;
 
 import com.darksoldier1404.dppc.action.obj.Action;
-import com.darksoldier1404.dppc.action.obj.ActionName;
+import com.darksoldier1404.dppc.action.obj.ActionType;
 import org.bukkit.entity.Player;
 
 public class DelayAction implements Action {
@@ -16,8 +16,8 @@ public class DelayAction implements Action {
     }
 
     @Override
-    public ActionName getActionName() {
-        return ActionName.DELAY_ACTION;
+    public ActionType getActionTypeName() {
+        return ActionType.DELAY_ACTION;
     }
 
     @Override

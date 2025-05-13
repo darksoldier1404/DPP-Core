@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DUpdateCheckCommand implements CommandExecutor, TabCompleter {
+public class DPPCCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -22,6 +22,7 @@ public class DUpdateCheckCommand implements CommandExecutor, TabCompleter {
             return false;
         }
         if (args.length == 0) {
+            sender.sendMessage("/dppca - DPP ActionBuilder Command Help");
             sender.sendMessage("/dppc updatecheck (PluginName) - Check for updates");
             return false;
         }

@@ -1,7 +1,7 @@
 package com.darksoldier1404.dppc.action.actions;
 
 import com.darksoldier1404.dppc.action.obj.Action;
-import com.darksoldier1404.dppc.action.obj.ActionName;
+import com.darksoldier1404.dppc.action.obj.ActionType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -47,8 +47,8 @@ public class PlaySoundAction implements Action {
     }
 
     @Override
-    public ActionName getActionName() {
-        return ActionName.PLAY_SOUND_ACTION;
+    public ActionType getActionTypeName() {
+        return ActionType.PLAY_SOUND_ACTION;
     }
 
     @Override

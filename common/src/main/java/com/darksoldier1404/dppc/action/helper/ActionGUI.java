@@ -1,7 +1,7 @@
 package com.darksoldier1404.dppc.action.helper;
 
 import com.darksoldier1404.dppc.action.ActionBuilder;
-import com.darksoldier1404.dppc.action.obj.ActionName;
+import com.darksoldier1404.dppc.action.obj.ActionType;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
 import com.darksoldier1404.dppc.utils.NBT;
 import org.bukkit.Material;
@@ -14,15 +14,24 @@ import java.util.Arrays;
 
 public class ActionGUI {
     private final JavaPlugin plugin;
-    private final ActionBuilder actionBuilder;
+    private ActionBuilder actionBuilder;
 
-    public ActionGUI(JavaPlugin plugin) {
+    public ActionGUI(ActionBuilder actionBuilder) {
+        this.plugin = actionBuilder.getPlugin();
+        this.actionBuilder = actionBuilder;
+    }
+
+    public ActionGUI(JavaPlugin plugin, String actionName) {
         this.plugin = plugin;
-        this.actionBuilder = new ActionBuilder(plugin);
+        this.actionBuilder = new ActionBuilder(plugin, actionName);
     }
 
     public JavaPlugin getPlugin() {
         return plugin;
+    }
+
+    public void setActionBuilder(ActionBuilder actionBuilder) {
+        this.actionBuilder = actionBuilder;
     }
 
     public ActionBuilder getActionBuilder() {
@@ -31,15 +40,15 @@ public class ActionGUI {
 
     public void openActionBuilderGUI(Player p) {
         DInventory inv = new DInventory(null, "Action Builder", 54, plugin);
-        if (actionBuilder.getActions().size() > 0) {
+        if (!actionBuilder.getActions().isEmpty()) {
             actionBuilder.getActions().forEach(action -> {
                 int index = actionBuilder.getActions().indexOf(action);
                 ItemStack actionItem = new ItemStack(Material.PAPER);
                 ItemMeta actionMeta = actionItem.getItemMeta();
-                actionMeta.setDisplayName("§f[ §e" + index + "§f] §9" + action.getActionName());
+                actionMeta.setDisplayName("§f[ §e" + index + " §f] §9" + action.getActionTypeName());
                 actionMeta.setLore(Arrays.asList("§aClick to edit", "§cRight click to remove", "", "§f" + action.serialize()));
                 actionItem.setItemMeta(actionMeta);
-                actionItem = NBT.setStringTag(actionItem, "dppc.actionType", action.getActionName().name());
+                actionItem = NBT.setStringTag(actionItem, "dppc.actionType", action.getActionTypeName().name());
                 actionItem = NBT.setIntTag(actionItem, "dppc.actionIndex", index);
                 inv.addItem(actionItem);
             });
@@ -64,12 +73,12 @@ public class ActionGUI {
 
     public void openActionSelectGUI(Player p) {
         DInventory inv = new DInventory(null, "Action Selector", 27, plugin);
-        for (ActionName name : ActionName.values()) {
+        for (ActionType name : ActionType.values()) {
             ItemStack actionItem = new ItemStack(Material.REDSTONE);
             ItemMeta actionMeta = actionItem.getItemMeta();
             actionMeta.setDisplayName("§b" + name);
             actionItem.setItemMeta(actionMeta);
-            actionItem = NBT.setStringTag(actionItem, "dppc.actionType", name.name());
+            actionItem = NBT.setStringTag(actionItem, "dppc.actionTypeSelect", name.name());
             inv.addItem(actionItem);
         }
         inv.setObj(this);
