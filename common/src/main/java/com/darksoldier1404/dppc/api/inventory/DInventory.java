@@ -125,6 +125,13 @@ public class DInventory extends CraftInventoryCustom {
         return true;
     }
 
+    public boolean setPageItem(int page, int slot, ItemStack item) {
+        if (page < 0 || page > pages) return false;
+        if (slot < 0 || slot > 44) return false;
+        pageItems.get(page)[slot] = item;
+        return true;
+    }
+
     public boolean setPageContent(int page, ItemStack[] items) {
         if (page < 0 || page > pages) return false;
         pageItems.put(page, items);

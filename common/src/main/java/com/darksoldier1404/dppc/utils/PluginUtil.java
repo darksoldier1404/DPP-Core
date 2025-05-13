@@ -89,16 +89,15 @@ public class PluginUtil {
     }
 
 
-    private static final String API_URL_TEMPLATE = "https://hangar.papermc.io/api/v1/projects/%s/latest?channel=Release";
+    private static final String API_URL = "https://raw.githubusercontent.com/darksoldier1404/DPP-Releases/main/releases.json";
 
     @NotNull
     public static String getLatestVersion(String pluginName) {
-        String urlString = String.format(API_URL_TEMPLATE, pluginName);
         try {
-            URL url = new URL(urlString);
+            URL url = new URL(API_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("accept", "text/plain");
+            connection.setRequestProperty("accept", "application/json");
 
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
@@ -115,14 +114,17 @@ public class PluginUtil {
             }
             in.close();
 
-            return response.toString().trim();
+            return response.toString().lines()
+                    .filter(line -> line.contains(pluginName))
+                    .map(line -> line.split(":")[1].replaceAll("[\"{}]", "").trim())
+                    .findFirst()
+                    .orElse(null);
         } catch (Exception e) {
             e.printStackTrace();
             return "Unknown";
         }
     }
 
-    // 버전 비교 메소드
     private static boolean isNewVersion(String currentVersion, String latestVersion) {
         String[] currentParts = currentVersion.split("\\.");
         String[] latestParts = latestVersion.split("\\.");
@@ -153,8 +155,7 @@ public class PluginUtil {
                     String currentVersion = plugin.getDescription().getVersion();
                     if (isNewVersion(currentVersion, latestVersion)) {
                         sender.sendMessage("A new version of " + plugin.getName() + " is available: " + latestVersion + ". You are running version " + currentVersion);
-                        // 다운로드 링크
-                        sender.sendMessage("Download: https://hangar.papermc.io/DEADPOOLIO/" + plugin.getName());
+                        sender.sendMessage("Download: https://dpnw.site/");
                     } else {
                         sender.sendMessage("No update available for " + plugin.getName() + ". You are running the latest version (" + currentVersion + ").");
                     }
@@ -175,7 +176,7 @@ public class PluginUtil {
                 String currentVersion = plugin.getDescription().getVersion();
                 if (isNewVersion(currentVersion, latestVersion)) {
                     sender.sendMessage("A new version of " + name + " is available: " + latestVersion + ". You are running version " + currentVersion);
-                    sender.sendMessage("Download: https://hangar.papermc.io/DEADPOOLIO/" + name);
+                    sender.sendMessage("Download: https://dpnw.site/");
                 } else {
                     sender.sendMessage("No update available for " + name + ". You are running the latest version (" + currentVersion + ").");
                 }

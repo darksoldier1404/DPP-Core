@@ -1,6 +1,7 @@
 package com.darksoldier1404.dppc.action.actions;
 
 import com.darksoldier1404.dppc.action.obj.Action;
+import com.darksoldier1404.dppc.action.obj.ActionName;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,6 +27,11 @@ public class TeleportAction implements Action {
             Location loc = new Location(world, x, y, z);
             player.teleport(loc);
         }
+    }
+
+    @Override
+    public ActionName getActionName() {
+        return ActionName.TELEPORT_ACTION;
     }
 
     @Override

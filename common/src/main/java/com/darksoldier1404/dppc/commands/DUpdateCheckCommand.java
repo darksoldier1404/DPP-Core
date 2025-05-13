@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +43,7 @@ public class DUpdateCheckCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("updatecheck");
+            return Collections.singletonList("updatecheck");
         }
         if (args.length == 2) {
             return PluginUtil.getLoadedPlugins().keySet().stream().map(JavaPlugin::getName).collect(Collectors.toList());

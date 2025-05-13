@@ -5,26 +5,33 @@ import com.darksoldier1404.dppc.action.actions.ExecuteCommandAction;
 import com.darksoldier1404.dppc.action.actions.PlaySoundAction;
 import com.darksoldier1404.dppc.action.actions.TeleportAction;
 import com.darksoldier1404.dppc.action.obj.Action;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import java.util.HashMap;
 
 @SuppressWarnings("all")
 public class ActionBuilder {
-    private final List<Action> actions = new ArrayList<Action>();
     private final JavaPlugin plugin;
+    private final List<Action> actions = new ArrayList<>();
 
     public ActionBuilder(JavaPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
+
+    public List<Action> getActions() {
+        return actions;
+    }
+
+    public ActionBuilder playSound(String soundName) {
+        actions.add(new PlaySoundAction(soundName, 1, 1, "None", "{player}"));
+        return this;
     }
 
     public ActionBuilder playSound(String soundName, float volume, float pitch, String worldName, Object target) {
@@ -81,40 +88,23 @@ public class ActionBuilder {
         return action;
     }
 
-    public void exportToYaml(File file) {
-        try {
-            FileWriter writer = new FileWriter(file);
-            Map<String, List<Map<String, String>>> output = new HashMap<String, List<Map<String, String>>>();
-            List<Map<String, String>> serialized = new ArrayList<Map<String, String>>();
-            for (Action action : actions) {
-                Map<String, String> actionMap = new HashMap<String, String>();
-                actionMap.put("action", action.serialize());
-                serialized.add(actionMap);
-            }
-            output.put("actions", serialized);
-            new Yaml().dump(output, writer);
-            writer.close();
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to export to YAML: " + e.getMessage());
+    public YamlConfiguration exportToYaml() {
+        YamlConfiguration file = new YamlConfiguration();
+        List<String> serialized = new ArrayList<String>();
+        for (Action action : actions) {
+            serialized.add(action.serialize());
         }
+        file.set("actions", serialized);
+        return file;
     }
 
-    public ActionBuilder importFromYaml(File file) {
-        try {
-            FileReader reader = new FileReader(file);
-            Map<String, List<Map<String, String>>> input = new Yaml().load(reader);
-            actions.clear();
-            if (input != null && input.containsKey("actions")) {
-                for (Map<String, String> actionMap : input.get("actions")) {
-                    String actionString = actionMap.get("action");
-                    if (actionString != null) {
-                        parseScript(actionString);
-                    }
-                }
+    public ActionBuilder importFromYaml(YamlConfiguration file) {
+        actions.clear();
+        List<String> serialized = file.getStringList("actions");
+        for (String actionString : serialized) {
+            if (actionString != null) {
+                parseScript(actionString);
             }
-            reader.close();
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to import from YAML: " + e.getMessage());
         }
         return this;
     }
