@@ -1,5 +1,6 @@
 package com.darksoldier1404.dppc;
 
+import com.darksoldier1404.dppc.action.helper.ActionGUIHandler;
 import com.darksoldier1404.dppc.commands.DUpdateCheckCommand;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.PluginUtil;
@@ -68,6 +69,7 @@ public class DPPCore extends JavaPlugin {
             PluginUtil.updateCheck();
         }, 100L);
         getCommand("dppc").setExecutor(new DUpdateCheckCommand());
+        getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
     }
 
     @Override
