@@ -1,12 +1,14 @@
 package com.darksoldier1404.dppc.utils;
 
 import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.earth2me.essentials.Essentials;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.worldguard.WorldGuard;
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
@@ -14,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -49,8 +52,20 @@ public class PluginUtil {
         }
     }
 
+    @Nullable
     public static boolean isMetricsEnabled(String name) {
         return DPPCore.getInstance().config.getStringList("Settings.metrics-excluded") == null ? true : !DPPCore.getInstance().config.getStringList("Settings.metrics-excluded").contains(name);
+    }
+
+    public static void initPlaceholders() {
+        if(getPluginInstance("PlaceholderAPI", PlaceholderAPIPlugin.class, "PlaceholderAPI") != null) {
+            for (PlaceholderBuilder.InternalExpansion pb : plugin.placeholders) {
+                pb.register();
+            }
+        }else{
+            plugin.getLogger().warning("PlaceholderAPI plugin is not installed.");
+            plugin.getLogger().warning("PlaceholderAPI is disabled.");
+        }
     }
 
     public static void initializeSoftDependPlugins() {
@@ -59,6 +74,7 @@ public class PluginUtil {
         DPPCore.wg = getWorldGuardInstance();
     }
 
+    @Nullable
     public static <T> T getPluginInstance(String pluginName, Class<T> pluginClass, String apiName) {
         Plugin instance = getServer().getPluginManager().getPlugin(pluginName);
         if (instance == null) {
@@ -73,6 +89,7 @@ public class PluginUtil {
         return pluginClass.cast(instance);
     }
 
+    @Nullable
     public static LuckPerms getLuckPermsInstance() {
         Plugin lpPlugin = getServer().getPluginManager().getPlugin("LuckPerms");
         if (lpPlugin == null) {
@@ -83,6 +100,7 @@ public class PluginUtil {
         return LuckPermsProvider.get();
     }
 
+    @Nullable
     public static WorldGuard getWorldGuardInstance() {
         Plugin wgPlugin = getServer().getPluginManager().getPlugin("WorldGuard");
         if (wgPlugin == null) {
