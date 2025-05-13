@@ -1,12 +1,11 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'io.papermc.hangar-publish-plugin' version '0.1.3'
 }
-
 allprojects {
     group = 'com.darksoldier1404'
     version = '4.0.2.19'
-
     repositories {
         mavenCentral()
         maven {
@@ -21,6 +20,7 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
+    apply plugin: 'io.papermc.hangar-publish-plugin'
 
     compileJava.options.encoding = 'UTF-8'
     tasks.withType(JavaCompile) {
@@ -98,7 +98,39 @@ subprojects {
         }
     }
 
-//    tasks.named('publish') {
-//        dependsOn 'renameJar'
-//    }
+    hangarPublish {
+        publications {
+            register("publishPluginPublicationToHangar") {
+                version = project.version.toString()
+                channel = "Snapshot" // We're using the 'Snapshot' channel
+                id = "DPP-Core" // TODO: Edit the project name to match your Hangar project
+                apiKey = System.getenv("HANGAR_API_TOKEN")
+
+                platforms {
+                    paper {
+                        // jar files in the jars directory
+                        jar.set(file("$rootDir/jars/DPP-Core-${project.name}-${version}-SNAPSHOT.jar"))
+
+                        // Set platform versions from gradle.properties
+                        def versions = project.property("paperVersion")
+                                .toString()
+                                .split(",")
+                                .collect { it.trim() }
+                        platformVersions = versions
+
+                        dependencies {
+                            // Example for a dependency found on Hangar
+//                            hangar("Maintenance") {
+//                                required = false
+//                            }
+//                            // Example for an external dependency
+//                            url("Debuggery", "https://github.com/PaperMC/Debuggery") {
+//                                required = true
+//                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
