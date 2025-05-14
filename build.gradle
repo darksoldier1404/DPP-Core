@@ -5,7 +5,7 @@ plugins {
 }
 allprojects {
     group = 'com.darksoldier1404'
-    version = '4.0.2.19'
+    version = '4.0.2.20'
     repositories {
         mavenCentral()
         maven {
@@ -97,36 +97,34 @@ subprojects {
             }
         }
     }
+}
 
-    hangarPublish {
-        publications {
-            register("publishPluginPublicationToHangar") {
-                version = project.version.toString()
-                channel = "Snapshot" // We're using the 'Snapshot' channel
-                id = "DPP-Core" // TODO: Edit the project name to match your Hangar project
-                apiKey = System.getenv("HANGAR_API_TOKEN")
+hangarPublish {
+    publications {
+        register("publishPluginPublicationToHangar") {
+            version = project.version.toString()
+            channel = "Snapshot" // We're using the 'Snapshot' channel
+            id = "DPP-Core" // TODO: Edit the project name to match your Hangar project
+            apiKey = System.getenv("HANGAR_API_TOKEN")
 
-                platforms {
-                    paper {
-                        // jar files in the jars directory
-                        jar.set(file("$rootDir/jars/DPP-Core-${project.name}-${version}-SNAPSHOT.jar"))
+            platforms {
+                paper {
+                    url = "https://github.com/darksoldier1404/DPP-Core/releases"
 
-                        // Set platform versions from gradle.properties
-                        def versions = project.property("paperVersion")
-                                .toString()
-                                .split(",")
-                                .collect { it.trim() }
-                        platformVersions = versions
+                    platformVersions = List.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5")
 
-                        dependencies {
-                            // Example for a dependency found on Hangar
-//                            hangar("Maintenance") {
-//                                required = false
-//                            }
-//                            // Example for an external dependency
-//                            url("Debuggery", "https://github.com/PaperMC/Debuggery") {
-//                                required = true
-//                            }
+                    dependencies {
+                        hangar("Essentials") {
+                            required = false
+                        }
+                        hangar("PlaceholderAPI") {
+                            required = false
+                        }
+                        url("WorldGuard", "https://dev.bukkit.org/projects/worldguard/files") {
+                            required.set(false)
+                        }
+                        url("LuckPerms", "https://luckperms.net/download") {
+                            required.set(false)
                         }
                     }
                 }
