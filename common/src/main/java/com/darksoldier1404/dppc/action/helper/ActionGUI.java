@@ -40,6 +40,7 @@ public class ActionGUI {
 
     public void openActionBuilderGUI(Player p) {
         DInventory inv = new DInventory(null, "Action Builder", 54, plugin);
+        inv.setChannel(0);
         if (!actionBuilder.getActions().isEmpty()) {
             actionBuilder.getActions().forEach(action -> {
                 int index = actionBuilder.getActions().indexOf(action);
@@ -73,6 +74,7 @@ public class ActionGUI {
 
     public void openActionSelectGUI(Player p) {
         DInventory inv = new DInventory(null, "Action Selector", 27, plugin);
+        inv.setChannel(0);
         for (ActionType name : ActionType.values()) {
             ItemStack actionItem = new ItemStack(Material.REDSTONE);
             ItemMeta actionMeta = actionItem.getItemMeta();

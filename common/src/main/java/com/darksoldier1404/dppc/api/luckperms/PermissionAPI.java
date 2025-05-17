@@ -21,17 +21,17 @@ public class PermissionAPI {
     }
 
     @Nullable
-    public User getUserFromUUID(UUID uuid) {
+    public static User getUserFromUUID(UUID uuid) {
         return lp.getUserManager().getUser(uuid);
     }
 
-    public void addPermission(UUID uuid, String permission, CommandSender sender) {
+    public static void addPermission(UUID uuid, String permission, CommandSender sender) {
         if(!addPermission(uuid, permission)) {
             sender.sendMessage(prefix + "User not found.");
         }
     }
 
-    public void addPermission(String name, String permission, CommandSender sender) {
+    public static void addPermission(String name, String permission, CommandSender sender) {
         Player p = Bukkit.getPlayer(name);
         if(p == null) {
             sender.sendMessage(prefix + "User not found or offline.");
@@ -41,26 +41,23 @@ public class PermissionAPI {
         addPermission(uuid, permission);
     }
 
-    public boolean addPermission(UUID uuid, String permission) {
-        // Add the permission
+    public static boolean addPermission(UUID uuid, String permission) {
         User user = getUserFromUUID(uuid);
         if(user == null) {
             return false;
         }
         user.data().add(Node.builder(permission).build());
 
-        // Now we need to save changes.
         lp.getUserManager().saveUser(user);
         return true;
     }
-    //
 
-    public void delPermission(UUID uuid, String permission, CommandSender sender) {
+    public static void delPermission(UUID uuid, String permission, CommandSender sender) {
         if(!delPermission(uuid, permission)) {
             sender.sendMessage(prefix + "존재하지 않는 유저입니다.");
         }
     }
-    public void delPermission(String name, String permission, CommandSender sender) {
+    public static void delPermission(String name, String permission, CommandSender sender) {
         Player p = Bukkit.getPlayer(name);
         if(p == null) {
             sender.sendMessage(prefix + "존재하지 않는 유저이거나 오프라인 유저입니다.");
@@ -70,15 +67,13 @@ public class PermissionAPI {
         delPermission(uuid, permission);
     }
 
-    public boolean delPermission(UUID uuid, String permission) {
-        // Add the permission
+    public static boolean delPermission(UUID uuid, String permission) {
         User user = getUserFromUUID(uuid);
         if(user == null) {
             return false;
         }
         user.data().remove(Node.builder(permission).build());
 
-        // Now we need to save changes.
         lp.getUserManager().saveUser(user);
         return true;
     }

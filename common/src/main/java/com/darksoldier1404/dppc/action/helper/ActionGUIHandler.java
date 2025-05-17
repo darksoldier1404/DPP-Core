@@ -31,6 +31,7 @@ public class ActionGUIHandler implements Listener {
         }
         Player p = (Player) e.getWhoClicked();
         DInventory inv = (DInventory) e.getInventory();
+        if(inv.isValidChannel(0)) return;
         ActionGUI ag = (ActionGUI) inv.getObj();
         if (inv.isValidHandler(ag.getPlugin())) {
             if (e.getCurrentItem() == null) {

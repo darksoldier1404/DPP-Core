@@ -23,9 +23,10 @@ public class DInventory extends CraftInventoryCustom {
     private boolean usePageTools;
     private int pages = 0;
     private int currentPage = 0;
-    private ItemStack[] pageTools = new ItemStack[8];
+    private ItemStack[] pageTools = new ItemStack[9];
     private Map<Integer, ItemStack[]> pageItems = new HashMap<>();
     private Object obj;
+    private int channel;
 
     public DInventory(InventoryHolder holder, String title, int size, JavaPlugin plugin) {
         super(holder, size, title);
@@ -195,6 +196,18 @@ public class DInventory extends CraftInventoryCustom {
 
     public void openInventory(Player p) {
         p.openInventory(this);
+    }
+
+    public int getChannel() {
+        return channel;
+    }
+
+    public void setChannel(int channel) {
+        this.channel = channel;
+    }
+    
+    public boolean isValidChannel(int channel) {
+        return this.channel == channel;
     }
 
     @Override
