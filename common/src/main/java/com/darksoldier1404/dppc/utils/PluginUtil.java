@@ -5,7 +5,6 @@ import com.darksoldier1404.dppc.action.ActionBuilder;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.earth2me.essentials.Essentials;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.worldguard.WorldGuard;
@@ -27,6 +26,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -55,9 +55,9 @@ public class PluginUtil {
     }
 
     public static void loadALLAction() {
-        for(YamlConfiguration raw : ConfigUtils.loadCustomDataList(plugin, "actions")) {
+        for (YamlConfiguration raw : ConfigUtils.loadCustomDataList(plugin, "actions")) {
             String actionName = raw.getString("ACTION_NAME");
-            if(actionName == null) {
+            if (actionName == null) {
                 plugin.getLogger().warning("Action name is null. Skipping...");
                 continue;
             }
@@ -71,11 +71,11 @@ public class PluginUtil {
     }
 
     public static void initPlaceholders() {
-        if(getPluginInstance("PlaceholderAPI", PlaceholderAPIPlugin.class, "PlaceholderAPI") != null) {
+        if (getPluginInstance("PlaceholderAPI", PlaceholderAPIPlugin.class, "PlaceholderAPI") != null) {
             for (PlaceholderBuilder.InternalExpansion pb : plugin.placeholders) {
                 pb.register();
             }
-        }else{
+        } else {
             plugin.getLogger().warning("PlaceholderAPI plugin is not installed.");
             plugin.getLogger().warning("PlaceholderAPI is disabled.");
         }
@@ -133,53 +133,66 @@ public class PluginUtil {
             URL url = new URL(API_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("accept", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
 
             int responseCode = connection.getResponseCode();
-            if (responseCode != 200) {
-                System.out.println("Warn : Unable to get version data. HTTP Response Code: " + responseCode);
-                System.out.println("Name : " + pluginName);
-                return null;
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                System.err.println("Warning: Unable to get version data for " + pluginName + ". HTTP Response Code: " + responseCode);
+                return "0.0.0.0";
             }
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-            StringBuilder response = new StringBuilder();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            JsonArray array = JsonParser.parseString(response.toString()).getAsJsonArray();
-            for (JsonElement element : array) {
-                JsonObject obj = element.getAsJsonObject();
-                String repo = obj.get("repo").getAsString();
-                if (repo.equalsIgnoreCase("darksoldier1404/" + pluginName)) {
-                    return obj.get("tag").getAsString();
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder response = new StringBuilder();
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
                 }
+
+                JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
+                JsonObject releases = jsonObject.getAsJsonObject("releases");
+                if (releases == null || !releases.has(pluginName)) {
+                    System.err.println("Warning: Plugin " + pluginName + " not found in API response.");
+                    return "0.0.0.0";
+                }
+
+                JsonArray pluginReleases = releases.getAsJsonArray(pluginName);
+                if (pluginReleases.isEmpty()) {
+                    System.err.println("Warning: No releases found for plugin " + pluginName);
+                    return "0.0.0.0";
+                }
+
+                JsonObject latestRelease = pluginReleases.get(0).getAsJsonObject();
+                String tag = latestRelease.get("tag").getAsString();
+                return Objects.requireNonNullElse(tag, "0.0.0.0");
             }
-            return "0.0.0.0";
         } catch (Exception e) {
+            System.err.println("Error fetching version for " + pluginName + ": " + e.getMessage());
             e.printStackTrace();
             return "0.0.0.0";
         }
     }
 
     private static boolean isNewVersion(String currentVersion, String latestVersion) {
-        String[] currentParts = currentVersion.split("\\.");
-        String[] latestParts = latestVersion.split("\\.");
+        try{
+            String[] currentParts = currentVersion.split("\\.");
+            String[] latestParts = latestVersion.split("\\.");
 
-        for (int i = 0; i < Math.min(currentParts.length, latestParts.length); i++) {
-            int currentPart = Integer.parseInt(currentParts[i]);
-            int latestPart = Integer.parseInt(latestParts[i]);
+            for (int i = 0; i < Math.min(currentParts.length, latestParts.length); i++) {
+                int currentPart = Integer.parseInt(currentParts[i]);
+                int latestPart = Integer.parseInt(latestParts[i]);
 
-            if (latestPart > currentPart) {
-                return true;
-            } else if (latestPart < currentPart) {
-                return false;
+                if (latestPart > currentPart) {
+                    return true;
+                } else if (latestPart < currentPart) {
+                    return false;
+                }
             }
+        }catch (NumberFormatException e) {
+            System.err.println("Error comparing versions: " + e.getMessage());
+            return false;
         }
-
         return false;
     }
 
