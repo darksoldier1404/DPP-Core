@@ -1,4 +1,4 @@
-package com.darksoldier1404.dppc.action.obj;
+package com.darksoldier1404.dppc.builder.action.obj;
 
 public enum ActionType {
     DELAY_ACTION,

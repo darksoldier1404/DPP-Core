@@ -1,7 +1,7 @@
 package com.darksoldier1404.dppc;
 
-import com.darksoldier1404.dppc.action.ActionBuilder;
-import com.darksoldier1404.dppc.action.helper.ActionGUIHandler;
+import com.darksoldier1404.dppc.builder.action.ActionBuilder;
+import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.commands.DPPCACommand;
 import com.darksoldier1404.dppc.commands.DPPCCommand;

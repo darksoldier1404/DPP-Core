@@ -1,7 +1,7 @@
 package com.darksoldier1404.dppc.utils;
 
 import com.darksoldier1404.dppc.DPPCore;
-import com.darksoldier1404.dppc.action.ActionBuilder;
+import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.earth2me.essentials.Essentials;
 import com.google.gson.JsonArray;

@@ -1,7 +1,7 @@
-package com.darksoldier1404.dppc.action.actions;
+package com.darksoldier1404.dppc.builder.action.actions;
 
-import com.darksoldier1404.dppc.action.obj.Action;
-import com.darksoldier1404.dppc.action.obj.ActionType;
+import com.darksoldier1404.dppc.builder.action.obj.Action;
+import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
