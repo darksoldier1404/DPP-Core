@@ -1,10 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
+import java.io.InputStream;
+
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ObjectCreator;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
-
-import java.io.InputStream;
 
 /**
  * A Standalone {@link NBTCompound} implementation. All data is just kept inside

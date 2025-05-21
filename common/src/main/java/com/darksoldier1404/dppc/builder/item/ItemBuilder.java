@@ -1,40 +1,24 @@
 package com.darksoldier1404.dppc.builder.item;
 
-import com.sk89q.worldedit.antlr4.runtime.misc.MultiMap;
-import org.bukkit.Tag;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
-import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemBuilder {
-    private ItemStack item;
-    private ItemMeta im;
+    private final ItemStack item;
+    private final ItemMeta im;
 
     public ItemBuilder(ItemStack item) {
         this.item = item;
         this.im = item.getItemMeta();
-    }
-
-    public ItemStack getItem() {
-        return item;
-    }
-
-    public void setItem(ItemStack item) {
-        this.item = item;
     }
 
     public ItemBuilder addLore(String line) {

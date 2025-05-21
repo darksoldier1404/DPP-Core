@@ -1,14 +1,16 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils;
 
-import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import com.mojang.authlib.GameProfile;
+
 import com.darksoldier1404.dppc.utils.nbtapi.NBTType;
+import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBTCompoundList;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBTList;
-
-import javax.annotation.Nullable;
-import java.util.UUID;
 
 public class GameprofileUtil {
 

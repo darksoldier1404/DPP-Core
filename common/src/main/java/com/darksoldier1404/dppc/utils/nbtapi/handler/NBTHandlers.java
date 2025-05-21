@@ -1,10 +1,11 @@
 package com.darksoldier1404.dppc.utils.nbtapi.handler;
 
+import org.bukkit.inventory.ItemStack;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NBTInternal;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTHandler;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBT;
-import com.darksoldier1404.dppc.utils.nbtapi.NBTAPI;
-import org.bukkit.inventory.ItemStack;
 
 public class NBTHandlers {
 
@@ -19,14 +20,14 @@ public class NBTHandlers {
         public void set(ReadWriteNBT nbt, String key, ItemStack value) {
             nbt.removeKey(key);
             ReadWriteNBT tag = nbt.getOrCreateCompound(key);
-            tag.mergeCompound(NBTAPI.itemStackToNBT(value));
+            tag.mergeCompound(NBTInternal.itemStackToNBT(value));
         }
 
         @Override
         public ItemStack get(ReadableNBT nbt, String key) {
             ReadableNBT tag = nbt.getCompound(key);
             if (tag != null) {
-                return NBTAPI.itemStackFromNBT(tag);
+                return NBTInternal.itemStackFromNBT(tag);
             }
             return null;
         }
@@ -50,7 +51,7 @@ public class NBTHandlers {
         public ReadableNBT get(ReadableNBT nbt, String key) {
             ReadableNBT tag = nbt.getCompound(key);
             if (tag != null) {
-                ReadWriteNBT value = NBTAPI.createNBTObject();
+                ReadWriteNBT value = NBTInternal.createNBTObject();
                 value.mergeCompound(tag);
                 return value;
             }
@@ -76,7 +77,7 @@ public class NBTHandlers {
         public ReadWriteNBT get(ReadableNBT nbt, String key) {
             ReadableNBT tag = nbt.getCompound(key);
             if (tag != null) {
-                ReadWriteNBT value = NBTAPI.createNBTObject();
+                ReadWriteNBT value = NBTInternal.createNBTObject();
                 value.mergeCompound(tag);
                 return value;
             }

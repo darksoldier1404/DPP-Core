@@ -1,10 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi.iface;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NBTType;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NBTType;
 
 public interface ReadableNBTList<T> extends Iterable<T> {
 

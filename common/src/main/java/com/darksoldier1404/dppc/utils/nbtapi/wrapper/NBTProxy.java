@@ -1,10 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi.wrapper;
 
-import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTHandler;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTHandler;
 
 public interface NBTProxy {
 

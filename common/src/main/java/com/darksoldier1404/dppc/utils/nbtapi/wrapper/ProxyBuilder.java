@@ -1,11 +1,5 @@
 package com.darksoldier1404.dppc.utils.nbtapi.wrapper;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NBTType;
-import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
-import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTHandler;
-import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
-import com.darksoldier1404.dppc.utils.nbtapi.wrapper.NBTTarget.Type;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -14,6 +8,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NBTType;
+import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
+import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTHandler;
+import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
+import com.darksoldier1404.dppc.utils.nbtapi.wrapper.NBTTarget.Type;
 
 public class ProxyBuilder<T extends NBTProxy> implements InvocationHandler {
 

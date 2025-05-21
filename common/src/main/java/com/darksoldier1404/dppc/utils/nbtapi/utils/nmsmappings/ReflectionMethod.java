@@ -1,14 +1,14 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
-import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
-import org.bukkit.inventory.ItemStack;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.UUID;
+import org.bukkit.inventory.ItemStack;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 
 /**
  * This class caches method reflections, keeps track of method name changes

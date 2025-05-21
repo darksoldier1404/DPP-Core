@@ -22,9 +22,11 @@ public class DataContainer {
         this.plugin = plugin;
         this.config = ConfigUtils.loadDefaultPluginConfig(plugin);
         this.prefix = ColorUtils.applyColor(config.getString("Settings.prefix"));
-        this.lang = new DLang(config.getString("Settings.Lang") == null ? "Korean" : config.getString("Settings.Lang"), plugin);
-        if (config.getString("Settings.Lang") == null) {
-            config.set("Settings.Lang", "Korean");
+        this.lang = new DLang(config.getString("Settings.Lang") == null ? "English" : config.getString("Settings.Lang"), plugin);
+        if (this.useDLang) {
+            if (config.getString("Settings.Lang") == null) {
+                config.set("Settings.Lang", "English");
+            }
         }
     }
 
@@ -34,9 +36,9 @@ public class DataContainer {
         this.prefix = ColorUtils.applyColor(config.getString("Settings.prefix"));
         this.useDLang = useDLang;
         if (this.useDLang) {
-            this.lang = new DLang(config.getString("Settings.Lang") == null ? "Korean" : config.getString("Settings.Lang"), plugin);
+            this.lang = new DLang(config.getString("Settings.Lang") == null ? "English" : config.getString("Settings.Lang"), plugin);
             if (config.getString("Settings.Lang") == null) {
-                config.set("Settings.Lang", "Korean");
+                config.set("Settings.Lang", "English");
             }
         }
     }
@@ -141,9 +143,9 @@ public class DataContainer {
         config = ConfigUtils.reloadPluginConfig(plugin, config);
         prefix = ColorUtils.applyColor(config.getString("Settings.prefix"));
         if (useDLang) {
-            lang = new DLang(config.getString("Settings.Lang") == null ? "Korean" : config.getString("Settings.Lang"), plugin);
+            lang = new DLang(config.getString("Settings.Lang") == null ? "English" : config.getString("Settings.Lang"), plugin);
             if (config.getString("Settings.Lang") == null) {
-                config.set("Settings.Lang", "Korean");
+                config.set("Settings.Lang", "English");
             }
         }
     }

@@ -1,12 +1,13 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NBTReflectionUtil;
 import com.mojang.datafixers.DSL.TypeReference;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
+
 import com.darksoldier1404.dppc.utils.nbtapi.NBTCompound;
 import com.darksoldier1404.dppc.utils.nbtapi.NBTContainer;
+import com.darksoldier1404.dppc.utils.nbtapi.NBTReflectionUtil;
 import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;

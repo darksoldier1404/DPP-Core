@@ -5,6 +5,7 @@ import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.commands.DPPCACommand;
 import com.darksoldier1404.dppc.commands.DPPCCommand;
+import com.darksoldier1404.dppc.commands.DPPCPCommand;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import com.earth2me.essentials.Essentials;
@@ -84,6 +85,7 @@ public class DPPCore extends JavaPlugin {
         }, 100L);
         getCommand("dppc").setExecutor(new DPPCCommand());
         getCommand("dppca").setExecutor(new DPPCACommand());
+        getCommand("dppcp").setExecutor(new DPPCPCommand());
         getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
 
     }

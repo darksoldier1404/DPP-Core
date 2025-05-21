@@ -1,11 +1,11 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTFileHandle;
-import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ObjectCreator;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+
+import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTFileHandle;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ObjectCreator;
 
 /**
  * {@link NBTCompound} implementation backed by a {@link File}

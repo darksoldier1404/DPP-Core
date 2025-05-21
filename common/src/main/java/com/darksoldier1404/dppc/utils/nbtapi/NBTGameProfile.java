@@ -1,10 +1,11 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
+import com.mojang.authlib.GameProfile;
+
 import com.darksoldier1404.dppc.utils.nbtapi.utils.GameprofileUtil;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ObjectCreator;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
-import com.mojang.authlib.GameProfile;
 
 public class NBTGameProfile {
 
@@ -17,7 +18,7 @@ public class NBTGameProfile {
     @Deprecated
     public static NBTCompound toNBT(GameProfile profile) {
         if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R4)) {
-            return (NBTCompound) GameprofileUtil.writeGameProfile(NBTAPI.createNBTObject(), profile);
+            return (NBTCompound) GameprofileUtil.writeGameProfile(NBTInternal.createNBTObject(), profile);
         }
         return new NBTContainer(ReflectionMethod.GAMEPROFILE_SERIALIZE.run(null,
                 ObjectCreator.NMS_NBTTAGCOMPOUND.getInstance(), profile));

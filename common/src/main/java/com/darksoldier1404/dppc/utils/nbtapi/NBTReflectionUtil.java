@@ -1,5 +1,23 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import com.darksoldier1404.dppc.utils.nbtapi.utils.DataFixerUtil;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.GsonWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
@@ -7,18 +25,6 @@ import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.MojangToMapping;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ObjectCreator;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
-import org.bukkit.Bukkit;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.*;
 
 /**
  * Utility class for translating NBTApi calls to reflections into NMS code All

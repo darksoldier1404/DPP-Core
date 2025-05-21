@@ -1,7 +1,8 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
 import com.google.gson.Gson;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
 
 /**
  * Helper class for 1.7 servers without Gson

@@ -1,8 +1,9 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
+import org.bukkit.Chunk;
+
 import com.darksoldier1404.dppc.utils.nbtapi.utils.CheckUtil;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
-import org.bukkit.Chunk;
 
 public class NBTChunk {
 

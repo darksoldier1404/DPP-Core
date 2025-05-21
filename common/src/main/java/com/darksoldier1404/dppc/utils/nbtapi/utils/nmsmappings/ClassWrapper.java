@@ -1,11 +1,12 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings;
 
-import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
-import org.bukkit.Bukkit;
+import static com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion.getLogger;
 
 import java.util.logging.Level;
 
-import static com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion.getLogger;
+import org.bukkit.Bukkit;
+
+import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 
 /**
  * Wraps NMS and CRAFT classes

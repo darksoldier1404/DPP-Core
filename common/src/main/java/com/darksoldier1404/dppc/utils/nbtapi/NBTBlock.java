@@ -1,7 +1,8 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import org.bukkit.block.Block;
+
+import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 
 /**
  * Helper class to store NBT data to Block Locations. Use getData() to get the
