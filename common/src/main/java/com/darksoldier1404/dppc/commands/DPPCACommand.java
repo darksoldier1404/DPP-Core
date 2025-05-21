@@ -1,9 +1,9 @@
 package com.darksoldier1404.dppc.commands;
 
 import com.darksoldier1404.dppc.DPPCore;
-import com.darksoldier1404.dppc.action.ActionBuilder;
-import com.darksoldier1404.dppc.action.helper.ActionGUI;
-import com.darksoldier1404.dppc.action.obj.Action;
+import com.darksoldier1404.dppc.builder.action.ActionBuilder;
+import com.darksoldier1404.dppc.builder.action.helper.ActionGUI;
+import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
