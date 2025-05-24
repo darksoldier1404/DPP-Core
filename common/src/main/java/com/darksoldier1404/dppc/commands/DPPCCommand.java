@@ -23,6 +23,7 @@ public class DPPCCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length == 0) {
             sender.sendMessage("/dppca - DPP ActionBuilder Command Help");
+            sender.sendMessage("/dppcp - installed DP-Plugins list GUI");
             sender.sendMessage("/dppc updatecheck (PluginName) - Check for updates");
             return false;
         }

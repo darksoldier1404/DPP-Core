@@ -1,10 +1,10 @@
-package com.darksoldier1404.dppc.action;
+package com.darksoldier1404.dppc.builder.action;
 
-import com.darksoldier1404.dppc.action.actions.DelayAction;
-import com.darksoldier1404.dppc.action.actions.ExecuteCommandAction;
-import com.darksoldier1404.dppc.action.actions.PlaySoundAction;
-import com.darksoldier1404.dppc.action.actions.TeleportAction;
-import com.darksoldier1404.dppc.action.obj.Action;
+import com.darksoldier1404.dppc.builder.action.actions.DelayAction;
+import com.darksoldier1404.dppc.builder.action.actions.ExecuteCommandAction;
+import com.darksoldier1404.dppc.builder.action.actions.PlaySoundAction;
+import com.darksoldier1404.dppc.builder.action.actions.TeleportAction;
+import com.darksoldier1404.dppc.builder.action.obj.Action;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

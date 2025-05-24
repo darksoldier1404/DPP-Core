@@ -1,9 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import com.darksoldier1404.dppc.utils.nbtapi.utils.CheckUtil;
-import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+
+import com.darksoldier1404.dppc.utils.nbtapi.utils.CheckUtil;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 
 /**
  * NBT class to access vanilla tags from Entities. Entities don't support custom

@@ -1,11 +1,17 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.function.Predicate;
+
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBTList;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
-
-import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Abstract List implementation for ListCompounds

@@ -1,16 +1,18 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils;
 
+import java.util.Optional;
+
+import org.bukkit.inventory.ItemStack;
+
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+
 import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.MojangToMapping;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Optional;
 
 public class NBTJsonUtil {
 

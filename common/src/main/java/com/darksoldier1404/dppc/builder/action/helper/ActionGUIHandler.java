@@ -1,7 +1,7 @@
-package com.darksoldier1404.dppc.action.helper;
+package com.darksoldier1404.dppc.builder.action.helper;
 
 import com.darksoldier1404.dppc.DPPCore;
-import com.darksoldier1404.dppc.action.obj.ActionType;
+import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.NBT;
@@ -32,6 +32,7 @@ public class ActionGUIHandler implements Listener {
         Player p = (Player) e.getWhoClicked();
         DInventory inv = (DInventory) e.getInventory();
         if(inv.isValidChannel(0)) return;
+        if(!(inv.getObj() instanceof ActionGUI)) return;
         ActionGUI ag = (ActionGUI) inv.getObj();
         if (inv.isValidHandler(ag.getPlugin())) {
             if (e.getCurrentItem() == null) {

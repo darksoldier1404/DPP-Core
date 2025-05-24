@@ -1,9 +1,6 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils;
 
-import com.darksoldier1404.dppc.utils.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -162,21 +159,6 @@ public enum MinecraftVersion {
     }
 
     private static void init() {
-        try {
-            if (hasGsonSupport() && !bStatsDisabled) {
-                Plugin plugin = Bukkit.getPluginManager().getPlugin(VersionChecker.getPlugin());
-                if (plugin != null && plugin instanceof JavaPlugin) {
-                    getLogger()
-                            .info("[NBTAPI] Using the plugin '" + plugin.getName() + "' to create a bStats instance!");
-                    new Metrics((JavaPlugin) plugin, 1058);
-                } else if (plugin == null) {
-                    getLogger().info("[NBTAPI] Unable to create a bStats instance!!");
-                }
-            }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "[NBTAPI] Error enabling Metrics!", ex);
-        }
-
         if (hasGsonSupport() && !updateCheckDisabled)
             new Thread(() -> {
                 try {
@@ -185,8 +167,6 @@ public enum MinecraftVersion {
                     logger.log(Level.WARNING, "[NBTAPI] Error while checking for updates! Error: " + ex.getMessage());
                 }
             }).start();
-        // Maven's Relocate is clever and changes strings, too. So we have to use this
-        // little "trick" ... :D (from bStats)
         final String defaultPackage = new String(new byte[] { 'd', 'e', '.', 't', 'r', '7', 'z', 'w', '.', 'c', 'h',
                 'a', 'n', 'g', 'e', 'm', 'e', '.', 'n', 'b', 't', 'a', 'p', 'i', '.', 'u', 't', 'i', 'l', 's' });
         final String reservedPackage = new String(new byte[] { 'd', 'e', '.', 't', 'r', '7', 'z', 'w', '.', 'n', 'b',

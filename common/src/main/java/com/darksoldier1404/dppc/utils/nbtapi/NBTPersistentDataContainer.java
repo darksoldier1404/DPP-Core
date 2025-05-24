@@ -1,9 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
+import java.util.Map;
+
 import org.bukkit.persistence.PersistentDataContainer;
 
-import java.util.Map;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
 
 public class NBTPersistentDataContainer extends NBTCompound {
 

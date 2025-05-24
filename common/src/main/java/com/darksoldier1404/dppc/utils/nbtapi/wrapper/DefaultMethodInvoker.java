@@ -1,13 +1,13 @@
 package com.darksoldier1404.dppc.utils.nbtapi.wrapper;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
-
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
 
 class DefaultMethodInvoker {
 

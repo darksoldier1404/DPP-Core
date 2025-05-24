@@ -22,4 +22,12 @@ dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
     compileOnly 'com.bukkit:craftbukkit:1.21.5'
     compileOnly 'com.bukkit:spigot:1.21.5'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2'
+    testImplementation 'com.bukkit:craftbukkit:1.21.5'
+    testImplementation 'com.bukkit:spigot:1.21.5'
 }

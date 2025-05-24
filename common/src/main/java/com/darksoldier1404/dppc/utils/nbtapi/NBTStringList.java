@@ -1,10 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
-import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
 
 /**
  * String implementation for NBTLists

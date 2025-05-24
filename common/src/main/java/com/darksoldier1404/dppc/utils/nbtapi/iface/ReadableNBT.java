@@ -1,12 +1,14 @@
 package com.darksoldier1404.dppc.utils.nbtapi.iface;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NBTType;
-import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
+
+import org.bukkit.inventory.ItemStack;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NBTType;
 
 /**
  * This interface only exposes methods that get data without any changes to the

@@ -1,11 +1,11 @@
 package com.darksoldier1404.dppc.utils.nbtapi.wrapper;
 
-import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
-import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBTCompoundList;
-
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
+import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBTCompoundList;
 
 class ProxiedList<E extends NBTProxy> implements ProxyList<E> {
 

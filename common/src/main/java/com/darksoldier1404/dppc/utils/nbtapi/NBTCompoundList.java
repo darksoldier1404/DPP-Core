@@ -1,8 +1,8 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
-import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBTCompoundList;
+import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;

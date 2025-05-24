@@ -1,5 +1,5 @@
 name: DPP-Core
-version: 4.0.2.21
+version: 4.0.3.23
 main: com.darksoldier1404.dppc.DPPCore
 authors: [ DEAD_POOLIO_ ]
 api-version: 1.20
@@ -7,7 +7,9 @@ loadbefore:
   - Essentials
   - PlaceholderAPI
   - ProtocolLib
+  - LuckPerms
 
 commands:
   dppc:
   dppca:
+  dppcp:

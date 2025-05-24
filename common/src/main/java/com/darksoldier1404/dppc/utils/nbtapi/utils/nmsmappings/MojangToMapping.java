@@ -1,10 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
-import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 
 /**
  * Temporary solution to hold Mojang to unmapped Spigot mappings.

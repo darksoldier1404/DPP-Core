@@ -1,9 +1,10 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import com.darksoldier1404.dppc.utils.nbtapi.utils.CheckUtil;
-import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockState;
+
+import com.darksoldier1404.dppc.utils.nbtapi.utils.CheckUtil;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 
 /**
  * NBT class to access vanilla tags from TileEntities. TileEntities don't

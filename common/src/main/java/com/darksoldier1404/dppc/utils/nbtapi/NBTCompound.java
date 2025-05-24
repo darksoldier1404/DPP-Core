@@ -1,21 +1,27 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.bukkit.inventory.ItemStack;
+
 import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTHandler;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.CheckUtil;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.PathUtil;
+import com.darksoldier1404.dppc.utils.nbtapi.utils.PathUtil.PathSegment;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.Forge1710Mappings;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
-import org.bukkit.inventory.ItemStack;
-
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Base class representing NMS Compounds. For a standalone implementation check
@@ -1054,10 +1060,10 @@ public class NBTCompound implements ReadWriteNBT {
 
     @Override
     public <T> T resolveOrNull(String key, Class<?> type) {
-        List<PathUtil.PathSegment> keys = PathUtil.splitPath(key);
+        List<PathSegment> keys = PathUtil.splitPath(key);
         NBTCompound tag = this;
         for (int i = 0; i < keys.size() - 1; i++) {
-            PathUtil.PathSegment segment = keys.get(i);
+            PathSegment segment = keys.get(i);
             if (!segment.hasIndex()) {
                 tag = tag.getCompound(segment.getPath());
                 if (tag == null) {
@@ -1075,7 +1081,7 @@ public class NBTCompound implements ReadWriteNBT {
                 }
             }
         }
-        PathUtil.PathSegment segment = keys.get(keys.size() - 1);
+        PathSegment segment = keys.get(keys.size() - 1);
         if (!segment.hasIndex()) {
             return tag.getOrNull(segment.getPath(), type);
         } else {
@@ -1085,10 +1091,10 @@ public class NBTCompound implements ReadWriteNBT {
 
     @Override
     public <T> T resolveOrDefault(String key, T defaultValue) {
-        List<PathUtil.PathSegment> keys = PathUtil.splitPath(key);
+        List<PathSegment> keys = PathUtil.splitPath(key);
         NBTCompound tag = this;
         for (int i = 0; i < keys.size() - 1; i++) {
-            PathUtil.PathSegment segment = keys.get(i);
+            PathSegment segment = keys.get(i);
             if (!segment.hasIndex()) {
                 tag = tag.getCompound(segment.getPath());
                 if (tag == null) {
@@ -1106,7 +1112,7 @@ public class NBTCompound implements ReadWriteNBT {
                 }
             }
         }
-        PathUtil.PathSegment segment = keys.get(keys.size() - 1);
+        PathSegment segment = keys.get(keys.size() - 1);
         if (!segment.hasIndex()) {
             return tag.getOrDefault(segment.getPath(), defaultValue);
         } else {
@@ -1116,7 +1122,7 @@ public class NBTCompound implements ReadWriteNBT {
 
     // FIXME: before I'm even done writing this method, this sucks. Needs refactoring at some point
     @SuppressWarnings("unchecked")
-    private <T> T getIndexedValue(NBTCompound comp, PathUtil.PathSegment segment, Class<T> type) {
+    private <T> T getIndexedValue(NBTCompound comp, PathSegment segment, Class<T> type) {
         if (type == String.class) {
             if (comp.getType(segment.getPath()) == NBTType.NBTTagList
                     && comp.getListType(segment.getPath()) == NBTType.NBTTagString) {
@@ -1234,10 +1240,10 @@ public class NBTCompound implements ReadWriteNBT {
 
     @Override
     public ReadWriteNBT resolveCompound(String key) {
-        List<PathUtil.PathSegment> keys = PathUtil.splitPath(key);
+        List<PathSegment> keys = PathUtil.splitPath(key);
         NBTCompound tag = this;
         for (int i = 0; i < keys.size(); i++) {
-            PathUtil.PathSegment segment = keys.get(i);
+            PathSegment segment = keys.get(i);
             if (!segment.hasIndex()) {
                 tag = tag.getCompound(segment.getPath());
                 if (tag == null) {
@@ -1260,10 +1266,10 @@ public class NBTCompound implements ReadWriteNBT {
 
     @Override
     public ReadWriteNBT resolveOrCreateCompound(String key) {
-        List<PathUtil.PathSegment> keys = PathUtil.splitPath(key);
+        List<PathSegment> keys = PathUtil.splitPath(key);
         NBTCompound tag = this;
         for (int i = 0; i < keys.size(); i++) {
-            PathUtil.PathSegment segment = keys.get(i);
+            PathSegment segment = keys.get(i);
             if (!segment.hasIndex()) {
                 tag = tag.getOrCreateCompound(segment.getPath());
                 if (tag == null) {
