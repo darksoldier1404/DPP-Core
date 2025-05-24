@@ -50,6 +50,10 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         addSubCommand(name, null, usage, false, action);
     }
 
+    public void addSubCommand(String name, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
+        addSubCommand(name, null, usage, isPlayerOnly, action);
+    }
+
     public void addSubCommand(String name, String permission, String usage, BiConsumer<CommandSender, String[]> action) {
         addSubCommand(name, permission, usage, false, action);
     }
