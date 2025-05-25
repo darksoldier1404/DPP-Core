@@ -1,8 +1,8 @@
 package com.darksoldier1404.dppc.utils;
 
 import com.darksoldier1404.dppc.DPPCore;
-import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
+import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.earth2me.essentials.Essentials;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +28,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -129,46 +132,63 @@ public class PluginUtil {
 
     @NotNull
     public static String getLatestVersion(String pluginName) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(API_URL);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("Accept", "application/json");
+                    connection.setConnectTimeout(5000);
+                    connection.setReadTimeout(5000);
+
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode != HttpURLConnection.HTTP_OK) {
+                        plugin.getLogger().warning("Warning: Unable to get version data for " + pluginName + ". HTTP Response Code: " + responseCode);
+                        future.complete("0.0.0.0");
+                        return;
+                    }
+
+                    try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                        StringBuilder response = new StringBuilder();
+                        String inputLine;
+                        while ((inputLine = in.readLine()) != null) {
+                            response.append(inputLine);
+                        }
+
+                        JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
+                        JsonObject releases = jsonObject.getAsJsonObject("releases");
+                        if (releases == null || !releases.has(pluginName)) {
+                            plugin.getLogger().warning("Warning: Plugin " + pluginName + " not found in API response.");
+                            future.complete("0.0.0.0");
+                            return;
+                        }
+
+                        JsonArray pluginReleases = releases.getAsJsonArray(pluginName);
+                        if (pluginReleases.isEmpty()) {
+                            plugin.getLogger().warning("Warning: No releases found for plugin " + pluginName);
+                            future.complete("0.0.0.0");
+                            return;
+                        }
+
+                        JsonObject latestRelease = pluginReleases.get(0).getAsJsonObject();
+                        String tag = latestRelease.get("tag").getAsString();
+                        future.complete(Objects.requireNonNullElse(tag, "0.0.0.0"));
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().warning("Error fetching version for " + pluginName + ": " + e.getMessage());
+                    e.printStackTrace();
+                    future.complete("0.0.0.0");
+                }
+            }
+        }.runTaskAsynchronously(plugin);
         try {
-            URL url = new URL(API_URL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                System.err.println("Warning: Unable to get version data for " + pluginName + ". HTTP Response Code: " + responseCode);
-                return "0.0.0.0";
-            }
-
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-
-                JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
-                JsonObject releases = jsonObject.getAsJsonObject("releases");
-                if (releases == null || !releases.has(pluginName)) {
-                    System.err.println("Warning: Plugin " + pluginName + " not found in API response.");
-                    return "0.0.0.0";
-                }
-
-                JsonArray pluginReleases = releases.getAsJsonArray(pluginName);
-                if (pluginReleases.isEmpty()) {
-                    System.err.println("Warning: No releases found for plugin " + pluginName);
-                    return "0.0.0.0";
-                }
-
-                JsonObject latestRelease = pluginReleases.get(0).getAsJsonObject();
-                String tag = latestRelease.get("tag").getAsString();
-                return Objects.requireNonNullElse(tag, "0.0.0.0");
-            }
+            return future.get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            System.err.println("Error fetching version for " + pluginName + ": " + e.getMessage());
+            plugin.getLogger().warning("Error waiting for version result for " + pluginName + ": " + e.getMessage());
             e.printStackTrace();
             return "0.0.0.0";
         }
@@ -190,18 +210,20 @@ public class PluginUtil {
                 }
             }
         }catch (NumberFormatException e) {
-            System.err.println("Error comparing versions: " + e.getMessage());
+            plugin.getLogger().warning("Error comparing versions: " + e.getMessage());
             return false;
         }
         return false;
     }
 
     public static void updateCheck() {
-        updateCheck(getServer().getConsoleSender());
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            updateCheck(getServer().getConsoleSender());
+        });
     }
 
     public static void updateCheck(CommandSender sender) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             for (JavaPlugin plugin : loadedPlugins.keySet()) {
                 String latestVersion = getLatestVersion(plugin.getName());
                 if (latestVersion != null) {
@@ -218,7 +240,7 @@ public class PluginUtil {
     }
 
     public static void updateCheck(CommandSender sender, String name) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             if (loadedPlugins.keySet().stream().noneMatch(plugin -> plugin.getName().equalsIgnoreCase(name))) {
                 sender.sendMessage("Plugin " + name + " not found.");
                 return;
