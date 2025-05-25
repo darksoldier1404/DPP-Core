@@ -80,6 +80,7 @@ public class DPPCore extends JavaPlugin {
         PluginUtil.loadALLPlugins();
         PluginUtil.initializeSoftDependPlugins();
         PluginUtil.loadALLAction();
+        PluginUtil.initPlaceholders();
         Bukkit.getScheduler().runTaskLater(this, () -> {
             PluginUtil.updateCheck();
         }, 100L);
