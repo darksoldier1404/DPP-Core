@@ -1,8 +1,8 @@
 package com.darksoldier1404.dppc;
 
+import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
-import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.commands.DPPCACommand;
 import com.darksoldier1404.dppc.commands.DPPCCommand;
 import com.darksoldier1404.dppc.commands.DPPCPCommand;
@@ -12,6 +12,7 @@ import com.earth2me.essentials.Essentials;
 import com.sk89q.worldguard.WorldGuard;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -88,7 +89,8 @@ public class DPPCore extends JavaPlugin {
         getCommand("dppca").setExecutor(new DPPCACommand());
         getCommand("dppcp").setExecutor(new DPPCPCommand());
         getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
-
+        Material m = Material.matchMaterial("BARRIER");
+        m.asBlockType();
     }
 
     @Override
