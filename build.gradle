@@ -63,34 +63,34 @@ subprojects {
         useJUnitPlatform()
     }
 
-    modrinth {
-        // Validate required properties
-        if (!project.hasProperty('modrinthApiKey') || !project.hasProperty('modrinthProjectId')) {
-            throw new GradleException('modrinthApiKey and modrinthProjectId must be specified in gradle.properties or as project properties.')
-        }
-
-        token = project.property('modrinthApiKey')
-        projectId = project.property('modrinthProjectId')
-        versionNumber = project.version
-        versionName = project.hasProperty('modrinthVersionTitle') ? project.property('modrinthVersionTitle') : "Release ${project.version}"
-        versionType = 'release'
-        // Defer file resolution to task execution time
-        uploadFile = project.provider {
-            def jarFile = file("${rootDir}/jars/DPP-Core-${project.name}-${project.version}-SNAPSHOT.jar")
-            logger.lifecycle("Checking for JAR: ${jarFile}")
-            if (!jarFile.exists()) {
-                throw new GradleException("Modrinth upload file does not exist: ${jarFile}")
-            }
-            jarFile
-        }
-        gameVersions = [project.name.replace('_', '.')] // e.g., 1_14_4 -> 1.14.4
-        loaders = ['paper']
-        changelog = "Release for ${project.version} on Minecraft ${project.name.replace('_', '.')}"
-        dependencies = []
-
-        // Optional: Use staging API for testing
-        debugMode = project.hasProperty('modrinthDebug') ? project.property('modrinthDebug').toBoolean() : false
-    }
+//    modrinth {
+//        // Validate required properties
+//        if (!project.hasProperty('modrinthApiKey') || !project.hasProperty('modrinthProjectId')) {
+//            throw new GradleException('modrinthApiKey and modrinthProjectId must be specified in gradle.properties or as project properties.')
+//        }
+//
+//        token = project.property('modrinthApiKey')
+//        projectId = project.property('modrinthProjectId')
+//        versionNumber = project.version
+//        versionName = project.hasProperty('modrinthVersionTitle') ? project.property('modrinthVersionTitle') : "Release ${project.version}"
+//        versionType = 'release'
+//        // Defer file resolution to task execution time
+//        uploadFile = project.provider {
+//            def jarFile = file("${rootDir}/jars/DPP-Core-${project.name}-${project.version}-SNAPSHOT.jar")
+//            logger.lifecycle("Checking for JAR: ${jarFile}")
+//            if (!jarFile.exists()) {
+//                throw new GradleException("Modrinth upload file does not exist: ${jarFile}")
+//            }
+//            jarFile
+//        }
+//        gameVersions = [project.name.replace('_', '.')] // e.g., 1_14_4 -> 1.14.4
+//        loaders = ['paper']
+//        changelog = "Release for ${project.version} on Minecraft ${project.name.replace('_', '.')}"
+//        dependencies = []
+//
+//        // Optional: Use staging API for testing
+//        debugMode = project.hasProperty('modrinthDebug') ? project.property('modrinthDebug').toBoolean() : false
+//    }
 
     tasks.modrinth.doFirst {
         def upload = file("${rootDir}/jars/DPP-Core-${project.name}-SNAPSHOT.jar")
@@ -126,9 +126,9 @@ subprojects {
         publications {
             mavenJava(MavenPublication) {
                 groupId = 'com.darksoldier1404.dppc'
-                artifactId = "DPP-Core-${project.name}"
-                artifact file("${rootDir}/jars/DPP-Core-${project.name}-SNAPSHOT.jar")
-                version = "${project.version}-SNAPSHOT"
+                artifactId = "DPP-Core"
+                artifact file("$rootDir/jars/DPP-Core-${project.name}-SNAPSHOT.jar")
+                version = "${project.name}-SNAPSHOT"
             }
         }
         repositories {

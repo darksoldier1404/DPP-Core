@@ -18,9 +18,9 @@ tasks.named('publishMavenJavaPublicationToMavenRepository').configure {
     enabled = false
 }
 
-tasks.named('modrinth').configure {
-    enabled = false
-}
+//tasks.named('modrinth').configure {
+//    enabled = false
+//}
 
 dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
