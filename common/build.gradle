@@ -18,6 +18,10 @@ tasks.named('publishMavenJavaPublicationToMavenRepository').configure {
     enabled = false
 }
 
+//tasks.named('modrinth').configure {
+//    enabled = false
+//}
+
 dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
     compileOnly 'com.bukkit:craftbukkit:1.21.5'

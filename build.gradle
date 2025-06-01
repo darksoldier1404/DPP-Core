@@ -2,17 +2,20 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'io.papermc.hangar-publish-plugin' version '0.1.3'
+    id 'com.modrinth.minotaur' version '2.8.7'
 }
+
 allprojects {
     group = 'com.darksoldier1404'
-    version = '4.0.3.25'
+    version = '4.0.4.26'
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         maven {
             url 'http://nexus.dpnw.site:8081/repository/maven-public/'
             allowInsecureProtocol = true
         }
-        maven { url 'https://org.bstats/bstats-bukkit' }
+        maven { url 'https://repo.bstats.org/repository/releases/' }
         maven { url 'https://repo.extendedclip.com/releases/' }
     }
 }
@@ -21,6 +24,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'io.papermc.hangar-publish-plugin'
+    apply plugin: 'com.modrinth.minotaur'
 
     compileJava.options.encoding = 'UTF-8'
     tasks.withType(JavaCompile) {
@@ -59,6 +63,43 @@ subprojects {
         useJUnitPlatform()
     }
 
+//    modrinth {
+//        // Validate required properties
+//        if (!project.hasProperty('modrinthApiKey') || !project.hasProperty('modrinthProjectId')) {
+//            throw new GradleException('modrinthApiKey and modrinthProjectId must be specified in gradle.properties or as project properties.')
+//        }
+//
+//        token = project.property('modrinthApiKey')
+//        projectId = project.property('modrinthProjectId')
+//        versionNumber = project.version
+//        versionName = project.hasProperty('modrinthVersionTitle') ? project.property('modrinthVersionTitle') : "Release ${project.version}"
+//        versionType = 'release'
+//        // Defer file resolution to task execution time
+//        uploadFile = project.provider {
+//            def jarFile = file("${rootDir}/jars/DPP-Core-${project.name}-${project.version}-SNAPSHOT.jar")
+//            logger.lifecycle("Checking for JAR: ${jarFile}")
+//            if (!jarFile.exists()) {
+//                throw new GradleException("Modrinth upload file does not exist: ${jarFile}")
+//            }
+//            jarFile
+//        }
+//        gameVersions = [project.name.replace('_', '.')] // e.g., 1_14_4 -> 1.14.4
+//        loaders = ['paper']
+//        changelog = "Release for ${project.version} on Minecraft ${project.name.replace('_', '.')}"
+//        dependencies = []
+//
+//        // Optional: Use staging API for testing
+//        debugMode = project.hasProperty('modrinthDebug') ? project.property('modrinthDebug').toBoolean() : false
+//    }
+
+    tasks.modrinth.doFirst {
+        def upload = file("${rootDir}/jars/DPP-Core-${project.name}-SNAPSHOT.jar")
+        logger.lifecycle("Preparing to upload JAR: ${upload}")
+        if (!upload.exists()) {
+            throw new GradleException("Upload file does not exist: ${upload}")
+        }
+    }
+
     tasks.register('renameJar') {
         def jarDir = file("$rootDir/jars")
         def moduleName = project.name
@@ -71,7 +112,7 @@ subprojects {
                 originalJar.renameTo(newJar)
                 println "JAR file renamed: ${newJarFileName}"
             } else {
-                throw new GradleException("Original JAR file does not exist: ${newJarFileName}")
+                throw new GradleException("Original JAR file does not exist: ${jarFileName}")
             }
         }
     }
@@ -97,34 +138,32 @@ subprojects {
             }
         }
     }
-}
 
-hangarPublish {
-    publications {
-        register("publishPluginPublicationToHangar") {
-            version = project.version.toString()
-            channel = "Snapshot" // We're using the 'Snapshot' channel
-            id = "DPP-Core" // TODO: Edit the project name to match your Hangar project
-            apiKey = System.getenv("HANGAR_API_TOKEN")
+    hangarPublish {
+        publications {
+            register("publishPluginPublicationToHangar") {
+                version = project.version.toString()
+                channel = "Snapshot"
+                id = "DPP-Core"
+                apiKey = System.getenv("HANGAR_API_TOKEN")
 
-            platforms {
-                paper {
-                    url = "https://github.com/darksoldier1404/DPP-Core/releases"
-
-                    platformVersions = List.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5")
-
-                    dependencies {
-                        hangar("Essentials") {
-                            required = false
-                        }
-                        hangar("PlaceholderAPI") {
-                            required = false
-                        }
-                        url("WorldGuard", "https://dev.bukkit.org/projects/worldguard/files") {
-                            required.set(false)
-                        }
-                        url("LuckPerms", "https://luckperms.net/download") {
-                            required.set(false)
+                platforms {
+                    paper {
+                        url = "https://github.com/darksoldier1404/DPP-Core/releases"
+                        platformVersions = List.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5")
+                        dependencies {
+                            hangar("Essentials") {
+                                required = false
+                            }
+                            hangar("PlaceholderAPI") {
+                                required = false
+                            }
+                            url("WorldGuard", "https://dev.bukkit.org/projects/worldguard/files") {
+                                required.set(false)
+                            }
+                            url("LuckPerms", "https://luckperms.net/download") {
+                                required.set(false)
+                            }
                         }
                     }
                 }
