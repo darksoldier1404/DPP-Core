@@ -232,8 +232,8 @@ public class DInventory extends CraftInventoryCustom {
         Map<Integer, ItemStack[]> resultItems = new HashMap<>();
         for (int page = 0; page < pageItems.size(); page++) {
             ItemStack[] items = new ItemStack[45];
-            for (int i = 0; i < pageItems.get(i).length - 9; i++) {
-                items[i] = pageItems.get(i)[i];
+            for (int i = 0; i < pageItems.get(page).length - 9; i++) {
+                items[i] = pageItems.get(page)[i];
             }
             resultItems.put(page, items);
         }
