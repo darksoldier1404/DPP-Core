@@ -1,3 +1,5 @@
+[![Crowdin](https://badges.crowdin.net/dp-plugins/localized.svg)](https://crowdin.com/project/dp-plugins)
+
 <details>
 	<summary>korean</summary>
 	
