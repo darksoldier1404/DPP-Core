@@ -227,9 +227,13 @@ public class DInventory extends CraftInventoryCustom {
     public Map<Integer, ItemStack[]> getPageItemsWithoutTools() {
         if (pageItems.isEmpty()) return null;
         Map<Integer, ItemStack[]> resultItems = new HashMap<>();
+        int pt = 9;
         for (int page = 0; page < pageItems.size(); page++) {
-            ItemStack[] items = new ItemStack[45];
-            for (int i = 0; i < pageItems.get(page).length - 9; i++) {
+            ItemStack[] items = new ItemStack[getSize()];
+            if (getSize() >= 9) {
+                pt = 0;
+            }
+            for (int i = 0; i < pageItems.get(page).length - pt; i++) {
                 items[i] = pageItems.get(page)[i];
             }
             resultItems.put(page, items);

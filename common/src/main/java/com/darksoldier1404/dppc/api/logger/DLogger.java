@@ -34,12 +34,6 @@ public class DLogger {
         log.info("DLogger activated - Console logging enabled: " + useConsoleLog);
     }
 
-    /**
-     * Adds a new log entry with the given name to the log map.
-     *
-     * @param name The name of the log to add.
-     * @return True if the log was successfully added, false if a log with the same name already exists.
-     */
     public boolean addLog(String name) {
         if (logMap.containsKey(name)) {
             log.warning("A log with the name " + name + " already exists.");
@@ -51,12 +45,6 @@ public class DLogger {
         }
     }
 
-    /**
-     * Retrieves the log configuration for a given name.
-     *
-     * @param name The name of the log to retrieve.
-     * @return The YamlConfiguration of the log, or null if the log doesn't exist.
-     */
     @Nullable
     public YamlConfiguration getLog(String name) {
         YamlConfiguration logData = logMap.get(name);
@@ -68,12 +56,6 @@ public class DLogger {
         return logData;
     }
 
-    /**
-     * Removes a log entry from the log map by its name.
-     *
-     * @param name The name of the log to remove.
-     * @return True if the log was successfully removed, false if no log with the name was found.
-     */
     public boolean removeLog(String name) {
         if (logMap.containsKey(name)) {
             logMap.remove(name);
@@ -85,14 +67,6 @@ public class DLogger {
         }
     }
 
-    /**
-     * Adds a key-value pair to a specific log.
-     *
-     * @param name The name of the log to update.
-     * @param key The key for the log entry.
-     * @param value The value to associate with the key.
-     * @return True if the key-value pair was added successfully, false if the key already exists.
-     */
     public boolean log(String name, String key, Object value) {
         YamlConfiguration data = logMap.get(name);
         if (data == null) {
@@ -110,13 +84,6 @@ public class DLogger {
         }
     }
 
-    /**
-     * Adds a key-value pair to the main log.
-     *
-     * @param key The key for the main log entry.
-     * @param value The value to associate with the key.
-     * @return True if the key-value pair was added successfully, false if the key already exists.
-     */
     public boolean log(String key, Object value) {
         if (mainLog == null) {
             log.warning("Main log does not exist.");
@@ -133,12 +100,6 @@ public class DLogger {
         }
     }
 
-    /**
-     * Adds a value to the main log with a generated key based on the current timestamp and nano time.
-     *
-     * @param value The value to add to the main log.
-     * @return True if the value was successfully added, false if the generated key already exists.
-     */
     public boolean log(Object value) {
         if (mainLog == null) {
             log.warning("Main log does not exist.");
@@ -156,17 +117,6 @@ public class DLogger {
         return true;
     }
 
-    /**
-     * Initializes an automatic save task that will save logs periodically.
-     *
-     * @param delay The delay before the first save.
-     * @param period The period between each save.
-     * @param logMapPath The path where log map files should be saved.
-     * @param logMapName The base name of the log map files.
-     * @param mainLogPath The path where the main log file should be saved.
-     * @param mainLogName The base name of the main log file.
-     * @param withReset Whether to reset the logs after each save.
-     */
     public void initAutoSave(long delay, long period, String logMapPath, String logMapName, String mainLogPath, String mainLogName, boolean withReset) {
         if (task != null) {
             log.warning("Automatic saving is already enabled.");
@@ -184,13 +134,6 @@ public class DLogger {
         log.info("Automatic save has been activated.");
     }
 
-    /**
-     * Saves all the logs in the log map to files.
-     *
-     * @param logMapPath The path where log map files should be saved.
-     * @param logMapName The base name of the log map files.
-     * @param withReset Whether to reset the logs after each save.
-     */
     private void saveLogs(String logMapPath, String logMapName, boolean withReset) {
         if (!logMap.isEmpty()) {
             for (String name : logMap.keySet()) {
@@ -213,13 +156,6 @@ public class DLogger {
         }
     }
 
-    /**
-     * Saves the main log to a file.
-     *
-     * @param mainLogPath The path where the main log file should be saved.
-     * @param mainLogName The base name of the main log file.
-     * @param withReset Whether to reset the main log after saving.
-     */
     private void saveMainLog(String mainLogPath, String mainLogName, boolean withReset) {
         try {
             if (!mainLog.getKeys(false).isEmpty()) {
@@ -237,9 +173,6 @@ public class DLogger {
         }
     }
 
-    /**
-     * Cancels the automatic save task if it is active.
-     */
     public void cancelAutoSaveTask() {
         if (task != null) {
             task.cancel();

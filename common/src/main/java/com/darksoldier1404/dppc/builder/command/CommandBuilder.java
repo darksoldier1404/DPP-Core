@@ -22,6 +22,10 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
     private BiConsumer<CommandSender, String[]> defaultAction;
     private String noSubCommandsMessage;
 
+    public List<String> getSubCommandNames() {
+        return subCommandNames;
+    }
+
     public CommandBuilder(String prefix) {
         this.prefix = prefix;
         this.noSubCommandsMessage = prefix + "No available commands.";

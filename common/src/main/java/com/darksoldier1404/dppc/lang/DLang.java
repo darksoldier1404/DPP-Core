@@ -1,5 +1,6 @@
 package com.darksoldier1404.dppc.lang;
 
+import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,10 +11,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
-@SuppressWarnings("all")
 public class DLang {
     private final JavaPlugin plugin;
+    private final Logger log = DPPCore.getInstance().log;
     private YamlConfiguration currentLang;
     private Map<String, YamlConfiguration> langFiles = new HashMap<>();
 
@@ -23,7 +25,7 @@ public class DLang {
         try {
             currentLang = langFiles.get(langKey);
         } catch (Exception e) {
-            System.out.println("[DLang] Error: Language file not found!");
+            log.warning("[DLang] Error: Language file not found!");
         }
     }
 
@@ -51,15 +53,15 @@ public class DLang {
         try {
             currentLang = langFiles.get(lang);
         } catch (Exception e) {
-            System.out.println("[DLang] Error: Language file not found!");
-            System.out.println("[DLang] input: " + lang);
+            log.warning("[DLang] Error: Language file not found!");
+            log.warning("[DLang] input: " + lang);
         }
     }
 
     @Nullable
     public String get(String key) {
         String s = currentLang.getString(key);
-        if(s == null) {
+        if (s == null) {
             return null;
         }
         return ChatColor.translateAlternateColorCodes('&', s);
@@ -87,7 +89,7 @@ public class DLang {
             try {
                 langFiles.put(data.getString("Lang"), data);
             } catch (Exception e) {
-                System.out.println("[DLang] Error loading lang file: " + data.getName());
+                log.warning("[DLang] Error loading lang file: " + data.getName());
             }
         }
     }
