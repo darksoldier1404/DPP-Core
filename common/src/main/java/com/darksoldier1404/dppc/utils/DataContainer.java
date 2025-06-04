@@ -69,7 +69,7 @@ public class DataContainer {
 
     public void initUserData(UUID uuid) {
         if (!hasUserData(uuid)) {
-            YamlConfiguration data = ConfigUtils.loadCustomData(plugin, uuid + ".yml", "udata");
+            YamlConfiguration data = ConfigUtils.loadCustomData(plugin, String.valueOf(uuid), "udata");
             addUserData(uuid, data);
         }
     }
@@ -119,14 +119,14 @@ public class DataContainer {
     public void saveUserData(UUID uuid) {
         if (this.data.containsKey("udata")) {
             Map<UUID, YamlConfiguration> udata = (Map<UUID, YamlConfiguration>) this.data.get("udata");
-            ConfigUtils.saveCustomData(plugin, udata.get(uuid), uuid + ".yml", "udata");
+            ConfigUtils.saveCustomData(plugin, udata.get(uuid), String.valueOf(uuid), "udata");
         }
     }
 
     public void saveAndLeave(UUID uuid) {
         if (this.data.containsKey("udata")) {
             Map<UUID, YamlConfiguration> udata = (Map<UUID, YamlConfiguration>) this.data.get("udata");
-            ConfigUtils.saveCustomData(plugin, udata.get(uuid), uuid + ".yml", "udata");
+            ConfigUtils.saveCustomData(plugin, udata.get(uuid), String.valueOf(uuid), "udata");
             udata.remove(uuid);
         }
     }
