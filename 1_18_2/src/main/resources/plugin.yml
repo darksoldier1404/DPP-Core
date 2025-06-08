@@ -1,5 +1,6 @@
 name: DPP-Core
-version: 4.0.4.27
+version: 4.0.4.28
+description: All DP-PLUGINS plugins require this plugin.
 main: com.darksoldier1404.dppc.DPPCore
 authors: [ DEAD_POOLIO_ ]
 api-version: 1.18
@@ -8,6 +9,13 @@ loadbefore:
   - PlaceholderAPI
   - ProtocolLib
   - LuckPerms
+softdepend:
+  - Essentials
+  - PlaceholderAPI
+  - ProtocolLib
+  - LuckPerms
+  - WorldGuard
+  - Vault
 
 commands:
   dppc:
