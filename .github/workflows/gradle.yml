@@ -1,6 +1,8 @@
 name: DPP-Core
 on:
   push:
+    branches:
+      - master
 jobs:
   gradle:
     #    runs-on: self-hosted
@@ -51,4 +53,23 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           files: jars/*.jar
           prerelease: false
-
+  publish:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Publish
+        env:
+          HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+          REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
+          REPO_DPP: ${{ secrets.REPO_DPP }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build publishPluginPublicationToHangar --stacktrace
