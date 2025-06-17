@@ -150,7 +150,7 @@ subprojects {
                 platforms {
                     paper {
                         url = "https://github.com/darksoldier1404/DPP-Core/releases"
-                        platformVersions = List.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5")
+                        platformVersions = List.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5", "1.21.6")
                         dependencies {
                             hangar("Essentials") {
                                 required = false
