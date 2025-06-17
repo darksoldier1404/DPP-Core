@@ -1,8 +1,8 @@
 package com.darksoldier1404.dppc.utils.nbtapi.handler;
 
+import com.darksoldier1404.dppc.utils.nbtapi.NBTInternal;
 import org.bukkit.inventory.ItemStack;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NBTInternal;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.NBTHandler;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBT;

@@ -1,10 +1,11 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 /**
  * String implementation for NBTLists
@@ -21,7 +22,11 @@ public class NBTStringList extends NBTList<String> {
     @Override
     public String get(int index) {
         try {
-            return (String) ReflectionMethod.LIST_GET_STRING.run(listObject, index);
+            Object ret = ReflectionMethod.LIST_GET_STRING.run(listObject, index);
+            if (ret instanceof Optional<?>) {
+                return ((Optional<String>) ret).orElse("");
+            }
+            return (String) ret;
         } catch (Exception ex) {
             throw new NbtApiException(ex);
         }

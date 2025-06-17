@@ -1,20 +1,18 @@
 package com.darksoldier1404.dppc.utils.nbtapi;
 
-import java.util.Set;
-import java.util.function.BiConsumer;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteItemNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadableNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.MinecraftVersion;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import javax.annotation.Nullable;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * NBT class to access vanilla/custom tags on ItemStacks. This class doesn't
