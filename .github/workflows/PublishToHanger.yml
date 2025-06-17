@@ -24,6 +24,8 @@ jobs:
         env:
           # Make sure you have added a repository secret in the repository's settings
           HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+          REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
+          REPO_DPP: ${{ secrets.REPO_DPP }}
         run: |
           chmod +x ./gradlew
           ./gradlew build publishPluginPublicationToHangar --stacktrace
