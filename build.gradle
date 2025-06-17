@@ -12,7 +12,7 @@ allprojects {
         gradlePluginPortal()
         mavenCentral()
         maven {
-            url 'http://nexus.dpnw.site:8081/repository/maven-public/'
+            url System.getenv("REPO_PUBLIC") ?: getProperty("REPO_PUBLIC")
             allowInsecureProtocol = true
         }
         maven { url 'https://repo.bstats.org/repository/releases/' }
@@ -133,7 +133,7 @@ subprojects {
         }
         repositories {
             maven {
-                url 'http://nexus.dpnw.site:8081/repository/dpp/'
+                url System.getenv("REPO_DPP") ?: getProperty("REPO_DPP")
                 allowInsecureProtocol = true
             }
         }
