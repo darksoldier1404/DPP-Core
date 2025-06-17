@@ -4,11 +4,6 @@ description: All DP-PLUGINS plugins require this plugin.
 main: com.darksoldier1404.dppc.DPPCore
 authors: [ DEAD_POOLIO_ ]
 api-version: 1.18
-loadbefore:
-  - Essentials
-  - PlaceholderAPI
-  - ProtocolLib
-  - LuckPerms
 softdepend:
   - Essentials
   - PlaceholderAPI

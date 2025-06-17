@@ -49,7 +49,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return byte
      */
     @NotNull
@@ -61,7 +61,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return short
      */
     @NotNull
@@ -73,7 +73,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return int
      */
     @NotNull
@@ -85,7 +85,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return float
      */
     @NotNull
@@ -97,7 +97,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return double
      */
     @NotNull
@@ -109,7 +109,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return boolean
      */
     public static boolean getBooleanTag(ItemStack item, String key) {
@@ -120,7 +120,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return long
      */
     @NotNull
@@ -132,7 +132,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return byte[]
      */
     @NotNull
@@ -144,7 +144,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return int[]
      */
     @NotNull
@@ -156,7 +156,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return Material
      */
     @Nullable
@@ -168,7 +168,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return InventoryType
      */
     @Nullable
@@ -180,7 +180,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return NBTTagList
      */
     @Nullable
@@ -192,10 +192,13 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return boolean
      */
     public static boolean hasTagKey(ItemStack item, String key) {
+        if (item == null) {
+            return false;
+        }
         return NBTAPI.get(item, (nbt) -> {
             return nbt.hasTag(key);
         });
@@ -213,9 +216,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   String
+     * @param item  ItemStack
+     * @param key   String
+     * @param value String
      * @return ItemStack
      */
     @NotNull
@@ -235,9 +238,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   byte
+     * @param item  ItemStack
+     * @param key   String
+     * @param value byte
      * @return ItemStack
      */
     @NotNull
@@ -249,9 +252,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   short
+     * @param item  ItemStack
+     * @param key   String
+     * @param value short
      * @return ItemStack
      */
     @NotNull
@@ -263,9 +266,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   int
+     * @param item  ItemStack
+     * @param key   String
+     * @param value int
      * @return ItemStack
      */
     @NotNull
@@ -277,9 +280,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   long
+     * @param item  ItemStack
+     * @param key   String
+     * @param value long
      * @return ItemStack
      */
     @NotNull
@@ -291,9 +294,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   float
+     * @param item  ItemStack
+     * @param key   String
+     * @param value float
      * @return ItemStack
      */
     @NotNull
@@ -305,9 +308,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   double
+     * @param item  ItemStack
+     * @param key   String
+     * @param value double
      * @return ItemStack
      */
     @NotNull
@@ -327,9 +330,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   byte[]
+     * @param item  ItemStack
+     * @param key   String
+     * @param value byte[]
      * @return ItemStack
      */
     @NotNull
@@ -341,9 +344,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   int[]
+     * @param item  ItemStack
+     * @param key   String
+     * @param value int[]
      * @return ItemStack
      */
     @NotNull
@@ -355,9 +358,9 @@ public class NBT {
     }
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   Material
+     * @param item  ItemStack
+     * @param key   String
+     * @param value Material
      * @return ItemStack
      */
     @NotNull
@@ -373,9 +376,9 @@ public class NBT {
     // Single ItemStack
 
     /**
-     * @param item ItemStack
-     * @param key     String
-     * @param value   ItemStack
+     * @param item  ItemStack
+     * @param key   String
+     * @param value ItemStack
      * @return ItemStack
      */
     public static ItemStack setItemStackTag(ItemStack item, String key, ItemStack value) {
@@ -391,7 +394,7 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key     String
+     * @param key  String
      * @return ItemStack
      */
     @Nullable
@@ -408,13 +411,13 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param inv Inventory
-     * @param key String
+     * @param inv  Inventory
+     * @param key  String
      * @return ItemStack
      */
     public static ItemStack setInventoryTag(ItemStack item, Inventory inv, String key) {
         for (int i = 0; i < inv.getSize(); i++) {
-            item = NBT.setItemStackTag(item, "inv_" + key + "_" + i+"_item", inv.getItem(i));
+            item = NBT.setItemStackTag(item, "inv_" + key + "_" + i + "_item", inv.getItem(i));
         }
         item = NBT.setIntTag(item, "inv_" + key + "_size", inv.getSize());
         return item;
@@ -422,14 +425,14 @@ public class NBT {
 
     /**
      * @param item ItemStack
-     * @param key String
+     * @param key  String
      * @return Inventory
      */
     @Nullable
     public static Inventory getInventoryTag(ItemStack item, String key) {
         Inventory inv = Bukkit.createInventory(null, NBT.getIntegerTag(item, "inv_" + key + "_size"));
         for (int i = 0; i < inv.getSize(); i++) {
-            inv.setItem(i, NBT.getItemStackTag(item, "inv_" + key + "_" + i+"_item"));
+            inv.setItem(i, NBT.getItemStackTag(item, "inv_" + key + "_" + i + "_item"));
         }
         return inv;
     }
