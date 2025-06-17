@@ -30,7 +30,7 @@ DPP-Core는 Spigot 또는 Paper 서버용 코어 플러그인입니다. DP-Shop,
 https://ko-fi.com/deadpoolio
 </details>
 
-<details>
+<details open>
 	<summary>english</summary>
 	
 # DPP-Core
