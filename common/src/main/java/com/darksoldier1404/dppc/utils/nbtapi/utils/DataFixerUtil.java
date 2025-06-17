@@ -1,14 +1,11 @@
 package com.darksoldier1404.dppc.utils.nbtapi.utils;
 
+import com.darksoldier1404.dppc.utils.nbtapi.*;
 import com.mojang.datafixers.DSL.TypeReference;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NBTCompound;
-import com.darksoldier1404.dppc.utils.nbtapi.NBTContainer;
-import com.darksoldier1404.dppc.utils.nbtapi.NBTReflectionUtil;
-import com.darksoldier1404.dppc.utils.nbtapi.NbtApiException;
 import com.darksoldier1404.dppc.utils.nbtapi.iface.ReadWriteNBT;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
 import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.MojangToMapping;
@@ -32,6 +29,7 @@ public class DataFixerUtil {
     public static final int VERSION1_21 = 3953;
     public static final int VERSION1_21_2 = 4080;
     public static final int VERSION1_21_3 = 4189;
+    public static final int VERSION1_21_5 = 4323;
 
     @SuppressWarnings("unchecked")
     public static Object fixUpRawItemData(Object nbt, int fromVersion, int toVersion)
@@ -49,7 +47,7 @@ public class DataFixerUtil {
 
     public static ReadWriteNBT fixUpItemData(ReadWriteNBT nbt, int fromVersion, int toVersion)
             throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        return new NBTContainer(fixUpRawItemData(
+        return NBTInternal.wrapNMSTag(fixUpRawItemData(
                 NBTReflectionUtil.getToCompount(((NBTCompound) nbt).getCompound(), ((NBTCompound) nbt)), fromVersion,
                 toVersion));
     }
@@ -64,7 +62,9 @@ public class DataFixerUtil {
      * @return
      */
     public static int getCurrentVersion() {
-        if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R3)) {
+        if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R4)) {
+            return VERSION1_21_5;
+        } else if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R3)) {
             return VERSION1_21_3;
         } else if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R2)) {
             return VERSION1_21_2;

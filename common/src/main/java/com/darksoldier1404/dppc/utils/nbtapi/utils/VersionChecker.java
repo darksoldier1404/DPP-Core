@@ -109,7 +109,20 @@ public class VersionChecker {
 
     protected static String getPlugin() {
         ClassLoader classLoader = VersionChecker.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("plugin.yml");
+        InputStream inputStream = classLoader.getResourceAsStream("paper-plugin.yml");
+        if (inputStream != null) {
+            try (InputStreamReader reader = new InputStreamReader(inputStream)) {
+                YamlConfiguration pluginYml = YamlConfiguration.loadConfiguration(reader);
+                return pluginYml.getString("name");
+            } catch (IOException e) {
+                // ignored
+            } catch (IllegalArgumentException e) {
+                // This can happen if the paper-plugin.yml is not formatted correctly
+                MinecraftVersion.getLogger().log(Level.WARNING, "[NBTAPI] Error reading paper-plugin.yml: " + e.getMessage());
+            }
+        }
+        
+        inputStream = classLoader.getResourceAsStream("plugin.yml");
 
         if (inputStream != null) {
             try (InputStreamReader reader = new InputStreamReader(inputStream)) {
@@ -117,9 +130,67 @@ public class VersionChecker {
                 return pluginYml.getString("name");
             } catch (IOException e) {
                 // ignored
+            } catch (IllegalArgumentException e) {
+                // This can happen if the plugin.yml is not formatted correctly
+                MinecraftVersion.getLogger().log(Level.WARNING, "[NBTAPI] Error reading plugin.yml: " + e.getMessage());
             }
         }
         return NBTItem.class.getPackage().getName();
+    }
+    
+    protected static String getPluginforBStats() {
+        ClassLoader classLoader = VersionChecker.class.getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("paper-plugin.yml");
+        if (inputStream != null) {
+            try (InputStreamReader reader = new InputStreamReader(inputStream)) {
+                YamlConfiguration pluginYml = YamlConfiguration.loadConfiguration(reader);
+                return pluginYml.getString("name");
+            } catch (IOException e) {
+                // ignored
+            } catch (IllegalArgumentException e) {
+                // This can happen if the paper-plugin.yml is not formatted correctly
+                MinecraftVersion.getLogger().log(Level.WARNING, "[NBTAPI] Error reading paper-plugin.yml: " + e.getMessage());
+            }
+        }
+        
+        inputStream = classLoader.getResourceAsStream("plugin.yml");
+
+        if (inputStream != null) {
+            try (InputStreamReader reader = new InputStreamReader(inputStream)) {
+                YamlConfiguration pluginYml = YamlConfiguration.loadConfiguration(reader);
+                return pluginYml.getString("name");
+            } catch (IOException e) {
+                // ignored
+            } catch (IllegalArgumentException e) {
+                // This can happen if the plugin.yml is not formatted correctly
+                MinecraftVersion.getLogger().log(Level.WARNING, "[NBTAPI] Error reading plugin.yml: " + e.getMessage());
+            }
+        }
+        return "UnknownPlugin";
+    }
+    
+    protected static String getPluginType() {
+        ClassLoader classLoader = VersionChecker.class.getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("paper-plugin.yml");
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                // ignored
+            }
+            return "PaperPlugin";
+        }
+        
+        inputStream = classLoader.getResourceAsStream("plugin.yml");
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                // ignored
+            }
+            return "SpigotPlugin";
+        }
+        return "UnknownPlugin";
     }
 
 }

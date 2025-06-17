@@ -1,8 +1,8 @@
 dependencies {
     implementation project(':common')
     implementation 'org.jetbrains:annotations:23.0.0'
-    compileOnly 'com.bukkit:craftbukkit:1.21.4'
-    compileOnly 'com.bukkit:spigot:1.21.4'
+    compileOnly 'com.bukkit:craftbukkit:1.21.6'
+    compileOnly 'com.bukkit:spigot:1.21.6'
 }
 
 jar {
