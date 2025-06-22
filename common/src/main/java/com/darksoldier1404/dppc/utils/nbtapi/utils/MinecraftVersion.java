@@ -5,15 +5,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.DrilldownPie;
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ClassWrapper;
-import com.darksoldier1404.dppc.utils.nbtapi.utils.nmsmappings.ReflectionMethod;
 
 /**
  * This class acts as the "Brain" of the NBTApi. It contains the main logger for
@@ -176,71 +168,6 @@ public enum MinecraftVersion {
                 'a', 'n', 'g', 'e', 'm', 'e', '.', 'n', 'b', 't', 'a', 'p', 'i', '.', 'u', 't', 'i', 'l', 's' });
         final String reservedPackage = new String(new byte[] { 'd', 'e', '.', 't', 'r', '7', 'z', 'w', '.', 'n', 'b',
                 't', 'a', 'p', 'i', '.', 'u', 't', 'i', 'l', 's' });
-        try {
-            if (hasGsonSupport() && !bStatsDisabled) {
-                Plugin plugin = Bukkit.getPluginManager().getPlugin(VersionChecker.getPlugin());
-                if (plugin != null && plugin instanceof JavaPlugin) {
-                    getLogger()
-                            .info("[NBTAPI] Using the plugin '" + plugin.getName() + "' to create a bStats instance!");
-                    Metrics metrics = new Metrics((JavaPlugin) plugin, 1058);
-                    metrics.addCustomChart(new SimplePie("nbtapi_version", () -> {
-                        return VERSION;
-                    }));
-                    metrics.addCustomChart(new DrilldownPie("nms_version", () -> {
-                        Map<String, Map<String, Integer>> map = new HashMap<>();
-                        Map<String, Integer> entry = new HashMap<>();
-                        entry.put(Bukkit.getName(), 1);
-                        map.put(getVersion().name(), entry);
-                        return map;
-                    }));
-                    metrics.addCustomChart(new SimplePie("shaded", () -> {
-                        return Boolean.toString(!"NBTAPI".equals(VersionChecker.getPlugin()));
-                    }));
-                    metrics.addCustomChart(new SimplePie("server_software", () -> {
-                        return Bukkit.getName();
-                    }));
-                    metrics.addCustomChart(new SimplePie("parent_plugin", () -> {
-                        return VersionChecker.getPluginforBStats();
-                    }));
-                    metrics.addCustomChart(new SimplePie("parent_plugin_type", () -> {
-                        return VersionChecker.getPluginType();
-                    }));
-                    metrics.addCustomChart(new SimplePie("special_environment", () -> {
-                        if (isFoliaPresent()) {
-                            return "Folia";
-                        } else if (isForgePresent()) {
-                            return "Forge";
-                        } else if (isFabricPresent()) {
-                            return "Fabric";
-                        } else if (isNeoForgePresent()) {
-                            return "NeoForge";
-                        } else {
-                            return "None";
-                        }
-                    }));
-                    metrics.addCustomChart(new SimplePie("bindings_check", () -> {
-                        
-                        boolean failedBinding = false;
-                        for (ClassWrapper c : ClassWrapper.values()) {
-                            if (c.isEnabled() && c.getClazz() == null) {
-                                failedBinding = true;
-                            }
-                        }
-                        for (ReflectionMethod method : ReflectionMethod.values()) {
-                            if (method.isCompatible() && !method.isLoaded()) {
-                                failedBinding = true;
-                            }
-                        }
-                        
-                        return failedBinding ? "Failed" : "Pass";
-                    }));
-                } else if (plugin == null) {
-                    getLogger().info("[NBTAPI] Unable to create a bStats instance!!");
-                }
-            }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "[NBTAPI] Error enabling Metrics!", ex);
-        }
 
         if (hasGsonSupport() && !updateCheckDisabled)
             new Thread(() -> {
