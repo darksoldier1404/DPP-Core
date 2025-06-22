@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @SuppressWarnings("all")
 public class MoneyAPI {
     private final static DPPCore plugin = DPPCore.getInstance();
-    private final static Essentials ess = plugin.ess;
+    private final static Essentials ess = (Essentials) plugin.ess;
 
     public static boolean isEnabled() {
         return ess != null;

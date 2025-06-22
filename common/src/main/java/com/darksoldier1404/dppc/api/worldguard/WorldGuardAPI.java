@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class WorldGuardAPI {
     private static final DPPCore plugin = DPPCore.getInstance();
-    private static final WorldGuard wg = plugin.wg;
+    private static final WorldGuard wg = WorldGuard.getInstance();
     private static final RegionContainer rc = wg.getPlatform().getRegionContainer();
 
     @Nullable

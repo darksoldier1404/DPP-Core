@@ -16,8 +16,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class CommandBuilder implements CommandExecutor, TabCompleter {
-    private final String prefix;
     private final Map<String, SubCommand> subCommands = new HashMap<>();
+    private final String prefix;
     private final List<String> subCommandNames = new ArrayList<>();
     private BiConsumer<CommandSender, String[]> defaultAction;
     private String noSubCommandsMessage;
@@ -137,8 +137,8 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             List<String> completions = new ArrayList<>();
             for (String cmd : subCommandNames) {
                 SubCommand sub = subCommands.get(cmd);
-                if ((sub.permission == null || sender.hasPermission(sub.permission)) && 
-                    (!sub.isPlayerOnly || sender instanceof Player)) {
+                if ((sub.permission == null || sender.hasPermission(sub.permission)) &&
+                        (!sub.isPlayerOnly || sender instanceof Player)) {
                     completions.add(cmd);
                 }
             }
@@ -146,9 +146,9 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
 
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
-        if (subCommand != null && subCommand.tabCompletion != null && 
-            (subCommand.permission == null || sender.hasPermission(subCommand.permission)) && 
-            (!subCommand.isPlayerOnly || sender instanceof Player)) {
+        if (subCommand != null && subCommand.tabCompletion != null &&
+                (subCommand.permission == null || sender.hasPermission(subCommand.permission)) &&
+                (!subCommand.isPlayerOnly || sender instanceof Player)) {
             return subCommand.tabCompletion.apply(args);
         }
         return null;

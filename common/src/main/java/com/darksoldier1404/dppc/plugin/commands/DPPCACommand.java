@@ -1,4 +1,4 @@
-package com.darksoldier1404.dppc.commands;
+package com.darksoldier1404.dppc.plugin.commands;
 
 import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
