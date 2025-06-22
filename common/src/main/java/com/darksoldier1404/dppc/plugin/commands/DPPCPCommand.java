@@ -1,6 +1,6 @@
-package com.darksoldier1404.dppc.commands;
+package com.darksoldier1404.dppc.plugin.commands;
 
-import com.darksoldier1404.dppc.functions.DPPCPFunction;
+import com.darksoldier1404.dppc.plugin.functions.DPPCPFunction;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

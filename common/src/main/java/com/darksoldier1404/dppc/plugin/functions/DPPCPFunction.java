@@ -1,4 +1,4 @@
-package com.darksoldier1404.dppc.functions;
+package com.darksoldier1404.dppc.plugin.functions;
 
 import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.api.inventory.DInventory;

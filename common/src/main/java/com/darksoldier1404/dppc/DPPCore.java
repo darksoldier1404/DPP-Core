@@ -3,9 +3,9 @@ package com.darksoldier1404.dppc;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
-import com.darksoldier1404.dppc.commands.DPPCACommand;
-import com.darksoldier1404.dppc.commands.DPPCCommand;
-import com.darksoldier1404.dppc.commands.DPPCPCommand;
+import com.darksoldier1404.dppc.plugin.commands.DPPCACommand;
+import com.darksoldier1404.dppc.plugin.commands.DPPCCommand;
+import com.darksoldier1404.dppc.plugin.commands.DPPCPCommand;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import com.earth2me.essentials.Essentials;
@@ -13,6 +13,7 @@ import com.sk89q.worldguard.WorldGuard;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -26,10 +27,9 @@ public class DPPCore extends JavaPlugin {
     private static DPPCore plugin;
     public YamlConfiguration config;
     public Logger log;
-    public static Essentials ess;
-    public static LuckPerms lp;
-    public static WorldGuard wg;
-    public static Set<PlaceholderBuilder.InternalExpansion> placeholders = new HashSet<PlaceholderBuilder.InternalExpansion>();
+    public static Plugin ess;
+    public static Plugin lp;
+    public static Set<PlaceholderBuilder.InternalExpansion> placeholders = new HashSet<>();
     public static Map<String, ActionBuilder> actions = new HashMap<>();
 
     public static DPPCore getInstance() {
