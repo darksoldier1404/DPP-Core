@@ -1,49 +1,44 @@
 name: DPP-Core
-
 on:
   push:
     branches:
       - master
-
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
-    outputs:
-      release_version: ${{ env.RELEASE_VERSION }}
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v2
-      - name: Setup Java
+      - name: setup java
         uses: actions/setup-java@v2
         with:
           distribution: temurin
           java-version: 21
       - name: Configure Git
         run: |
-          git config --global user.email "no-reply@github.com"
-          git config --global user.name "Github Actions"
+          git config --global user.email "no-reply@github.com" && git config --global user.name "Github Actions"
           echo "workflow=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: Build JAR
+      - name: Execute Gradle build
         env:
           REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
           REPO_DPP: ${{ secrets.REPO_DPP }}
         run: ./gradlew jar
-      - name: Read version from plugin.yml
+      - name: Run read-yaml action
         id: yaml-data
         uses: KJ002/read-yaml@main
         with:
           file: './common/build/resources/main/plugin.yml'
           key-path: '["version"]'
-      - name: Set RELEASE_VERSION
+      - name: Set env
         run: echo "RELEASE_VERSION=${{ steps.yaml-data.outputs.data }}" >> $GITHUB_ENV
-      - name: Create GitHub Release
+      - name: release
         uses: marvinpinto/action-automatic-releases@latest
         with:
           title: "Release #${{ env.RELEASE_VERSION }}"
@@ -51,19 +46,18 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           files: jars/*.jar
           prerelease: false
-
   publishToHangar:
     needs: build
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Setup Java
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: 21
-      - name: Publish to Hangar
+      - name: Publish
         env:
           HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
           REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
@@ -71,34 +65,3 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew publishPluginPublicationToHangar --stacktrace
-
-  publishToCurseForge:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: 21
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-      - name: Build JAR for CurseForge
-        env:
-          REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
-          REPO_DPP: ${{ secrets.REPO_DPP }}
-        run: ./gradlew jar
-      - name: Upload to CurseForge
-        uses: itsmeow/curseforge-upload@v3
-        with:
-          token: ${{ secrets.CF_API_TOKEN }}
-          project_id: ${{ secrets.CF_PROJECT_ID }}
-          game_endpoint: minecraft
-          file_path: "common/build/libs/DPP-Core-${{ needs.build.outputs.release_version }}.jar"
-          game_versions: "Minecraft 1.21,Java 21"
-          relations: ""
-          release_type: "release"
-          changelog: "Release ${{ needs.build.outputs.release_version }}"
-          changelog_type: "text"
