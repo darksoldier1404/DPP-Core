@@ -64,4 +64,3 @@ jobs:
           REPO_DPP: ${{ secrets.REPO_DPP }}
         run: |
           chmod +x ./gradlew
-          ./gradlew publishPluginPublicationToHangar --stacktrace

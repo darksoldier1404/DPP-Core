@@ -74,7 +74,7 @@ public class PluginUtil {
     }
 
     public static void initPlaceholders() {
-        if (getPluginInstance("PlaceholderAPI", PlaceholderAPIPlugin.class, "PlaceholderAPI") != null) {
+        if (getPluginInstance("PlaceholderAPI", "PlaceholderAPI") != null) {
             for (PlaceholderBuilder.InternalExpansion pb : plugin.placeholders) {
                 pb.register();
             }
@@ -85,11 +85,22 @@ public class PluginUtil {
     }
 
     public static void initializeSoftDependPlugins() {
-        DPPCore.ess = getPluginInstance("Essentials", Essentials.class, "MoneyAPI");
-        DPPCore.lp = getLuckPermsInstance();
-        DPPCore.wg = getWorldGuardInstance();
+        DPPCore.ess = getPluginInstance("Essentials", "MoneyAPI");
+        DPPCore.lp = getPluginInstance("LuckPerms", "PermissionAPI");
     }
 
+    @Nullable
+    public static Plugin getPluginInstance(String pluginName, String apiName) {
+        Plugin instance = getServer().getPluginManager().getPlugin(pluginName);
+        if (instance == null) {
+            plugin.getLogger().warning(pluginName + " plugin is not installed.");
+            plugin.getLogger().warning(apiName + " is disabled.");
+            return null;
+        }
+        return instance;
+    }
+
+    @Deprecated
     @Nullable
     public static <T> T getPluginInstance(String pluginName, Class<T> pluginClass, String apiName) {
         Plugin instance = getServer().getPluginManager().getPlugin(pluginName);
@@ -195,7 +206,7 @@ public class PluginUtil {
     }
 
     private static boolean isNewVersion(String currentVersion, String latestVersion) {
-        try{
+        try {
             String[] currentParts = currentVersion.split("\\.");
             String[] latestParts = latestVersion.split("\\.");
 
@@ -209,7 +220,7 @@ public class PluginUtil {
                     return false;
                 }
             }
-        }catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             plugin.getLogger().warning("Error comparing versions: " + e.getMessage());
             return false;
         }

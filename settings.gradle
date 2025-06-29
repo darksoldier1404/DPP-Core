@@ -1,7 +1,5 @@
 rootProject.name = 'DPP-Core'
 include 'common'
-include '1_14_4'
-include '1_15_2'
 include '1_16_5'
 include '1_17_1'
 include '1_18_2'
