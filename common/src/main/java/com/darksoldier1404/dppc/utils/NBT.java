@@ -1,6 +1,6 @@
 package com.darksoldier1404.dppc.utils;
 
-import com.darksoldier1404.dppc.utils.nbtapi.NBTAPI;
+import com.darksoldier1404.dppc.nbt.NBTAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -206,11 +206,15 @@ public class NBT {
 
     @Nullable
     public static Map<String, String> getAllStringTag(ItemStack item) {
+        if (item == null) {
+            return null;
+        }
         Map<String, String> map = new HashMap<>();
         NBTAPI.get(item, (nbt) -> {
             nbt.getKeys().forEach((key) -> {
-                map.put(key, nbt.getString(key));
+                map.put(key, nbt.getTag(key).toString());
             });
+            return null;
         });
         return map;
     }

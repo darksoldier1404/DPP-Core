@@ -1,5 +1,6 @@
 package com.darksoldier1404.dppc;
 
+import com.darksoldier1404.dppc.api.inventory.events.DInventoryListener;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
@@ -85,6 +86,7 @@ public class DPPCore extends JavaPlugin {
         getCommand("dppca").setExecutor(new DPPCACommand());
         getCommand("dppcp").setExecutor(new DPPCPCommand());
         getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
+        getServer().getPluginManager().registerEvents(new DInventoryListener(), this);
     }
 
     @Override
