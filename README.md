@@ -9,8 +9,6 @@
 
 DPP-Core는 Spigot 또는 Paper 서버용 코어 플러그인입니다. DP-Shop, DP-Menu 등 DP-PLUGINS의 의존성으로 사용되며, 다양한 API를 제공합니다.
 
-this project include NBTAPI by tr7zw
-https://github.com/tr7zw/Item-NBT-API
 ## 기능
 
 - DP-PLUGINS를 위한 필수 API 제공
@@ -41,8 +39,6 @@ https://ko-fi.com/deadpoolio
 
 DPP-Core is a core plugin for Spigot or Paper servers. It serves as a dependency for DP-Plugins such as DP-Shop and DP-Menu, providing various APIs.
 
-this project include NBTAPI by tr7zw
-https://github.com/tr7zw/Item-NBT-API
 ## Features
 
 - Provides essential APIs for DP-Plugins
