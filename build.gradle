@@ -63,7 +63,7 @@ test {
 }
 
 tasks.modrinth.doFirst {
-    def upload = file("${rootDir}/jars/DPP-Core-${project.name}-SNAPSHOT.jar")
+    def upload = file("${rootDir}/jars/DPP-Core-${version}-SNAPSHOT.jar")
     logger.lifecycle("Preparing to upload JAR: ${upload}")
     if (!upload.exists()) {
         throw new GradleException("Upload file does not exist: ${upload}")
@@ -152,16 +152,16 @@ modrinth {
     versionName = project.hasProperty('modrinthVersionTitle') ? project.property('modrinthVersionTitle') : "Release ${project.version}"
     versionType = 'release'
     uploadFile = project.provider {
-        def jarFile = file("${rootDir}/jars/DPP-Core-${project.name}-${project.version}-SNAPSHOT.jar")
+        def jarFile = file("${rootDir}/jars/DPP-Core-${version}-SNAPSHOT.jar")
         logger.lifecycle("Checking for JAR: ${jarFile}")
         if (!jarFile.exists()) {
             throw new GradleException("Modrinth upload file does not exist: ${jarFile}")
         }
         jarFile
     }
-    gameVersions = ["1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5", "1.21.6"]
-    loaders = ['paper']
-    changelog = "Release for ${project.version} supporting Minecraft 1.16.5 to 1.21.6"
+    gameVersions = ["1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5", "1.21.6"]
+    loaders = ['bukkit', 'spigot', 'paper', 'purpur']
+    changelog = "Release for ${project.version} supporting Minecraft 1.14.4 to 1.21.6"
     dependencies = []
-    debugMode = true
+    debugMode = false
 }
