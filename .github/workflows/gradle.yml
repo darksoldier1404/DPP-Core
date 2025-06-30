@@ -35,7 +35,7 @@ jobs:
         id: yaml-data
         uses: KJ002/read-yaml@main
         with:
-          file: './common/build/resources/main/plugin.yml'
+          file: './build/resources/main/plugin.yml'
           key-path: '["version"]'
       - name: Set env
         run: echo "RELEASE_VERSION=${{ steps.yaml-data.outputs.data }}" >> $GITHUB_ENV
