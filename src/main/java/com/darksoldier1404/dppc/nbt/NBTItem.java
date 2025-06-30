@@ -17,11 +17,8 @@ public class NBTItem {
     private static final String NAMESPACE = "dppc";
 
     public NBTItem(ItemStack item) {
-        if (item == null || item.getType() == Material.AIR)
-            throw new IllegalArgumentException("ItemStack cannot be null or AIR");
         this.item = item;
         this.meta = item.getItemMeta();
-        if (this.meta == null) throw new IllegalArgumentException("ItemMeta cannot be null");
         this.container = this.meta.getPersistentDataContainer();
     }
 
