@@ -234,16 +234,14 @@ public class DInventory implements InventoryHolder {
     public Map<Integer, ItemStack[]> getPageItemsWithoutTools() {
         if (pageItems.isEmpty()) return null;
         Map<Integer, ItemStack[]> resultItems = new HashMap<>();
-        int pt = 9;
-        for (int page = 0; page < pageItems.size(); page++) {
-            ItemStack[] items = new ItemStack[inventory.getSize()];
-            if (inventory.getSize() >= 9) {
-                pt = 0;
+        int contentSize = inventory.getSize() - 9;
+        for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
+            ItemStack[] items = new ItemStack[contentSize];
+            ItemStack[] pageContent = entry.getValue();
+            for (int i = 0; i < contentSize && i < pageContent.length; i++) {
+                items[i] = pageContent[i];
             }
-            for (int i = 0; i < pageItems.get(page).length - pt; i++) {
-                items[i] = pageItems.get(page)[i];
-            }
-            resultItems.put(page, items);
+            resultItems.put(entry.getKey(), items);
         }
         return resultItems;
     }

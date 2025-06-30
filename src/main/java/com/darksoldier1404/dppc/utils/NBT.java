@@ -199,9 +199,13 @@ public class NBT {
         if (item == null) {
             return false;
         }
-        return NBTAPI.get(item, (nbt) -> {
-            return nbt.hasTag(key);
-        });
+        try {
+            return NBTAPI.get(item, (nbt) -> {
+                return nbt.hasTag(key);
+            });
+        } catch (Exception ignore) {
+            return false;
+        }
     }
 
     @Nullable

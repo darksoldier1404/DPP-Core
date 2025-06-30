@@ -13,16 +13,24 @@ public class NBTAPI {
         if (item == null) {
             return null;
         }
-        NBTItem nbt = new NBTItem(item);
-        consumer.accept(nbt);
-        return nbt.getItem();
+        try {
+            NBTItem nbt = new NBTItem(item);
+            consumer.accept(nbt);
+            return nbt.getItem();
+        } catch (Exception ignore) {
+            return null;
+        }
     }
 
     public static <T> T get(ItemStack item, Function<NBTItem, T> getter) {
         if (item == null) {
             return null;
         }
-        NBTItem nbt = new NBTItem(item);
-        return getter.apply(nbt);
+        try {
+            NBTItem nbt = new NBTItem(item);
+            return getter.apply(nbt);
+        } catch (Exception ignore) {
+            return null;
+        }
     }
 }
