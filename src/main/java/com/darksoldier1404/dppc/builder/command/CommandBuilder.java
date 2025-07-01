@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class CommandBuilder implements CommandExecutor, TabCompleter {
@@ -68,9 +69,17 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
     }
 
     public void addTabCompletion(String subCommand, Function<String[], List<String>> completion) {
-        SubCommand cmd = subCommands.get(subCommand.toLowerCase());
+        SubCommand cmd = this.subCommands.get(subCommand.toLowerCase());
         if (cmd != null) {
             cmd.setTabCompletion(completion);
+        }
+    }
+
+    // Overloaded method to support CommandSender in tab completion
+    public void addTabCompletion(String subCommand, BiFunction<CommandSender, String[], List<String>> completion) {
+        SubCommand cmd = this.subCommands.get(subCommand.toLowerCase());
+        if (cmd != null) {
+            cmd.setTabCompletionWithSender(completion);
         }
     }
 
@@ -89,6 +98,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         private final boolean isPlayerOnly;
         private final BiConsumer<CommandSender, String[]> action;
         private Function<String[], List<String>> tabCompletion;
+        private BiFunction<CommandSender, String[], List<String>> tabCompletionWithSender;
 
         public SubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
             this.name = name;
@@ -100,6 +110,9 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
 
         public void setTabCompletion(Function<String[], List<String>> tabCompletion) {
             this.tabCompletion = tabCompletion;
+        }
+        public void setTabCompletionWithSender(BiFunction<CommandSender, String[], List<String>> tabCompletionWithSender) {
+            this.tabCompletionWithSender = tabCompletionWithSender;
         }
     }
 
@@ -146,10 +159,14 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
 
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
-        if (subCommand != null && subCommand.tabCompletion != null &&
+        if (subCommand != null &&
                 (subCommand.permission == null || sender.hasPermission(subCommand.permission)) &&
                 (!subCommand.isPlayerOnly || sender instanceof Player)) {
-            return subCommand.tabCompletion.apply(args);
+            if (subCommand.tabCompletionWithSender != null) {
+                return subCommand.tabCompletionWithSender.apply(sender, args);
+            } else if (subCommand.tabCompletion != null) {
+                return subCommand.tabCompletion.apply(args);
+            }
         }
         return null;
     }
