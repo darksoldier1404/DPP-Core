@@ -39,7 +39,6 @@ public class ActionGUI {
     }
 
     public void openActionBuilderGUI(Player p) {
-//        DInventory inv = DInventoryFactory.createDInventory("1.14", "Action Builder", 54, plugin, null, false);
         DInventory inv = new DInventory("Action Builder", 54, plugin);
         inv.setChannel(0);
         if (!actionBuilder.getActions().isEmpty()) {

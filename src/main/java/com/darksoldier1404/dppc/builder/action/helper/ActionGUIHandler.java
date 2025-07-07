@@ -26,13 +26,12 @@ public class ActionGUIHandler implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        if (!(e.getInventory() instanceof DInventory)) {
+        if (!(e.getInventory().getHolder() instanceof DInventory)) {
             return;
         }
         Player p = (Player) e.getWhoClicked();
-        DInventory inv = (DInventory) e.getInventory();
-        if(inv.isValidChannel(0)) return;
-        if(!(inv.getObj() instanceof ActionGUI)) return;
+        DInventory inv = (DInventory) e.getInventory().getHolder();
+        if (!(inv.getObj() instanceof ActionGUI)) return;
         ActionGUI ag = (ActionGUI) inv.getObj();
         if (inv.isValidHandler(ag.getPlugin())) {
             if (e.getCurrentItem() == null) {
@@ -75,7 +74,8 @@ public class ActionGUIHandler implements Listener {
                         case DELAY_ACTION:
                             p.sendMessage("§aPlease enter the delay time in tick.");
                             break;
-                        case EXECUTE_ACTION:
+                        case EXECUTE_AS_PLAYER_ACTION:
+                        case EXECUTE_AS_ADMIN_ACTION:
                             p.sendMessage("§aPlease enter the command to execute without slash");
                             break;
                         case PLAY_SOUND_ACTION:
@@ -96,7 +96,8 @@ public class ActionGUIHandler implements Listener {
                     case DELAY_ACTION:
                         p.sendMessage("§aPlease enter the delay time in tick.");
                         break;
-                    case EXECUTE_ACTION:
+                    case EXECUTE_AS_PLAYER_ACTION:
+                    case EXECUTE_AS_ADMIN_ACTION:
                         p.sendMessage("§aPlease enter the command to execute without slash");
                         break;
                     case PLAY_SOUND_ACTION:
@@ -129,8 +130,13 @@ public class ActionGUIHandler implements Listener {
                         e.getPlayer().sendMessage("§cInvalid number. Please enter a valid delay time.");
                     }
                     break;
-                case EXECUTE_ACTION:
-                    ag.getActionBuilder().executeCommand(message);
+                case EXECUTE_AS_ADMIN_ACTION:
+                    ag.getActionBuilder().executeCommandAsAdmin(message);
+                    actionGUIEdit.remove(e.getPlayer().getUniqueId());
+                    Bukkit.getScheduler().runTaskLater(ag.getPlugin(), () -> ag.openActionBuilderGUI(e.getPlayer()), 1L);
+                    break;
+                case EXECUTE_AS_PLAYER_ACTION:
+                    ag.getActionBuilder().executeCommandAsPlayer(message);
                     actionGUIEdit.remove(e.getPlayer().getUniqueId());
                     Bukkit.getScheduler().runTaskLater(ag.getPlugin(), () -> ag.openActionBuilderGUI(e.getPlayer()), 1L);
                     break;
