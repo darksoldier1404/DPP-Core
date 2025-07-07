@@ -187,7 +187,7 @@ public class ActionBuilder {
         }
 
         private void scheduleNextAction(long delay) {
-            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
+            plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
                 @Override
                 public void run() {
                     try {
