@@ -1,9 +1,6 @@
 package com.darksoldier1404.dppc.builder.action;
 
-import com.darksoldier1404.dppc.builder.action.actions.DelayAction;
-import com.darksoldier1404.dppc.builder.action.actions.ExecuteCommandAction;
-import com.darksoldier1404.dppc.builder.action.actions.PlaySoundAction;
-import com.darksoldier1404.dppc.builder.action.actions.TeleportAction;
+import com.darksoldier1404.dppc.builder.action.actions.*;
 import com.darksoldier1404.dppc.builder.action.obj.Action;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -54,7 +51,7 @@ public class ActionBuilder {
     }
 
     private void update(Action a) {
-        if(isEditing) {
+        if (isEditing) {
             if (currentEditIndex >= actions.size()) {
                 plugin.getLogger().warning("Invalid index for editing action.");
                 isEditing = false;
@@ -82,13 +79,28 @@ public class ActionBuilder {
         return this;
     }
 
-    public ActionBuilder executeCommand(String command) {
-        update(new ExecuteCommandAction(command));
+    public ActionBuilder executeCommandAsAdmin(String command) {
+        update(new ExecuteCommandAsAdminAction(command));
+        return this;
+    }
+
+    public ActionBuilder executeCommandAsPlayer(String command) {
+        update(new ExecuteCommandAsPlayerAction(command));
         return this;
     }
 
     public ActionBuilder teleport(String worldName, double x, double y, double z) {
         update(new TeleportAction(worldName, x, y, z));
+        return this;
+    }
+
+    public ActionBuilder sendMessage(String message) {
+        update(new SendMessageAction(message));
+        return this;
+    }
+
+    public ActionBuilder closeInventory() {
+        update(new CloseInventoryAction());
         return this;
     }
 
@@ -119,10 +131,19 @@ public class ActionBuilder {
         action = DelayAction.parse(line);
         if (action != null) return action;
 
-        action = ExecuteCommandAction.parse(line);
+        action = ExecuteCommandAsAdminAction.parse(line);
+        if (action != null) return action;
+
+        action = ExecuteCommandAsPlayerAction.parse(line);
         if (action != null) return action;
 
         action = TeleportAction.parse(line);
+        if (action != null) return action;
+
+        action = SendMessageAction.parse(line);
+        if (action != null) return action;
+
+        action = CloseInventoryAction.parse(line);
         return action;
     }
 
@@ -166,7 +187,7 @@ public class ActionBuilder {
         }
 
         private void scheduleNextAction(long delay) {
-            plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
+            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
                 @Override
                 public void run() {
                     try {

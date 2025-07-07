@@ -78,13 +78,13 @@ public class DPPCore extends JavaPlugin {
         PluginUtil.initializeSoftDependPlugins();
         PluginUtil.loadALLAction();
         PluginUtil.initPlaceholders();
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
-            PluginUtil.updateCheck();
-        }, 100L);
+        getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
         getCommand("dppc").setExecutor(new DPPCCommand());
         getCommand("dppca").setExecutor(new DPPCACommand());
         getCommand("dppcp").setExecutor(new DPPCPCommand());
-        getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
+            PluginUtil.updateCheck();
+        }, 100L);
     }
 
     @Override
