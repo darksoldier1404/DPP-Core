@@ -94,6 +94,16 @@ public class ActionBuilder {
         return this;
     }
 
+    public ActionBuilder sendMessage(String message) {
+        update(new SendMessageAction(message));
+        return this;
+    }
+
+    public ActionBuilder closeInventory() {
+        update(new CloseInventoryAction());
+        return this;
+    }
+
     public void execute(Player player) {
         new ActionExecutor(plugin, actions, player).start();
     }
@@ -128,6 +138,12 @@ public class ActionBuilder {
         if (action != null) return action;
 
         action = TeleportAction.parse(line);
+        if (action != null) return action;
+
+        action = SendMessageAction.parse(line);
+        if (action != null) return action;
+
+        action = CloseInventoryAction.parse(line);
         return action;
     }
 

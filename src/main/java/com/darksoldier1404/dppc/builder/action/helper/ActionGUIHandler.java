@@ -84,6 +84,12 @@ public class ActionGUIHandler implements Listener {
                         case TELEPORT_ACTION:
                             p.sendMessage("§aPlease enter the teleport location (world x y z).");
                             break;
+                        case SEND_MESSAGE_ACTION:
+                            p.sendMessage("§aPlease enter the message to send.");
+                            break;
+                        case CLOSE_INVENTORY_ACTION:
+                            p.sendMessage("§aPlease enter the any message to confirm adding close inventory action.");
+                            return;
                     }
                     p.closeInventory();
                 }
@@ -106,6 +112,12 @@ public class ActionGUIHandler implements Listener {
                     case TELEPORT_ACTION:
                         p.sendMessage("§aPlease enter the teleport location (world x y z).");
                         break;
+                    case SEND_MESSAGE_ACTION:
+                        p.sendMessage("§aPlease enter the message to send.");
+                        break;
+                    case CLOSE_INVENTORY_ACTION:
+                        p.sendMessage("§aPlease enter the any message to confirm adding close inventory action.");
+                        return;
                 }
                 p.closeInventory();
             }
@@ -182,6 +194,16 @@ public class ActionGUIHandler implements Listener {
                     } catch (NumberFormatException ex) {
                         e.getPlayer().sendMessage("§cInvalid number. Please enter a valid coordinate.");
                     }
+                    break;
+                case SEND_MESSAGE_ACTION:
+                    ag.getActionBuilder().sendMessage(message);
+                    actionGUIEdit.remove(e.getPlayer().getUniqueId());
+                    Bukkit.getScheduler().runTaskLater(ag.getPlugin(), () -> ag.openActionBuilderGUI(e.getPlayer()), 1L);
+                    break;
+                case CLOSE_INVENTORY_ACTION:
+                    ag.getActionBuilder().closeInventory();
+                    actionGUIEdit.remove(e.getPlayer().getUniqueId());
+                    Bukkit.getScheduler().runTaskLater(ag.getPlugin(), () -> ag.openActionBuilderGUI(e.getPlayer()), 1L);
                     break;
             }
         }
