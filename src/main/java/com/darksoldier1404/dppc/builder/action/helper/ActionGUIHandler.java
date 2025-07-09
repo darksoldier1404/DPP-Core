@@ -57,18 +57,49 @@ public class ActionGUIHandler implements Listener {
                     return;
                 }
             }
-            if (NBT.hasTagKey(item, "dppc.actionType")) {
-                if (e.getClick() == ClickType.RIGHT) {
-                    int index = NBT.getIntegerTag(item, "dppc.actionIndex");
-                    ag.getActionBuilder().getActions().remove(index);
-                    ag.openActionBuilderGUI(p);
-                    return;
+            if (inv.isValidChannel(0)) {
+                if (NBT.hasTagKey(item, "dppc.actionType")) {
+                    if (e.getClick() == ClickType.RIGHT) {
+                        int index = NBT.getIntegerTag(item, "dppc.actionIndex");
+                        ag.getActionBuilder().getActions().remove(index);
+                        ag.openActionBuilderGUI(p);
+                        return;
+                    }
+                    if (e.getClick() == ClickType.LEFT) {
+                        String actionType = NBT.getStringTag(item, "dppc.actionType");
+                        ActionType actionName = ActionType.valueOf(actionType);
+                        ag.getActionBuilder().setCurrentEditIndex(NBT.getIntegerTag(item, "dppc.actionIndex"));
+                        ag.getActionBuilder().setEditing(true);
+                        actionGUIEdit.put(p.getUniqueId(), Tuple.of(ag, actionName));
+                        switch (actionName) {
+                            case DELAY_ACTION:
+                                p.sendMessage("§aPlease enter the delay time in tick.");
+                                break;
+                            case EXECUTE_AS_PLAYER_ACTION:
+                            case EXECUTE_AS_ADMIN_ACTION:
+                                p.sendMessage("§aPlease enter the command to execute without slash");
+                                break;
+                            case PLAY_SOUND_ACTION:
+                                p.sendMessage("§aPlease enter the sound name or with parameters (volume, pitch, world, target).");
+                                break;
+                            case TELEPORT_ACTION:
+                                p.sendMessage("§aPlease enter the teleport location (world x y z).");
+                                break;
+                            case SEND_MESSAGE_ACTION:
+                                p.sendMessage("§aPlease enter the message to send.");
+                                break;
+                            case CLOSE_INVENTORY_ACTION:
+                                p.sendMessage("§aPlease enter the any message to confirm adding close inventory action.");
+                                return;
+                        }
+                        p.closeInventory();
+                    }
                 }
-                if (e.getClick() == ClickType.LEFT) {
-                    String actionType = NBT.getStringTag(item, "dppc.actionType");
+            }
+            if (inv.isValidChannel(1)) {
+                if (NBT.hasTagKey(item, "dppc.actionTypeSelect")) {
+                    String actionType = NBT.getStringTag(item, "dppc.actionTypeSelect");
                     ActionType actionName = ActionType.valueOf(actionType);
-                    ag.getActionBuilder().setCurrentEditIndex(NBT.getIntegerTag(item, "dppc.actionIndex"));
-                    ag.getActionBuilder().setEditing(true);
                     actionGUIEdit.put(p.getUniqueId(), Tuple.of(ag, actionName));
                     switch (actionName) {
                         case DELAY_ACTION:
@@ -93,33 +124,6 @@ public class ActionGUIHandler implements Listener {
                     }
                     p.closeInventory();
                 }
-            }
-            if (NBT.hasTagKey(item, "dppc.actionTypeSelect")) {
-                String actionType = NBT.getStringTag(item, "dppc.actionTypeSelect");
-                ActionType actionName = ActionType.valueOf(actionType);
-                actionGUIEdit.put(p.getUniqueId(), Tuple.of(ag, actionName));
-                switch (actionName) {
-                    case DELAY_ACTION:
-                        p.sendMessage("§aPlease enter the delay time in tick.");
-                        break;
-                    case EXECUTE_AS_PLAYER_ACTION:
-                    case EXECUTE_AS_ADMIN_ACTION:
-                        p.sendMessage("§aPlease enter the command to execute without slash");
-                        break;
-                    case PLAY_SOUND_ACTION:
-                        p.sendMessage("§aPlease enter the sound name or with parameters (volume, pitch, world, target).");
-                        break;
-                    case TELEPORT_ACTION:
-                        p.sendMessage("§aPlease enter the teleport location (world x y z).");
-                        break;
-                    case SEND_MESSAGE_ACTION:
-                        p.sendMessage("§aPlease enter the message to send.");
-                        break;
-                    case CLOSE_INVENTORY_ACTION:
-                        p.sendMessage("§aPlease enter the any message to confirm adding close inventory action.");
-                        return;
-                }
-                p.closeInventory();
             }
         }
     }

@@ -3,6 +3,7 @@ package com.darksoldier1404.dppc.utils;
 import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
+import com.darksoldier1404.dppc.utils.enums.DependPlugin;
 import com.earth2me.essentials.Essentials;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -25,9 +26,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -37,6 +36,7 @@ import static org.bukkit.Bukkit.getServer;
 public class PluginUtil {
     private static final DPPCore plugin = DPPCore.getInstance();
     private static final Map<JavaPlugin, Integer> loadedPlugins = new HashMap<>();
+    private static final Set<DependPlugin> dependPlugins = new HashSet<>();
 
     public static void addPlugin(JavaPlugin plugin, int id) {
         loadedPlugins.put(plugin, id);
@@ -74,7 +74,7 @@ public class PluginUtil {
     }
 
     public static void initPlaceholders() {
-        if (getPluginInstance("PlaceholderAPI", "PlaceholderAPI") != null) {
+        if (dependPlugins.contains(DependPlugin.PlaceholderAPI)) {
             for (PlaceholderBuilder.InternalExpansion pb : plugin.placeholders) {
                 pb.register();
             }
@@ -85,18 +85,25 @@ public class PluginUtil {
     }
 
     public static void initializeSoftDependPlugins() {
-        DPPCore.ess = getPluginInstance("Essentials", "MoneyAPI");
-        DPPCore.lp = getPluginInstance("LuckPerms", "PermissionAPI");
+        DPPCore.ess = getPluginInstance("Essentials", "MoneyAPI", DependPlugin.Essentials);
+        DPPCore.lp = getPluginInstance("LuckPerms", "PermissionAPI", DependPlugin.LuckPerms);
+        getPluginInstance("WorldGuard", "WorldGuardAPI", DependPlugin.WorldGuard);
+        getPluginInstance("PlaceholderAPI", "PlaceholderUtils", DependPlugin.PlaceholderAPI);
+    }
+
+    public static boolean isDependPluginLoaded(DependPlugin dependPlugin) {
+        return dependPlugins.contains(dependPlugin);
     }
 
     @Nullable
-    public static Plugin getPluginInstance(String pluginName, String apiName) {
+    public static Plugin getPluginInstance(String pluginName, String apiName, DependPlugin dependPlugin) {
         Plugin instance = getServer().getPluginManager().getPlugin(pluginName);
         if (instance == null) {
             plugin.getLogger().warning(pluginName + " plugin is not installed.");
             plugin.getLogger().warning(apiName + " is disabled.");
             return null;
         }
+        dependPlugins.add(dependPlugin);
         return instance;
     }
 
