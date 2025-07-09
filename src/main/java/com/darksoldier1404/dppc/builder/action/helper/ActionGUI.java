@@ -74,7 +74,7 @@ public class ActionGUI {
 
     public void openActionSelectGUI(Player p) {
         DInventory inv = new DInventory( "Action Selector", 27, plugin);
-        inv.setChannel(0);
+        inv.setChannel(1);
         for (ActionType name : ActionType.values()) {
             ItemStack actionItem = new ItemStack(Material.REDSTONE);
             ItemMeta actionMeta = actionItem.getItemMeta();
