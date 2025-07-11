@@ -14,6 +14,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
+/**
+ * The type Luckperm api.
+ */
 public class LuckpermAPI {
     private static final DPPCore plugin = DPPCore.getInstance();
     private static final LuckPerms lp = (LuckPerms) plugin.lp;
@@ -21,38 +24,50 @@ public class LuckpermAPI {
     private static final String MSG_USER_NOT_FOUND = PREFIX + "User not found.";
     private static final Logger logger = plugin.getLogger();
 
+    /**
+     * Gets user.
+     *
+     * @param player the player
+     * @return the user
+     */
     @Nullable
-    public static User getUser(OfflinePlayer p) {
-        return getUserOrNotify(p);
+    public static User getUser(OfflinePlayer player) {
+        return getUserOrNotify(player);
     }
 
+    /**
+     * Gets user from uuid.
+     *
+     * @param uuid the uuid
+     * @return the user from uuid
+     */
     @Nullable
     public static User getUserFromUUID(UUID uuid) {
         return lp.getUserManager().getUser(uuid);
     }
 
     @Nullable
-    private static User getUserOrNotify(OfflinePlayer p) {
+    private static User getUserOrNotify(OfflinePlayer player) {
         try {
-            User user = lp.getUserManager().getUser(p.getUniqueId());
+            User user = lp.getUserManager().getUser(player.getUniqueId());
             return user;
         } catch (Exception e) {
-            logger.severe("Failed to get user for " + p.getName() + ": " + e.getMessage());
+            logger.severe("Failed to get user for " + player.getName() + ": " + e.getMessage());
             return null;
         }
     }
 
-    private static <T extends Node> void addNode(OfflinePlayer p, T node) {
-        User user = getUserOrNotify(p);
+    private static <T extends Node> void addNode(OfflinePlayer player, T node) {
+        User user = getUserOrNotify(player);
         if (user != null) {
             user.data().add(node);
             lp.getUserManager().saveUser(user);
-            logger.info("Added node for player " + p.getName());
+            logger.info("Added node for player " + player.getName());
         }
     }
 
-    private static <T extends Node> void removeNode(OfflinePlayer p, Class<T> nodeType, Predicate<T> predicate) {
-        User user = getUserOrNotify(p);
+    private static <T extends Node> void removeNode(OfflinePlayer player, Class<T> nodeType, Predicate<T> predicate) {
+        User user = getUserOrNotify(player);
         if (user != null) {
             boolean modified = user.getNodes().stream()
                     .filter(nodeType::isInstance)
@@ -66,78 +81,180 @@ public class LuckpermAPI {
                     .orElse(false);
             if (modified) {
                 lp.getUserManager().saveUser(user);
-                logger.info("Removed node for player " + p.getName());
+                logger.info("Removed node for player " + player.getName());
             }
         }
     }
 
-    private static <T extends Node> boolean hasNode(OfflinePlayer p, Class<T> nodeType, Predicate<T> predicate) {
-        User user = getUserOrNotify(p);
+    private static <T extends Node> boolean hasNode(OfflinePlayer player, Class<T> nodeType, Predicate<T> predicate) {
+        User user = getUserOrNotify(player);
         return user != null && user.getNodes().stream()
                 .filter(nodeType::isInstance)
                 .map(nodeType::cast)
                 .anyMatch(predicate);
     }
 
-    public static void setPrefix(OfflinePlayer p, String prefix, int priority) {
+    /**
+     * Sets prefix.
+     *
+     * @param player   the player
+     * @param prefix   the prefix
+     * @param priority the priority
+     */
+    public static void setPrefix(OfflinePlayer player, String prefix, int priority) {
         if (prefix == null || prefix.isEmpty()) {
             return;
         }
-        addNode(p, PrefixNode.builder(prefix, priority).build());
+        addNode(player, PrefixNode.builder(prefix, priority).build());
     }
 
-    public static void setSuffix(OfflinePlayer p, String suffix, int priority) {
+    /**
+     * Sets suffix.
+     *
+     * @param player   the player
+     * @param suffix   the suffix
+     * @param priority the priority
+     */
+    public static void setSuffix(OfflinePlayer player, String suffix, int priority) {
         if (suffix == null || suffix.isEmpty()) {
             return;
         }
-        addNode(p, SuffixNode.builder(suffix, priority).build());
+        addNode(player, SuffixNode.builder(suffix, priority).build());
     }
 
-    public static void delPrefix(OfflinePlayer p, String prefix) {
-        removeNode(p, PrefixNode.class, node -> node.getKey().equals(prefix));
+    /**
+     * Del prefix.
+     *
+     * @param player the player
+     * @param prefix the prefix
+     */
+    public static void delPrefix(OfflinePlayer player, String prefix) {
+        removeNode(player, PrefixNode.class, node -> node.getKey().equals(prefix));
     }
 
-    public static void delSuffix(OfflinePlayer p, String suffix) {
-        removeNode(p, SuffixNode.class, node -> node.getKey().equals(suffix));
+    /**
+     * Del suffix.
+     *
+     * @param player the player
+     * @param suffix the suffix
+     */
+    public static void delSuffix(OfflinePlayer player, String suffix) {
+        removeNode(player, SuffixNode.class, node -> node.getKey().equals(suffix));
     }
 
-    public static void delPrefix(OfflinePlayer p, int priority) {
-        removeNode(p, PrefixNode.class, node -> node.getPriority() == priority);
+    /**
+     * Del prefix.
+     *
+     * @param player   the player
+     * @param priority the priority
+     */
+    public static void delPrefix(OfflinePlayer player, int priority) {
+        removeNode(player, PrefixNode.class, node -> node.getPriority() == priority);
     }
 
-    public static void delSuffix(OfflinePlayer p, int priority) {
-        removeNode(p, SuffixNode.class, node -> node.getPriority() == priority);
+    /**
+     * Del suffix.
+     *
+     * @param player   the player
+     * @param priority the priority
+     */
+    public static void delSuffix(OfflinePlayer player, int priority) {
+        removeNode(player, SuffixNode.class, node -> node.getPriority() == priority);
     }
 
-    public static boolean isPrefixExists(OfflinePlayer p, String prefix) {
-        return hasNode(p, PrefixNode.class, node -> node.getKey().equals(prefix));
+    /**
+     * Is prefix exists boolean.
+     *
+     * @param player the player
+     * @param prefix the prefix
+     * @return the boolean
+     */
+    public static boolean isPrefixExists(OfflinePlayer player, String prefix) {
+        return hasNode(player, PrefixNode.class, node -> node.getKey().equals(prefix));
     }
 
-    public static boolean isSuffixExists(OfflinePlayer p, String suffix) {
-        return hasNode(p, SuffixNode.class, node -> node.getKey().equals(suffix));
+    /**
+     * Is suffix exists boolean.
+     *
+     * @param player the player
+     * @param suffix the suffix
+     * @return the boolean
+     */
+    public static boolean isSuffixExists(OfflinePlayer player, String suffix) {
+        return hasNode(player, SuffixNode.class, node -> node.getKey().equals(suffix));
     }
 
-    public static boolean isPrefixExists(OfflinePlayer p, int priority) {
-        return hasNode(p, PrefixNode.class, node -> node.getPriority() == priority);
+    /**
+     * Is prefix exists boolean.
+     *
+     * @param player   the player
+     * @param priority the priority
+     * @return the boolean
+     */
+    public static boolean isPrefixExists(OfflinePlayer player, int priority) {
+        return hasNode(player, PrefixNode.class, node -> node.getPriority() == priority);
     }
 
-    public static boolean isSuffixExists(OfflinePlayer p, int priority) {
-        return hasNode(p, SuffixNode.class, node -> node.getPriority() == priority);
+    /**
+     * Is suffix exists boolean.
+     *
+     * @param player   the player
+     * @param priority the priority
+     * @return the boolean
+     */
+    public static boolean isSuffixExists(OfflinePlayer player, int priority) {
+        return hasNode(player, SuffixNode.class, node -> node.getPriority() == priority);
     }
 
-    public static <T extends Node> void removeNodeByKey(OfflinePlayer p, Class<T> nodeType, String key) {
-        removeNode(p, nodeType, node -> node.getKey().equals(key));
+    /**
+     * Remove node by key.
+     *
+     * @param <T>      the type parameter
+     * @param player   the player
+     * @param nodeType the node type
+     * @param key      the key
+     */
+    public static <T extends Node> void removeNodeByKey(OfflinePlayer player, Class<T> nodeType, String key) {
+        removeNode(player, nodeType, node -> node.getKey().equals(key));
     }
 
-    public static <T extends Node> void removeNodeByPriority(OfflinePlayer p, Class<T> nodeType, int priority, Function<T, Integer> priorityExtractor) {
-        removeNode(p, nodeType, node -> priorityExtractor.apply(node) == priority);
+    /**
+     * Remove node by priority.
+     *
+     * @param <T>               the type parameter
+     * @param player            the player
+     * @param nodeType          the node type
+     * @param priority          the priority
+     * @param priorityExtractor the priority extractor
+     */
+    public static <T extends Node> void removeNodeByPriority(OfflinePlayer player, Class<T> nodeType, int priority, Function<T, Integer> priorityExtractor) {
+        removeNode(player, nodeType, node -> priorityExtractor.apply(node) == priority);
     }
 
-    public static <T extends Node> boolean hasNodeByKey(OfflinePlayer p, Class<T> nodeType, String key) {
-        return hasNode(p, nodeType, node -> node.getKey().equals(key));
+    /**
+     * Has node by key boolean.
+     *
+     * @param <T>      the type parameter
+     * @param player   the player
+     * @param nodeType the node type
+     * @param key      the key
+     * @return the boolean
+     */
+    public static <T extends Node> boolean hasNodeByKey(OfflinePlayer player, Class<T> nodeType, String key) {
+        return hasNode(player, nodeType, node -> node.getKey().equals(key));
     }
 
-    public static <T extends Node> boolean hasNodeByPriority(OfflinePlayer p, Class<T> nodeType, int priority, Function<T, Integer> priorityExtractor) {
-        return hasNode(p, nodeType, node -> priorityExtractor.apply(node) == priority);
+    /**
+     * Has node by priority boolean.
+     *
+     * @param <T>               the type parameter
+     * @param player            the player
+     * @param nodeType          the node type
+     * @param priority          the priority
+     * @param priorityExtractor the priority extractor
+     * @return the boolean
+     */
+    public static <T extends Node> boolean hasNodeByPriority(OfflinePlayer player, Class<T> nodeType, int priority, Function<T, Integer> priorityExtractor) {
+        return hasNode(player, nodeType, node -> priorityExtractor.apply(node) == priority);
     }
 }

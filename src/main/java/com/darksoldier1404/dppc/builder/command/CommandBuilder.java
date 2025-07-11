@@ -16,6 +16,9 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * The type Command builder.
+ */
 public class CommandBuilder implements CommandExecutor, TabCompleter {
     private final Map<String, SubCommand> subCommands = new HashMap<>();
     private final String prefix;
@@ -23,10 +26,20 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
     private BiConsumer<CommandSender, String[]> defaultAction;
     private String noSubCommandsMessage;
 
+    /**
+     * Gets sub command names.
+     *
+     * @return the sub command names
+     */
     public List<String> getSubCommandNames() {
         return subCommandNames;
     }
 
+    /**
+     * Instantiates a new Command builder.
+     *
+     * @param prefix the prefix
+     */
     public CommandBuilder(String prefix) {
         this.prefix = prefix;
         this.noSubCommandsMessage = prefix + "No available commands.";
@@ -51,23 +64,61 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         };
     }
 
+    /**
+     * Add sub command.
+     *
+     * @param name   the name
+     * @param usage  the usage
+     * @param action the action
+     */
     public void addSubCommand(String name, String usage, BiConsumer<CommandSender, String[]> action) {
         addSubCommand(name, null, usage, false, action);
     }
 
+    /**
+     * Add sub command.
+     *
+     * @param name         the name
+     * @param usage        the usage
+     * @param isPlayerOnly the is player only
+     * @param action       the action
+     */
     public void addSubCommand(String name, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
         addSubCommand(name, null, usage, isPlayerOnly, action);
     }
 
+    /**
+     * Add sub command.
+     *
+     * @param name       the name
+     * @param permission the permission
+     * @param usage      the usage
+     * @param action     the action
+     */
     public void addSubCommand(String name, String permission, String usage, BiConsumer<CommandSender, String[]> action) {
         addSubCommand(name, permission, usage, false, action);
     }
 
+    /**
+     * Add sub command.
+     *
+     * @param name         the name
+     * @param permission   the permission
+     * @param usage        the usage
+     * @param isPlayerOnly the is player only
+     * @param action       the action
+     */
     public void addSubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
         subCommands.put(name.toLowerCase(), new SubCommand(name, permission, usage, isPlayerOnly, action));
         subCommandNames.add(name.toLowerCase());
     }
 
+    /**
+     * Add tab completion.
+     *
+     * @param subCommand the sub command
+     * @param completion the completion
+     */
     public void addTabCompletion(String subCommand, Function<String[], List<String>> completion) {
         SubCommand cmd = this.subCommands.get(subCommand.toLowerCase());
         if (cmd != null) {
@@ -75,7 +126,13 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
     }
 
-    // Overloaded method to support CommandSender in tab completion
+    /**
+     * Add tab completion.
+     *
+     * @param subCommand the sub command
+     * @param completion the completion
+     */
+// Overloaded method to support CommandSender in tab completion
     public void addTabCompletion(String subCommand, BiFunction<CommandSender, String[], List<String>> completion) {
         SubCommand cmd = this.subCommands.get(subCommand.toLowerCase());
         if (cmd != null) {
@@ -83,10 +140,20 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
     }
 
+    /**
+     * Sets default action.
+     *
+     * @param action the action
+     */
     public void setDefaultAction(BiConsumer<CommandSender, String[]> action) {
         this.defaultAction = action;
     }
 
+    /**
+     * Sets no sub commands message.
+     *
+     * @param message the message
+     */
     public void setNoSubCommandsMessage(String message) {
         this.noSubCommandsMessage = message;
     }
@@ -100,6 +167,15 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         private Function<String[], List<String>> tabCompletion;
         private BiFunction<CommandSender, String[], List<String>> tabCompletionWithSender;
 
+        /**
+         * Instantiates a new Sub command.
+         *
+         * @param name         the name
+         * @param permission   the permission
+         * @param usage        the usage
+         * @param isPlayerOnly the is player only
+         * @param action       the action
+         */
         public SubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
             this.name = name;
             this.permission = permission;
@@ -108,9 +184,20 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             this.action = action;
         }
 
+        /**
+         * Sets tab completion.
+         *
+         * @param tabCompletion the tab completion
+         */
         public void setTabCompletion(Function<String[], List<String>> tabCompletion) {
             this.tabCompletion = tabCompletion;
         }
+
+        /**
+         * Sets tab completion with sender.
+         *
+         * @param tabCompletionWithSender the tab completion with sender
+         */
         public void setTabCompletionWithSender(BiFunction<CommandSender, String[], List<String>> tabCompletionWithSender) {
             this.tabCompletionWithSender = tabCompletionWithSender;
         }

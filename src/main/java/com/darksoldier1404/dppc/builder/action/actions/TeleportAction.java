@@ -7,12 +7,23 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+/**
+ * The type Teleport action.
+ */
 public class TeleportAction implements Action {
     private final String worldName;
     private final double x;
     private final double y;
     private final double z;
 
+    /**
+     * Instantiates a new Teleport action.
+     *
+     * @param worldName the world name
+     * @param x         the x
+     * @param y         the y
+     * @param z         the z
+     */
     public TeleportAction(String worldName, double x, double y, double z) {
         this.worldName = worldName;
         this.x = x;
@@ -39,6 +50,12 @@ public class TeleportAction implements Action {
         return String.format("teleport %s %.1f,%.1f,%.1f", worldName, x, y, z);
     }
 
+    /**
+     * Parse teleport action.
+     *
+     * @param line the line
+     * @return the teleport action
+     */
     public static TeleportAction parse(String line) {
         String[] parts = line.split("\\s+");
         if (parts.length != 3 || !parts[0].equalsIgnoreCase("teleport")) {

@@ -21,27 +21,56 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The type World guard api.
+ */
 @SuppressWarnings("unused")
 public class WorldGuardAPI {
     private static final DPPCore plugin = DPPCore.getInstance();
     private static final WorldGuard wg = WorldGuard.getInstance();
     private static final RegionContainer rc = wg.getPlatform().getRegionContainer();
 
+    /**
+     * Gets region manager.
+     *
+     * @param world the world
+     * @return the region manager
+     */
     @Nullable
     public static RegionManager getRegionManager(World world) {
         return rc.get(new BukkitWorld(world));
     }
 
+    /**
+     * Gets region manager.
+     *
+     * @param worldName the world name
+     * @return the region manager
+     */
     @Nullable
     public static RegionManager getRegionManager(String worldName) {
         World world = Bukkit.getWorld(worldName);
         return (world != null) ? getRegionManager(world) : null;
     }
 
+    /**
+     * Is region boolean.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @return the boolean
+     */
     public static boolean isRegion(World world, String regionName) {
         return isRegion(getRegionManager(world), regionName);
     }
 
+    /**
+     * Is region boolean.
+     *
+     * @param worldName  the world name
+     * @param regionName the region name
+     * @return the boolean
+     */
     public static boolean isRegion(String worldName, String regionName) {
         return isRegion(getRegionManager(worldName), regionName);
     }
@@ -50,6 +79,13 @@ public class WorldGuardAPI {
         return rm != null && rm.hasRegion(regionName);
     }
 
+    /**
+     * Is player in region boolean.
+     *
+     * @param player     the player
+     * @param regionName the region name
+     * @return the boolean
+     */
     public static boolean isPlayerInRegion(Player player, String regionName) {
         World world = player.getWorld();
         RegionManager rm = getRegionManager(world);
@@ -59,6 +95,14 @@ public class WorldGuardAPI {
         return regions.getRegions().stream().anyMatch(region -> region.getId().equalsIgnoreCase(regionName));
     }
 
+    /**
+     * Is player region owner boolean.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @param player     the player
+     * @return the boolean
+     */
     public static boolean isPlayerRegionOwner(World world, String regionName, Player player) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return false;
@@ -67,6 +111,14 @@ public class WorldGuardAPI {
         return region != null && region.getOwners().contains(player.getUniqueId());
     }
 
+    /**
+     * Is player region member boolean.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @param player     the player
+     * @return the boolean
+     */
     public static boolean isPlayerRegionMember(World world, String regionName, Player player) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return false;
@@ -75,6 +127,14 @@ public class WorldGuardAPI {
         return region != null && region.getMembers().contains(player.getUniqueId());
     }
 
+    /**
+     * Add region owner boolean.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @param player     the player
+     * @return the boolean
+     */
     public static boolean addRegionOwner(World world, String regionName, Player player) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return false;
@@ -92,6 +152,14 @@ public class WorldGuardAPI {
         }
     }
 
+    /**
+     * Remove region owner boolean.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @param player     the player
+     * @return the boolean
+     */
     public static boolean removeRegionOwner(World world, String regionName, Player player) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return false;
@@ -109,6 +177,12 @@ public class WorldGuardAPI {
         }
     }
 
+    /**
+     * Gets all regions.
+     *
+     * @param world the world
+     * @return the all regions
+     */
     public static List<String> getAllRegions(World world) {
         RegionManager rm = getRegionManager(world);
         if (rm == null) return Collections.emptyList();
@@ -116,6 +190,13 @@ public class WorldGuardAPI {
         return new ArrayList<>(rm.getRegions().keySet());
     }
 
+    /**
+     * Gets child regions.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @return the child regions
+     */
     public static List<String> getChildRegions(World world, String regionName) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return Collections.emptyList();
@@ -126,6 +207,13 @@ public class WorldGuardAPI {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Gets region area volume.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @return the region area volume
+     */
     public static int getRegionAreaVolume(World world, String regionName) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return 0;
@@ -143,6 +231,14 @@ public class WorldGuardAPI {
         return xSize * ySize * zSize;
     }
 
+    /**
+     * Is block in region boolean.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @param location   the location
+     * @return the boolean
+     */
     public static boolean isBlockInRegion(World world, String regionName, Location location) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return false;
@@ -151,6 +247,13 @@ public class WorldGuardAPI {
         return region != null && region.contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
+    /**
+     * Gets players in region.
+     *
+     * @param world      the world
+     * @param regionName the region name
+     * @return the players in region
+     */
     public static List<Player> getPlayersInRegion(World world, String regionName) {
         RegionManager rm = getRegionManager(world);
         if (rm == null || !rm.hasRegion(regionName)) return Collections.emptyList();

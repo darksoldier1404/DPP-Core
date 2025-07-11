@@ -8,6 +8,9 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+/**
+ * The type Play sound action.
+ */
 public class PlaySoundAction implements Action {
     private final String soundName;
     private final float volume;
@@ -15,6 +18,15 @@ public class PlaySoundAction implements Action {
     private final String worldName;
     private final Object target;
 
+    /**
+     * Instantiates a new Play sound action.
+     *
+     * @param soundName the sound name
+     * @param volume    the volume
+     * @param pitch     the pitch
+     * @param worldName the world name
+     * @param target    the target
+     */
     public PlaySoundAction(String soundName, float volume, float pitch, String worldName, Object target) {
         this.soundName = soundName;
         this.volume = volume;
@@ -63,6 +75,12 @@ public class PlaySoundAction implements Action {
         return String.format("playsound %s %s %s %s %s", soundName, volume, pitch, worldName, targetString);
     }
 
+    /**
+     * Parse play sound action.
+     *
+     * @param line the line
+     * @return the play sound action
+     */
     public static PlaySoundAction parse(String line) {
         String[] parts = line.split("\\s+");
         if (parts.length != 6 || !parts[0].equalsIgnoreCase("playsound")) {
