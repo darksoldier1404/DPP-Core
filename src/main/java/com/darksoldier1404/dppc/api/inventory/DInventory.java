@@ -267,6 +267,7 @@ public class DInventory implements InventoryHolder {
 
     public DInventory deserialize(YamlConfiguration data) {
         update();
+        if (!data.contains("DInventory")) return this;
         this.handlerName = data.getString("DInventory.handlerName");
         this.uuid = UUID.fromString(data.getString("DInventory.uuid"));
         this.usePage = data.getBoolean("DInventory.usePage");
@@ -283,18 +284,20 @@ public class DInventory implements InventoryHolder {
             }
         }
         this.pageItems = new HashMap<>();
-        for (String page : data.getConfigurationSection("DInventory.pageItems").getKeys(false)) {
-            for (String itemPath : data.getConfigurationSection("DInventory.pageItems." + page).getKeys(false)) {
-                if (!data.isItemStack("DInventory.pageItems." + page + "." + itemPath)) {
-                    continue;
+        if (data.contains("DInventory.pageItems")) {
+            for (String page : data.getConfigurationSection("DInventory.pageItems").getKeys(false)) {
+                for (String itemPath : data.getConfigurationSection("DInventory.pageItems." + page).getKeys(false)) {
+                    if (!data.isItemStack("DInventory.pageItems." + page + "." + itemPath)) {
+                        continue;
+                    }
+                    ItemStack item = data.getItemStack("DInventory.pageItems." + page + "." + itemPath);
+                    int slot = Integer.parseInt(itemPath);
+                    if (slot < 0 || slot > 44) continue;
+                    if (!pageItems.containsKey(Integer.parseInt(page))) {
+                        pageItems.put(Integer.parseInt(page), new ItemStack[45]);
+                    }
+                    pageItems.get(Integer.parseInt(page))[slot] = item;
                 }
-                ItemStack item = data.getItemStack("DInventory.pageItems." + page + "." + itemPath);
-                int slot = Integer.parseInt(itemPath);
-                if (slot < 0 || slot > 44) continue;
-                if (!pageItems.containsKey(Integer.parseInt(page))) {
-                    pageItems.put(Integer.parseInt(page), new ItemStack[45]);
-                }
-                pageItems.get(Integer.parseInt(page))[slot] = item;
             }
         }
         if (data.contains("obj")) {
