@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.darksoldier1404'
-version = '5.0.2.41'
+version = '5.0.3.42'
 
 repositories {
     gradlePluginPortal()
