@@ -52,6 +52,14 @@ public class DInventory implements InventoryHolder {
         DInventoryManager.addInventory(plugin, this);
     }
 
+    public void updateTitle(String title) { // use only not opened inventory
+        if (title == null || title.isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
+        this.inventory = Bukkit.createInventory(this, inventory.getSize(), title);
+        update();
+    }
+
     @Override
     public Inventory getInventory() {
         return inventory;
