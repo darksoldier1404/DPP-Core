@@ -1,6 +1,5 @@
 package com.darksoldier1404.dppc.api.inventory;
 
-import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.DInventoryManager;
 import com.darksoldier1404.dppc.utils.NBT;
 import org.bukkit.Bukkit;
@@ -33,7 +32,6 @@ public class DInventory implements InventoryHolder {
     private Map<Integer, ItemStack[]> pageItems = new HashMap<>();
     private Object obj;
     private int channel;
-    private YamlConfiguration data;
 
     public DInventory(String title, int size, JavaPlugin plugin) {
         this.inventory = Bukkit.createInventory(this, size, title);
@@ -261,16 +259,15 @@ public class DInventory implements InventoryHolder {
 
     public DInventory deserialize(YamlConfiguration data) {
         update();
-        this.data = data;
-        this.handlerName = data.getString("handlerName");
-        this.uuid = UUID.fromString(data.getString("uuid"));
-        this.usePage = data.getBoolean("usePage");
-        this.usePageTools = data.getBoolean("usePageTools");
-        this.pages = data.getInt("pages");
-        this.currentPage = data.getInt("currentPage");
+        this.handlerName = data.getString("DInventory.handlerName");
+        this.uuid = UUID.fromString(data.getString("DInventory.uuid"));
+        this.usePage = data.getBoolean("DInventory.usePage");
+        this.usePageTools = data.getBoolean("DInventory.usePageTools");
+        this.pages = data.getInt("DInventory.pages");
+        this.currentPage = data.getInt("DInventory.currentPage");
         this.pageTools = new ItemStack[9];
         for (int i = 0; i < 9; i++) {
-            String itemPath = "pageTools." + i;
+            String itemPath = "DInventory.pageTools." + i;
             if (data.contains(itemPath)) {
                 pageTools[i] = data.getItemStack(itemPath);
             } else {
@@ -278,12 +275,12 @@ public class DInventory implements InventoryHolder {
             }
         }
         this.pageItems = new HashMap<>();
-        for (String page : data.getConfigurationSection("pageItems").getKeys(false)) {
-            for (String itemPath : data.getConfigurationSection("pageItems." + page).getKeys(false)) {
-                if (!data.isItemStack("pageItems." + page + "." + itemPath)) {
+        for (String page : data.getConfigurationSection("DInventory.pageItems").getKeys(false)) {
+            for (String itemPath : data.getConfigurationSection("DInventory.pageItems." + page).getKeys(false)) {
+                if (!data.isItemStack("DInventory.pageItems." + page + "." + itemPath)) {
                     continue;
                 }
-                ItemStack item = data.getItemStack("pageItems." + page + "." + itemPath);
+                ItemStack item = data.getItemStack("DInventory.pageItems." + page + "." + itemPath);
                 int slot = Integer.parseInt(itemPath);
                 if (slot < 0 || slot > 44) continue;
                 if (!pageItems.containsKey(Integer.parseInt(page))) {
@@ -293,30 +290,29 @@ public class DInventory implements InventoryHolder {
             }
         }
         if (data.contains("obj")) {
-            this.obj = decodeObjectFromBase64(data.getString("obj"));
+            this.obj = decodeObjectFromBase64(data.getString("DInventory.obj"));
         } else {
             this.obj = null;
         }
-        if (data.contains("channel")) {
-            this.channel = data.getInt("channel");
+        if (data.contains("DInventory.channel")) {
+            this.channel = data.getInt("DInventory.channel");
         } else {
             this.channel = 0;
         }
         return null;
     }
 
-    public YamlConfiguration serialize() {
+    public YamlConfiguration serialize(YamlConfiguration data) {
         update();
-        YamlConfiguration data = new YamlConfiguration();
-        data.set("handlerName", handlerName);
-        data.set("uuid", uuid.toString());
-        data.set("usePage", usePage);
-        data.set("usePageTools", usePageTools);
-        data.set("pages", pages);
-        data.set("currentPage", currentPage);
+        data.set("DInventory.handlerName", handlerName);
+        data.set("DInventory.uuid", uuid.toString());
+        data.set("DInventory.usePage", usePage);
+        data.set("DInventory.usePageTools", usePageTools);
+        data.set("DInventory.pages", pages);
+        data.set("DInventory.currentPage", currentPage);
         for (int i = 0; i < pageTools.length; i++) {
             if (pageTools[i] != null) {
-                data.set("pageTools." + i, pageTools[i]);
+                data.set("DInventory.pageTools." + i, pageTools[i]);
             }
         }
         for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
@@ -324,14 +320,14 @@ public class DInventory implements InventoryHolder {
             ItemStack[] items = entry.getValue();
             for (int i = 0; i < items.length; i++) {
                 if (items[i] != null) {
-                    data.set("pageItems." + page + "." + i, items[i]);
+                    data.set("DInventory.pageItems." + page + "." + i, items[i]);
                 }
             }
         }
         if (obj != null) {
-            data.set("obj", encodeObjectToBase64(obj));
+            data.set("DInventory.obj", encodeObjectToBase64(obj));
         }
-        data.set("channel", channel);
+        data.set("DInventory.channel", channel);
         return data;
     }
 
@@ -362,21 +358,6 @@ public class DInventory implements InventoryHolder {
             e.fillInStackTrace();
             return null;
         }
-    }
-
-    public void save() {
-        save(name);
-    }
-
-    public void save(String name) {
-        update();
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Inventory name cannot be null or empty");
-        }
-        if (data == null) {
-            throw new IllegalStateException("Data configuration is not initialized");
-        }
-        ConfigUtils.saveCustomData(plugin, serialize(), name, "DInventory");
     }
 
     public int getSize() {
