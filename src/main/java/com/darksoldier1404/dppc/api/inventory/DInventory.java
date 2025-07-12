@@ -7,7 +7,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +28,7 @@ public class DInventory implements InventoryHolder {
     private UUID uuid;
     private boolean usePage;
     private boolean usePageTools;
+    private boolean useDefaultPageTools;
     private int pages = 0;
     private int currentPage = 0;
     private ItemStack[] pageTools = new ItemStack[9];
@@ -47,6 +50,17 @@ public class DInventory implements InventoryHolder {
         this.handlerName = plugin.getName();
         this.usePage = usePage;
         usePageTools = true;
+        this.plugin = plugin;
+        uuid = UUID.randomUUID();
+        DInventoryManager.addInventory(plugin, this);
+    }
+
+    public DInventory(String title, int size, boolean usePage, boolean useDefaultPageTools, JavaPlugin plugin) {
+        this.inventory = Bukkit.createInventory(this, size, title);
+        this.handlerName = plugin.getName();
+        this.usePage = usePage;
+        usePageTools = true;
+        this.useDefaultPageTools = useDefaultPageTools;
         this.plugin = plugin;
         uuid = UUID.randomUUID();
         DInventoryManager.addInventory(plugin, this);
@@ -119,6 +133,14 @@ public class DInventory implements InventoryHolder {
         this.usePageTools = usePageTools;
     }
 
+    public boolean isUseDefaultPageTools() {
+        return useDefaultPageTools;
+    }
+
+    public void setUseDefaultPageTools(boolean useDefaultPageTools) {
+        this.useDefaultPageTools = useDefaultPageTools;
+    }
+
     public void setPages(int pages) {
         this.pages = pages;
     }
@@ -173,6 +195,9 @@ public class DInventory implements InventoryHolder {
     }
 
     public void updatePageTools() {
+        if (useDefaultPageTools) {
+            applyDefaultPageTools();
+        }
         int pt = 0;
         for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
             if (pageTools[pt] != null) {
@@ -181,6 +206,14 @@ public class DInventory implements InventoryHolder {
             }
             pt++;
         }
+    }
+
+    public void applyChanges() {
+        ItemStack[] contents = new ItemStack[inventory.getSize()];
+        for (int i = 0; i < inventory.getSize(); i++) {
+            contents[i] = inventory.getItem(i);
+        }
+        pageItems.put(currentPage, contents);
     }
 
     public void update() {
@@ -252,6 +285,45 @@ public class DInventory implements InventoryHolder {
         return resultItems;
     }
 
+    public void applyDefaultPageTools() {
+        if (useDefaultPageTools) {
+            ItemStack[] defaultPageTools = new ItemStack[9];
+            ItemStack pane = NBT.setStringTag(new ItemStack(org.bukkit.Material.BLACK_STAINED_GLASS_PANE), "dppc_clickcancel", "true");
+            ItemMeta meta = pane.getItemMeta();
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.setDisplayName(" ");
+            pane.setItemMeta(meta);
+            ItemStack nextPage = NBT.setStringTag(new ItemStack(org.bukkit.Material.ARROW), "dppc_clickcancel", "true");
+            nextPage = NBT.setStringTag(nextPage, "dppc_nextpage", "true");
+            ItemMeta nextMeta = nextPage.getItemMeta();
+            nextMeta.setDisplayName("§aNext Page");
+            nextMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            nextPage.setItemMeta(nextMeta);
+            ItemStack prevPage = NBT.setStringTag(new ItemStack(org.bukkit.Material.ARROW), "dppc_clickcancel", "true");
+            prevPage = NBT.setStringTag(prevPage, "dppc_prevpage", "true");
+            ItemMeta prevMeta = prevPage.getItemMeta();
+            prevMeta.setDisplayName("§aPrevious Page");
+            prevMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            prevPage.setItemMeta(prevMeta);
+            ItemStack currentPageItem = NBT.setStringTag(new ItemStack(org.bukkit.Material.PAPER), "dppc_clickcancel", "true");
+            currentPageItem = NBT.setStringTag(currentPageItem, "dppc_currentpage", "true");
+            ItemMeta currentMeta = currentPageItem.getItemMeta();
+            currentMeta.setDisplayName("§aCurrent Page: <dppc_currentpage> / <dppc_maxpage>");
+            currentMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            currentPageItem.setItemMeta(currentMeta);
+            defaultPageTools[0] = pane; // Slot 0
+            defaultPageTools[1] = prevPage; // Slot 1
+            defaultPageTools[2] = pane; // Slot 2
+            defaultPageTools[3] = pane; // Slot 3
+            defaultPageTools[4] = currentPageItem; // Slot 4
+            defaultPageTools[5] = pane; // Slot 5
+            defaultPageTools[6] = pane; // Slot 6
+            defaultPageTools[7] = nextPage; // Slot 7
+            defaultPageTools[8] = pane; // Slot 8
+            this.pageTools = defaultPageTools;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -310,7 +382,7 @@ public class DInventory implements InventoryHolder {
         } else {
             this.channel = 0;
         }
-        return null;
+        return this;
     }
 
     public YamlConfiguration serialize(YamlConfiguration data) {
@@ -453,10 +525,6 @@ public class DInventory implements InventoryHolder {
 
     public int firstEmpty() {
         return inventory.firstEmpty();
-    }
-
-    public boolean isEmpty() {
-        return inventory.isEmpty();
     }
 
     public void remove(org.bukkit.Material material) {
