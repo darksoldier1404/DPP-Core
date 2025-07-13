@@ -276,4 +276,40 @@ public class PluginUtil {
             }
         });
     }
+
+    public static void showBanner() {
+        StringBuilder loadedPlugins = new StringBuilder();
+        getLoadedPlugins().keySet().stream()
+                .forEach(pl -> {
+                    if (pl != null) {
+                        loadedPlugins.append(String.format(
+                                "   §aName §f: §b%-25s §7| §aVersion §f: §e%-15s%n",
+                                pl.getName(),
+                                pl.getDescription().getVersion()
+                        ));
+                    }
+                });
+
+        String result = loadedPlugins.toString();
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+            getServer().getConsoleSender().sendMessage("\n" +
+                    "─────────────────────────────────────────────────────────────────\n" +
+                    "  §b    ____  ____  ____        ______              \n" +
+                    "     / __ ⧵/ __ ⧵/ __ ⧵      / ____/___  ________ \n" +
+                    "    / / / / /_/ / /_/ /_____/ /   / __ ⧵/ ___/ _ ⧵\n" +
+                    "   / /_/ / ____/ ____/_____/ /___/ /_/ / /  /  __/\n" +
+                    "  /_____/_/   /_/          ⧵____/⧵____/_/   ⧵___/ \n\n" +
+                    "§7》》》》》》》 §aVERSION §f: §e" + plugin.getDescription().getVersion() + "\n\n" +
+                    "§7》》》》》》》 §cAPI-VERSION §f: §e" + plugin.getDescription().getAPIVersion() + "\n\n" +
+                    "§7》》》》》》》 §dSERVER-VERSION §f: §e" + getServer().getBukkitVersion() + " (" + getServer().getVersion() + ")" + "\n\n\n" +
+                    "§7》》》》》》》 §bCheck out our new plugins! §f: §ehttps://dpnw.site\n\n" +
+                    "§7》》》》》》》 §bJoin our Discord Server to get latest update! §f: §ehttps://discord.com/invite/JnMCqkn2FX\n\n\n" +
+                    "§7》》》》》》》 §6Plugin installed with DPP-Core §7《《《《《《《\n\n" +
+                    loadedPlugins +
+                    "§f─────────────────────────────────────────────────────────────────\n");
+        }, 80L);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+            updateCheck();
+        }, 90L);
+    }
 }
