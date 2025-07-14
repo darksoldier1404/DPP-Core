@@ -20,9 +20,10 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public class DInventory implements InventoryHolder {
+public class DInventory implements InventoryHolder, Cloneable {
     private Inventory inventory;
     private String handlerName;
+    private final String title;
     private JavaPlugin plugin;
     private String name;
     private UUID uuid;
@@ -37,6 +38,7 @@ public class DInventory implements InventoryHolder {
     private int channel;
 
     public DInventory(String title, int size, JavaPlugin plugin) {
+        this.title = title;
         this.inventory = Bukkit.createInventory(this, size, title);
         usePage = false;
         handlerName = plugin.getName();
@@ -46,6 +48,7 @@ public class DInventory implements InventoryHolder {
     }
 
     public DInventory(String title, int size, boolean usePage, JavaPlugin plugin) {
+        this.title = title;
         this.inventory = Bukkit.createInventory(this, size, title);
         this.handlerName = plugin.getName();
         this.usePage = usePage;
@@ -56,6 +59,7 @@ public class DInventory implements InventoryHolder {
     }
 
     public DInventory(String title, int size, boolean usePage, boolean useDefaultPageTools, JavaPlugin plugin) {
+        this.title = title;
         this.inventory = Bukkit.createInventory(this, size, title);
         this.handlerName = plugin.getName();
         this.usePage = usePage;
@@ -565,6 +569,55 @@ public class DInventory implements InventoryHolder {
 
     public org.bukkit.Location getLocation() {
         return inventory.getLocation();
+    }
+
+    @Override
+    public DInventory clone() {
+        try {
+            DInventory clone = (DInventory) super.clone();
+            clone.inventory = Bukkit.createInventory(clone, inventory.getSize(), title);
+            clone.handlerName = handlerName;
+            clone.name = name;
+            clone.plugin = plugin;
+            clone.uuid = UUID.randomUUID();
+            clone.usePage = usePage;
+            clone.usePageTools = usePageTools;
+            clone.useDefaultPageTools = useDefaultPageTools;
+            clone.pages = pages;
+            clone.currentPage = currentPage;
+            clone.pageTools = new ItemStack[9];
+            for (int i = 0; i < pageTools.length; i++) {
+                if (pageTools[i] != null) {
+                    clone.pageTools[i] = pageTools[i].clone();
+                } else {
+                    clone.pageTools[i] = null;
+                }
+            }
+            clone.pageItems = new HashMap<>();
+            for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
+                int page = entry.getKey();
+                ItemStack[] items = new ItemStack[45];
+                for (int j = 0; j < entry.getValue().length; j++) {
+                    if (entry.getValue()[j] != null) {
+                        items[j] = entry.getValue()[j].clone();
+                    }
+                }
+                clone.pageItems.put(page, items);
+            }
+            clone.obj = obj;
+            clone.channel = channel;
+            ItemStack[] contents = inventory.getContents();
+            for (int i = 0; i < contents.length; i++) {
+                if (contents[i] != null) {
+                    clone.inventory.setItem(i, contents[i].clone());
+                } else {
+                    clone.inventory.setItem(i, null);
+                }
+            }
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
 
