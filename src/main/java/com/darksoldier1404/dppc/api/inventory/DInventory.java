@@ -18,6 +18,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class DInventory implements InventoryHolder, Cloneable {
@@ -569,6 +571,18 @@ public class DInventory implements InventoryHolder, Cloneable {
 
     public org.bukkit.Location getLocation() {
         return inventory.getLocation();
+    }
+
+    public void applyAllItemChanges(Consumer<ItemStack> consumer) {
+        if (pageItems.isEmpty()) return;
+        for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
+            ItemStack[] items = entry.getValue();
+            for (ItemStack item : items) {
+                if (item != null) {
+                    consumer.accept(item);
+                }
+            }
+        }
     }
 
     @Override
