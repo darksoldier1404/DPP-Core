@@ -58,16 +58,16 @@ public class DLang {
         }
     }
 
-    @Nullable
+    @NotNull
     public String get(String key) {
         String s = currentLang.getString(key);
         if (s == null) {
-            return null;
+            return "[DLang] Error: Language key not found: " + key;
         }
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
-    @Nullable
+    @NotNull
     public String getWithArgs(String key, String... args) {
         String s = currentLang.getString(key);
         if (s != null) {
@@ -76,7 +76,7 @@ public class DLang {
             }
             return ChatColor.translateAlternateColorCodes('&', s);
         }
-        return null;
+        return "[DLang] Error: Language key not found: " + key;
     }
 
     public void loadDefaultLangFiles() {
