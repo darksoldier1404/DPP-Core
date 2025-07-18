@@ -18,7 +18,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
@@ -573,13 +572,38 @@ public class DInventory implements InventoryHolder, Cloneable {
         return inventory.getLocation();
     }
 
-    public void applyAllItemChanges(Consumer<ItemStack> consumer) {
+    public static class PageItemSet {
+        private final int page;
+        private final int slot;
+        private final ItemStack item;
+
+        public PageItemSet(int page, int slot, ItemStack item) {
+            this.page = page;
+            this.slot = slot;
+            this.item = item;
+        }
+
+        public int getPage() {
+            return page;
+        }
+
+        public int getSlot() {
+            return slot;
+        }
+
+        public ItemStack getItem() {
+            return item;
+        }
+    }
+
+    public void applyAllItemChanges(Consumer<PageItemSet> consumer) {
         if (pageItems.isEmpty()) return;
         for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
+            int page = entry.getKey();
             ItemStack[] items = entry.getValue();
-            for (ItemStack item : items) {
-                if (item != null) {
-                    consumer.accept(item);
+            for (int slot = 0; slot < items.length; slot++) {
+                if (items[slot] != null) {
+                    consumer.accept(new PageItemSet(page, slot, items[slot]));
                 }
             }
         }
@@ -610,7 +634,7 @@ public class DInventory implements InventoryHolder, Cloneable {
             clone.pageItems = new HashMap<>();
             for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
                 int page = entry.getKey();
-                ItemStack[] items = new ItemStack[45];
+                ItemStack[] items = new ItemStack[54];
                 for (int j = 0; j < entry.getValue().length; j++) {
                     if (entry.getValue()[j] != null) {
                         items[j] = entry.getValue()[j].clone();
@@ -634,4 +658,3 @@ public class DInventory implements InventoryHolder, Cloneable {
         }
     }
 }
-
