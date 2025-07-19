@@ -24,7 +24,7 @@ DPP-Core는 Spigot 또는 Paper 서버용 코어 플러그인입니다. DP-Shop,
 ## 지원
 
 문제가 있을 경우 DP-Plugins Discord에서 지원 요청.
-- https://discord.gg/w4bXzWNd7N
+- https://discord.gg/JnMCqkn2FX
 
 ## 기부
 https://ko-fi.com/deadpoolio
@@ -54,7 +54,7 @@ DPP-Core is a core plugin for Spigot or Paper servers. It serves as a dependency
 ## Support
 
 For issues, request support on the DP-Plugins Discord.
-- https://discord.gg/w4bXzWNd7N
+- https://discord.gg/JnMCqkn2FX
 
 ## Donate
 https://ko-fi.com/deadpoolio
