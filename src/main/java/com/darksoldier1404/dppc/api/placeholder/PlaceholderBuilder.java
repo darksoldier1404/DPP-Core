@@ -1,6 +1,8 @@
 package com.darksoldier1404.dppc.api.placeholder;
 
 import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.utils.PluginUtil;
+import com.darksoldier1404.dppc.utils.enums.DependPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

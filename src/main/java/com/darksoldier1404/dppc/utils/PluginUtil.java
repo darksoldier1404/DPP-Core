@@ -9,7 +9,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.worldguard.WorldGuard;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
+import me.clip.placeholderapi.PlaceholderHook;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
@@ -77,6 +79,7 @@ public class PluginUtil {
         if (dependPlugins.contains(DependPlugin.PlaceholderAPI)) {
             for (PlaceholderBuilder.InternalExpansion pb : plugin.placeholders) {
                 pb.register();
+                plugin.getLogger().info("PlaceholderAPI registered: " + pb.getIdentifier());
             }
         } else {
             plugin.getLogger().warning("PlaceholderAPI plugin is not installed.");
