@@ -1,9 +1,11 @@
 name: DPP-Core
-version: 5.0.5.49
+version: 5.0.6.50
 description: All DP-PLUGINS plugins require this plugin.
 main: com.darksoldier1404.dppc.DPPCore
 authors: [ DEAD_POOLIO_ ]
 api-version: 1.14
+loadbefore:
+  - PlaceholderAPI
 softdepend:
   - Essentials
   - PlaceholderAPI
