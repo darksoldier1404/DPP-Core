@@ -28,6 +28,7 @@ public class DPPCore extends JavaPlugin {
     public static Plugin lp;
     public static Set<PlaceholderBuilder.InternalExpansion> placeholders = new HashSet<>();
     public static Map<String, ActionBuilder> actions = new HashMap<>();
+    public static final String prefix = "§f[ §bDPP-Core §f] ";
 
     public static DPPCore getInstance() {
         return plugin;
@@ -55,7 +56,7 @@ public class DPPCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
         getCommand("dppc").setExecutor(new DPPCCommand());
         getCommand("dppca").setExecutor(new DPPCACommand());
-        getCommand("dppcp").setExecutor(new DPPCPCommand());
+        getCommand("dppcp").setExecutor(new DPPCPCommand().getExecutor());
         PluginUtil.showBanner();
     }
 

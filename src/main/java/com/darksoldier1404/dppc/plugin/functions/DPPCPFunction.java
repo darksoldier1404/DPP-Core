@@ -24,15 +24,18 @@ public class DPPCPFunction {
             String apiVersion = plugin.getDescription().getAPIVersion();
             String dependencies = plugin.getDescription().getDepend().stream()
                     .reduce("", (a, b) -> a + ", " + b);
+            String softDependencies = plugin.getDescription().getSoftDepend().stream()
+                    .reduce("", (a, b) -> a + ", " + b);
             String commands = plugin.getDescription().getCommands().keySet().stream()
                     .reduce("", (a, b) -> a + ", " + b);
             ItemMeta meta = item.getItemMeta();
             meta.setLore(Arrays.asList(
-                    "Version: " + version,
-                    "Main Class: " + mainClass,
-                    "API Version: " + apiVersion,
-                    "Dependencies: " + dependencies,
-                    "Commands: " + commands
+                    "§eVersion§f: §b" + version,
+                    "§eMain Class§f: §b" + mainClass,
+                    "§eAPI Version§f: §b" + apiVersion,
+                    "§eDepend§f: §b" + dependencies,
+                    "§eSoft Depend§f: §b" + softDependencies,
+                    "§eCommands§f: §b" + commands
             ));
             item.setItemMeta(meta);
             di.addItem(item);

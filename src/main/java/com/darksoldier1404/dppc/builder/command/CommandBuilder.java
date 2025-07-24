@@ -51,19 +51,19 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         };
     }
 
-    public void addSubCommand(String name, String usage, BiConsumer<CommandSender, String[]> action) {
+    public void addSubCommand(String name, String usage, BiFunction<CommandSender, String[], Boolean> action) {
         addSubCommand(name, null, usage, false, action);
     }
 
-    public void addSubCommand(String name, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
+    public void addSubCommand(String name, String usage, boolean isPlayerOnly, BiFunction<CommandSender, String[], Boolean> action) {
         addSubCommand(name, null, usage, isPlayerOnly, action);
     }
 
-    public void addSubCommand(String name, String permission, String usage, BiConsumer<CommandSender, String[]> action) {
+    public void addSubCommand(String name, String permission, String usage, BiFunction<CommandSender, String[], Boolean> action) {
         addSubCommand(name, permission, usage, false, action);
     }
 
-    public void addSubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
+    public void addSubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiFunction<CommandSender, String[], Boolean> action) {
         subCommands.put(name.toLowerCase(), new SubCommand(name, permission, usage, isPlayerOnly, action));
         subCommandNames.add(name.toLowerCase());
     }
@@ -96,11 +96,11 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         private final String permission; // Nullable for no permission check
         private final String usage;
         private final boolean isPlayerOnly;
-        private final BiConsumer<CommandSender, String[]> action;
+        private final BiFunction<CommandSender, String[], Boolean> action;
         private Function<String[], List<String>> tabCompletion;
         private BiFunction<CommandSender, String[], List<String>> tabCompletionWithSender;
 
-        public SubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiConsumer<CommandSender, String[]> action) {
+        public SubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiFunction<CommandSender, String[], Boolean> action) {
             this.name = name;
             this.permission = permission;
             this.usage = usage;
@@ -139,7 +139,9 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             return false;
         }
 
-        subCommand.action.accept(sender, args);
+        if(!subCommand.action.apply(sender, args)) {
+            sender.sendMessage(prefix + "Usage: " + subCommand.usage);
+        }
         return false;
     }
 
