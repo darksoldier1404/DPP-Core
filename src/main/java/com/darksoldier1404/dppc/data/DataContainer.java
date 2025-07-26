@@ -1,6 +1,8 @@
-package com.darksoldier1404.dppc.utils;
+package com.darksoldier1404.dppc.data;
 
 import com.darksoldier1404.dppc.lang.DLang;
+import com.darksoldier1404.dppc.utils.ColorUtils;
+import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
@@ -131,6 +133,15 @@ public class DataContainer {
         }
     }
 
+    public void saveAllUserData() {
+        if (this.data.containsKey("udata")) {
+            Map<UUID, YamlConfiguration> udata = (Map<UUID, YamlConfiguration>) this.data.get("udata");
+            for (Map.Entry<UUID, YamlConfiguration> entry : udata.entrySet()) {
+                ConfigUtils.saveCustomData(plugin, entry.getValue(), String.valueOf(entry.getKey()), "udata");
+            }
+        }
+    }
+
     public void set(String key, Object value) {
         data.put(key, value);
     }
@@ -152,5 +163,12 @@ public class DataContainer {
 
     public void save() {
         ConfigUtils.savePluginConfig(plugin, config);
+        saveAllUserData();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if (entry.getValue() instanceof DataCargo) {
+                DataCargo cargo = (DataCargo) entry.getValue();
+                cargo.save();
+            }
+        }
     }
 }
