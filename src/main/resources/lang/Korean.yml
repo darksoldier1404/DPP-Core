@@ -1,0 +1,18 @@
+Lang: Korean
+
+g:
+  cmd:
+    player_only: "플레이어만 사용 가능한 명령어 입니다."
+    permission:
+      denied: "해당 명령어를 사용할 권한이 없습니다."
+    config:
+      reload:
+        done: "config.yml 파일 리로드 완료."
+  money: # MoneyAPI
+    give: "{0}님에게 {1} 원을 지급 하였습니다."
+    take: "{0}님에게서 {1} 원을 차감 하였습니다."
+    set: "{0}님의 잔고를 {1} 원으로 설정 하였습니다."
+    info: "{0}님의 잔고는 {1} 원 입니다."
+    my: "내 잔고는 {0} 원 입니다."
+    not_enough:
+      withargs: "잔고가 부족합니다. 현재 잔고: {0} 원, 필요 금액: {1} 원"

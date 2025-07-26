@@ -1,18 +1,46 @@
 package com.darksoldier1404.dppc.lang;
 
+import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.sk89q.worldguard.config.WorldConfiguration.log;
+
 public class DLangContainer {
     private static final Set<DLangContext> langContexts = new HashSet<>();
+    public static Lang currentLang = Lang.ENGLISH;
 
     public Set<DLangContext> getLangContexts() {
         return langContexts;
+    }
+
+    public static void setCurrentLang(Lang lang) {
+        currentLang = lang;
+    }
+
+    public static Lang getCurrentLang() {
+        return currentLang;
+    }
+
+    public static void loadDefaultLangFiles(JavaPlugin plugin) {
+        File f = new File(plugin.getDataFolder() + "/lang", "English.yml");
+        if (!f.exists()) {
+            plugin.saveResource("lang/English.yml", false);
+            plugin.saveResource("lang/Korean.yml", false);
+        }
+        for (YamlConfiguration data : ConfigUtils.loadCustomDataList(plugin, "lang")) {
+            try {
+                initPluginLang(plugin, data);
+            } catch (Exception e) {
+                log.warning("[DLang] Error loading lang file: " + data.getName());
+            }
+        }
     }
 
     public static void initPluginLang(JavaPlugin plugin, YamlConfiguration data) {
@@ -36,27 +64,28 @@ public class DLangContainer {
         langContexts.add(context);
     }
 
-    @NotNull
-    public String get(String key) {
+    public static String find(String key) {
         for (DLangContext context : langContexts) {
-            return ChatColor.translateAlternateColorCodes('&', context.getValue(key));
+            if (context.getLang() == currentLang) {
+                if (context.hasValue(key)) {
+                    return context.getValue(key);
+                }
+            }
         }
         return "[DLang] Error: Language key not found: " + key;
     }
 
     @NotNull
+    public String get(String key) {
+        return find(key);
+    }
+
+    @NotNull
     public String getWithArgs(String key, String... args) {
-        String s = null;
-        for (DLangContext context : langContexts) {
-            s = context.getValue(key);
-            break;
+        String s = find(key);
+        for (int i = 0; i < args.length; i++) {
+            s = s.replace("{" + i + "}", args[i]);
         }
-        if (s != null) {
-            for (int i = 0; i < args.length; i++) {
-                s = s.replace("{" + i + "}", args[i]);
-            }
-            return ChatColor.translateAlternateColorCodes('&', s);
-        }
-        return "[DLang] Error: Language key not found: " + key;
+        return ChatColor.translateAlternateColorCodes('&', s);
     }
 }
