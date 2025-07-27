@@ -46,9 +46,13 @@ public class DataContainer<K, V> extends HashMap<K, V> {
         switch (dataType) {
             case USER:
                 for (Map.Entry<K, V> entry : entrySet()) {
-                    UUID uuid = (UUID) entry.getKey();
-                    YamlConfiguration userData = (YamlConfiguration) entry.getValue();
-                    ConfigUtils.saveCustomData(plugin, userData, uuid.toString(), "udata");
+                    if (entry.getKey() instanceof UUID) {
+                        UUID uuid = (UUID) entry.getKey();
+                        YamlConfiguration userData = (YamlConfiguration) entry.getValue();
+                        ConfigUtils.saveCustomData(plugin, userData, uuid.toString(), "udata");
+                    } else {
+                        System.err.println("Invalid key type: Expected UUID but found " + entry.getKey().getClass().getSimpleName());
+                    }
                 }
                 break;
             case CUSTOM:
