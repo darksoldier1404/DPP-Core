@@ -55,7 +55,12 @@ public class DataContainer<K, V> extends HashMap<K, V> {
                 for (Map.Entry<K, V> entry : entrySet()) {
                     String fileName = (String) entry.getKey();
                     DataCargo dataCargo = (DataCargo) entry.getValue();
-                    ConfigUtils.saveCustomData(plugin, (YamlConfiguration) dataCargo.serialize(), fileName, path != null ? path : "data");
+                    Object serializedData = dataCargo.serialize();
+                    if (serializedData instanceof YamlConfiguration) {
+                        ConfigUtils.saveCustomData(plugin, (YamlConfiguration) serializedData, fileName, path != null ? path : "data");
+                    } else {
+                        System.err.println("Failed to save data for " + fileName + ": serialized data is not a YamlConfiguration.");
+                    }
                 }
                 break;
         }
