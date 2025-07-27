@@ -1,5 +1,6 @@
 package com.darksoldier1404.dppc.builder.command;
 
+import com.darksoldier1404.dppc.data.DPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,7 @@ import java.util.function.Function;
 
 public class CommandBuilder implements CommandExecutor, TabCompleter {
     private final Map<String, SubCommand> subCommands = new HashMap<>();
-    private final String prefix;
+    private final DPlugin plugin;
     private final List<String> subCommandNames = new ArrayList<>();
     private BiConsumer<CommandSender, String[]> defaultAction;
     private String noSubCommandsMessage;
@@ -27,9 +28,9 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         return subCommandNames;
     }
 
-    public CommandBuilder(String prefix) {
-        this.prefix = prefix;
-        this.noSubCommandsMessage = prefix + "No available commands.";
+    public CommandBuilder(DPlugin plugin) {
+        this.plugin = plugin;
+        this.noSubCommandsMessage = plugin.getPrefix() + "No available commands.";
         this.defaultAction = (sender, args) -> {
             StringBuilder helpMessage = new StringBuilder();
             boolean hasCommands = false;
@@ -37,10 +38,10 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 SubCommand sub = subCommands.get(cmd);
                 if (sub.permission == null || sender.hasPermission(sub.permission)) {
                     if (!hasCommands) {
-                        helpMessage.append(prefix).append("Available commands:\n");
+                        helpMessage.append(plugin.getPrefix()).append("Available commands:\n");
                         hasCommands = true;
                     }
-                    helpMessage.append(prefix).append(sub.usage).append("\n");
+                    helpMessage.append(plugin.getPrefix()).append(sub.usage).append("\n");
                 }
             }
             if (hasCommands) {
@@ -125,22 +126,22 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
 
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
         if (subCommand == null) {
-            sender.sendMessage(prefix + "Unknown subcommand.");
+            sender.sendMessage(plugin.getPrefix() + "Unknown subcommand.");
             return false;
         }
 
         if (subCommand.isPlayerOnly && !(sender instanceof Player)) {
-            sender.sendMessage(prefix + "This command can only be used by players.");
+            sender.sendMessage(plugin.getPrefix() + "This command can only be used by players.");
             return false;
         }
 
         if (subCommand.permission != null && !sender.hasPermission(subCommand.permission)) {
-            sender.sendMessage(prefix + "You do not have permission to use this command.");
+            sender.sendMessage(plugin.getPrefix() + "You do not have permission to use this command.");
             return false;
         }
 
         if(!subCommand.action.apply(sender, args)) {
-            sender.sendMessage(prefix + "Usage: " + subCommand.usage);
+            sender.sendMessage(plugin.getPrefix() + "Usage: " + subCommand.usage);
         }
         return false;
     }
