@@ -85,7 +85,13 @@ public class DataContainer<K, V> extends HashMap<K, V> {
                     if (data != null) {
                         try {
                             DataCargo dataCargo = (DataCargo) clazz.getDeclaredConstructor().newInstance();
-                            put((K) fileName.split("\\.")[0], (V) dataCargo.deserialize(data));
+                            Object key = fileName.split("\\.")[0];
+                            Object value = dataCargo.deserialize(data);
+                            if (clazz.isInstance(value) && key instanceof String) {
+                                put((K) key, (V) value);
+                            } else {
+                                System.err.println("Type mismatch: Key or value is not compatible with the expected types.");
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                             System.err.println("Failed to load data for " + fileName + " in " + clazz.getSimpleName());
