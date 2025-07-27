@@ -84,6 +84,17 @@ public class DataContainer<K, V> extends HashMap<K, V> {
                     YamlConfiguration data = entry.getValue();
                     if (data != null) {
                         try {
+                            // Validate that the class implements DataCargo
+                            if (!DataCargo.class.isAssignableFrom(clazz)) {
+                                System.err.println("Class " + clazz.getSimpleName() + " does not implement DataCargo.");
+                                continue;
+                            }
+
+                            // Validate that the class has a no-argument constructor
+                            if (clazz.getDeclaredConstructor() == null) {
+                                System.err.println("Class " + clazz.getSimpleName() + " does not have a no-argument constructor.");
+                                continue;
+                            }
                             DataCargo dataCargo = (DataCargo) clazz.getDeclaredConstructor().newInstance();
                             Object key = fileName.split("\\.")[0];
                             Object value = dataCargo.deserialize(data);
