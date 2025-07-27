@@ -1,3 +1,5 @@
 Settings:
   # Global Language setting for the all DP-Plugins.
   Lang: English
+
+  prefix: "&f[ &bDPP-Core &f] "

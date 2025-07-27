@@ -9,12 +9,12 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class ConfigUtils {
-    private static final DPPCore core = DPPCore.getInstance();
-    private static final Logger log = core.log;
+    private static final Logger log = DPPCore.getInstance().getLogger();
 
     @NotNull
     public static YamlConfiguration loadDefaultPluginConfig(@NotNull JavaPlugin plugin) {
@@ -104,6 +104,27 @@ public class ConfigUtils {
             }
         }
         return dataList;
+    }
+
+    public static HashMap<String, YamlConfiguration> loadCustomDataMap(@NotNull JavaPlugin plugin, @NotNull String path) {
+        HashMap<String, YamlConfiguration> dataMap = new HashMap<>();
+        File folder = new File(plugin.getDataFolder() + "/" + path);
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    try {
+                        YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
+                        log.info(plugin.getName() + " " + file.getName() + " file loaded.");
+                        dataMap.put(file.getName(), data);
+                    } catch (Exception e) {
+                        log.warning(plugin.getName() + " " + file.getName() + " file load failed.");
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return dataMap;
     }
 
     @Nullable

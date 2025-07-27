@@ -7,9 +7,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.stream.Collectors;
 
 import static com.darksoldier1404.dppc.DPPCore.*;
+import static com.darksoldier1404.dppc.DPPCore.plugin;
 
 public class DPPCPCommand {
-    private final CommandBuilder builder = new CommandBuilder(prefix);
+    private final CommandBuilder builder = new CommandBuilder(plugin);
 
     public DPPCPCommand() {
         builder.addSubCommand("info", "dppc.admin", "/dppcp info <PluginName>", (p, args) -> {
@@ -18,30 +19,30 @@ public class DPPCPCommand {
             }
             String pluginName = args[1];
             if (pluginName.isEmpty()) {
-                p.sendMessage(prefix + "§cPlease specify a plugin name.");
+                p.sendMessage(plugin.getPrefix() + "§cPlease specify a plugin name.");
                 return false;
             }
-            p.sendMessage(prefix + "§aPlugin Information for: " + pluginName);
-            JavaPlugin plugin = PluginUtil.getPluginByName(pluginName);
-            if (plugin == null) {
-                p.sendMessage(prefix + "§cPlugin not found: " + pluginName);
+            p.sendMessage(plugin.getPrefix() + "§aPlugin Information for: " + pluginName);
+            JavaPlugin javaPlugin = PluginUtil.getPluginByName(pluginName);
+            if (javaPlugin == null) {
+                p.sendMessage(plugin.getPrefix() + "§cPlugin not found: " + pluginName);
                 return false;
             }
-            String version = plugin.getDescription().getVersion();
-            String mainClass = plugin.getDescription().getMain();
-            String apiVersion = plugin.getDescription().getAPIVersion();
-            String dependencies = plugin.getDescription().getDepend().stream()
+            String version = javaPlugin.getDescription().getVersion();
+            String mainClass = javaPlugin.getDescription().getMain();
+            String apiVersion = javaPlugin.getDescription().getAPIVersion();
+            String dependencies = javaPlugin.getDescription().getDepend().stream()
                     .reduce("", (a, b) -> a + ", " + b);
-            String softDependencies = plugin.getDescription().getSoftDepend().stream()
+            String softDependencies = javaPlugin.getDescription().getSoftDepend().stream()
                     .reduce("", (a, b) -> a + ", " + b);
-            String commands = plugin.getDescription().getCommands().keySet().stream()
+            String commands = javaPlugin.getDescription().getCommands().keySet().stream()
                     .reduce("", (a, b) -> a + ", " + b);
-            p.sendMessage(prefix + "§eVersion§f: §b" + version);
-            p.sendMessage(prefix + "§eMain Class§f: §b" + mainClass);
-            p.sendMessage(prefix + "§eAPI Version§f: §b" + (apiVersion != null ? apiVersion : "N/A"));
-            p.sendMessage(prefix + "§eDepend§f: §b" + (dependencies.isEmpty() ? "None" : dependencies.substring(2)));
-            p.sendMessage(prefix + "§eSoft Depend§f: §b" + (softDependencies.isEmpty() ? "None" : softDependencies.substring(2)));
-            p.sendMessage(prefix + "§eCommands§f: §b" + (commands.isEmpty() ? "None" : commands.substring(2)));
+            p.sendMessage(plugin.getPrefix() + "§eVersion§f: §b" + version);
+            p.sendMessage(plugin.getPrefix() + "§eMain Class§f: §b" + mainClass);
+            p.sendMessage(plugin.getPrefix() + "§eAPI Version§f: §b" + (apiVersion != null ? apiVersion : "N/A"));
+            p.sendMessage(plugin.getPrefix() + "§eDepend§f: §b" + (dependencies.isEmpty() ? "None" : dependencies.substring(2)));
+            p.sendMessage(plugin.getPrefix() + "§eSoft Depend§f: §b" + (softDependencies.isEmpty() ? "None" : softDependencies.substring(2)));
+            p.sendMessage(plugin.getPrefix() + "§eCommands§f: §b" + (commands.isEmpty() ? "None" : commands.substring(2)));
             return true;
         });
         for (String c : builder.getSubCommandNames()) {
