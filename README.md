@@ -1,4 +1,5 @@
 [![Crowdin](https://badges.crowdin.net/dp-plugins/localized.svg)](https://crowdin.com/project/dp-plugins)
+[![CodeFactor](https://www.codefactor.io/repository/github/dp-plugins/dpp-core/badge)](https://www.codefactor.io/repository/github/dp-plugins/dpp-core)
 
 <details>
 	<summary>korean</summary>
