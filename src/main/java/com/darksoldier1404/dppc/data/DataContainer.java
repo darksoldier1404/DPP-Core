@@ -49,10 +49,17 @@ public class DataContainer<K, V> extends HashMap<K, V> {
                     if (entry.getKey() instanceof UUID) {
                         UUID uuid = (UUID) entry.getKey();
                         YamlConfiguration userData = (YamlConfiguration) entry.getValue();
-                        ConfigUtils.saveCustomData(plugin, userData, uuid.toString(), "udata");
+                        ConfigUtils.saveCustomData(plugin, userData, uuid.toString(), path != null ? path : "udata");
                     } else {
                         System.err.println("Invalid key type: Expected UUID but found " + entry.getKey().getClass().getSimpleName());
                     }
+                }
+                break;
+            case YAML:
+                for (Map.Entry<K, V> entry : entrySet()) {
+                    String fileName = (String) entry.getKey();
+                    YamlConfiguration yamlData = (YamlConfiguration) entry.getValue();
+                    ConfigUtils.saveCustomData(plugin, yamlData, fileName, path != null ? path : "data");
                 }
                 break;
             case CUSTOM:
@@ -70,50 +77,55 @@ public class DataContainer<K, V> extends HashMap<K, V> {
         }
     }
 
-    public void load(Class<?> clazz) {
+    public DataContainer load(Class<?> clazz) {
         switch (dataType) {
-            case USER:
-                for (K key : keySet()) {
-                    UUID uuid = (UUID) key;
-                    YamlConfiguration userData = ConfigUtils.loadCustomData(plugin, uuid.toString(), "udata");
-                    if (userData != null) {
-                        put(key, (V) userData);
+            case USER: {
+                HashMap<String, YamlConfiguration> userData = ConfigUtils.loadCustomDataMap(plugin, path != null ? path : "udata");
+                for (Map.Entry<String, YamlConfiguration> entry : userData.entrySet()) {
+                    YamlConfiguration yamlData = entry.getValue();
+                    if (yamlData != null) {
+                        put((K) entry.getKey(), (V) yamlData);
                     }
                 }
                 break;
-            case CUSTOM:
+            }
+            case YAML: {
+                HashMap<String, YamlConfiguration> yamlDataMap = ConfigUtils.loadCustomDataMap(plugin, path != null ? path : "data");
+                for (Map.Entry<String, YamlConfiguration> entry : yamlDataMap.entrySet()) {
+                    YamlConfiguration yamlData = entry.getValue();
+                    if (yamlData != null) {
+                        put((K) entry.getKey(), (V) yamlData);
+                    }
+                }
+                break;
+            }
+            case CUSTOM: {
+                if (!DataCargo.class.isAssignableFrom(clazz)) {
+                    System.err.println("Class " + clazz.getSimpleName() + " does not implement DataCargo.");
+                    break;
+                }
                 HashMap<String, YamlConfiguration> dataMap = ConfigUtils.loadCustomDataMap(plugin, path != null ? path : "data");
                 for (Map.Entry<String, YamlConfiguration> entry : dataMap.entrySet()) {
-                    String fileName = entry.getKey();
                     YamlConfiguration data = entry.getValue();
                     if (data != null) {
                         try {
-                            // Validate that the class implements DataCargo
-                            if (!DataCargo.class.isAssignableFrom(clazz)) {
-                                System.err.println("Class " + clazz.getSimpleName() + " does not implement DataCargo.");
-                                continue;
-                            }
-
-                            // Validate that the class has a no-argument constructor
-                            if (clazz.getDeclaredConstructor() == null) {
-                                System.err.println("Class " + clazz.getSimpleName() + " does not have a no-argument constructor.");
-                                continue;
-                            }
                             DataCargo dataCargo = (DataCargo) clazz.getDeclaredConstructor().newInstance();
-                            Object key = fileName.split("\\.")[0];
+                            String key = entry.getKey().split("\\.")[0];
                             Object value = dataCargo.deserialize(data);
-                            if (clazz.isInstance(value) && key instanceof String) {
+                            if (clazz.isInstance(value)) {
                                 put((K) key, (V) value);
                             } else {
-                                System.err.println("Type mismatch: Key or value is not compatible with the expected types.");
+                                System.err.println("Type mismatch: Value is not compatible with the expected type.");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            System.err.println("Failed to load data for " + fileName + " in " + clazz.getSimpleName());
+                            System.err.println("Failed to load data for " + entry.getKey() + " in " + clazz.getSimpleName());
                         }
                     }
                 }
                 break;
+            }
         }
+        return this;
     }
 }

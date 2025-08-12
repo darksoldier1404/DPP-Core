@@ -6,7 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.stream.Collectors;
 
-import static com.darksoldier1404.dppc.DPPCore.*;
 import static com.darksoldier1404.dppc.DPPCore.plugin;
 
 public class DPPCPCommand {

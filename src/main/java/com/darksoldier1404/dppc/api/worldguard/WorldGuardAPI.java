@@ -136,9 +136,9 @@ public class WorldGuardAPI {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
-        int xSize = max.x() - min.x() + 1;
-        int ySize = max.y() - min.y() + 1;
-        int zSize = max.z() - min.z() + 1;
+        int xSize = max.getX() - min.getX() + 1;
+        int ySize = max.getY() - min.getY() + 1;
+        int zSize = max.getZ() - min.getZ() + 1;
 
         return xSize * ySize * zSize;
     }

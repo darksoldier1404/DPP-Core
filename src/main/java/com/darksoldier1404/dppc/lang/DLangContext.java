@@ -3,16 +3,17 @@ package com.darksoldier1404.dppc.lang;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DLangContext {
     private final JavaPlugin plugin;
-    private final Lang lang;
+    private final Locale lang;
     private final Map<String, String> defaultValueMap = new ConcurrentHashMap<>();
     private final Map<String, String> valueMap = new ConcurrentHashMap<>();
 
-    public DLangContext(JavaPlugin plugin, Lang lang) {
+    public DLangContext(JavaPlugin plugin, Locale lang) {
         this.plugin = plugin;
         this.lang = lang;
     }
@@ -21,7 +22,7 @@ public class DLangContext {
         return plugin;
     }
 
-    public Lang getLang() {
+    public Locale getLang() {
         return lang;
     }
 
@@ -36,13 +37,14 @@ public class DLangContext {
     public void initDefaultValues(String key, String value) {
         defaultValueMap.put(key, value);
         valueMap.put(key, value);
+        System.out.println("[DLang] Initialized default value for key: " + key + " with value: " + value);
     }
 
     public void setDefaultValue(String key, String value) {
         defaultValueMap.put(key, value);
     }
 
-    public void removeDefaultValue(Lang lang) {
+    public void removeDefaultValue(Locale lang) {
         defaultValueMap.remove(lang);
     }
 
@@ -65,11 +67,7 @@ public class DLangContext {
     }
 
     public boolean hasValue(String key) {
-        return valueMap.containsKey(key);
-    }
-
-    public boolean hasDefaultValue(String key) {
-        return defaultValueMap.containsKey(key);
+        return valueMap.containsKey(key) || defaultValueMap.containsKey(key);
     }
 
     public void clear() {

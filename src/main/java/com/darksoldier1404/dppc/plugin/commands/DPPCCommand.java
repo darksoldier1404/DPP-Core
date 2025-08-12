@@ -1,5 +1,6 @@
 package com.darksoldier1404.dppc.plugin.commands;
 
+import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,8 +10,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class DPPCCommand implements CommandExecutor, TabCompleter {
@@ -25,6 +28,7 @@ public class DPPCCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("/dppca - DPP ActionBuilder Command Help");
             sender.sendMessage("/dppcp - installed DP-Plugins list GUI");
             sender.sendMessage("/dppc updatecheck (PluginName) - Check for updates");
+            sender.sendMessage("/dppc lang <lang> - Change the language");
             return false;
         }
         if (args[0].equalsIgnoreCase("updatecheck")) {
@@ -38,6 +42,16 @@ public class DPPCCommand implements CommandExecutor, TabCompleter {
             }
             return false;
         }
+        if (args[0].equalsIgnoreCase("lang")) {
+            if (args.length == 2) {
+                DLang.setCurrentLang(Locale.forLanguageTag(args[1]));
+                sender.sendMessage("§aLanguage changed to: " + args[1]);
+                return true;
+            } else {
+                sender.sendMessage("§cUsage: /dppc lang <lang>");
+                return false;
+            }
+        }
         return false;
     }
 
@@ -46,6 +60,16 @@ public class DPPCCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
             return Collections.singletonList("updatecheck");
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("updatecheck")) {
+            return PluginUtil.getLoadedPlugins().keySet().stream()
+                    .map(JavaPlugin::getName)
+                    .collect(Collectors.toList());
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("lang")) {
+            return Arrays.stream(Locale.getAvailableLocales()).collect(Collectors.toList()).stream()
+                    .map(Locale::toLanguageTag)
+                    .collect(Collectors.toList());
         }
         if (args.length == 2) {
             return PluginUtil.getLoadedPlugins().keySet().stream().map(JavaPlugin::getName).collect(Collectors.toList());
