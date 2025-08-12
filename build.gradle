@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.darksoldier1404'
-version = '5.1.0.54'
+version = '5.2.0'
 def isLatest = false
 def V14 = '1.16.5'
 def V21 = '1.21.8'
@@ -72,10 +72,6 @@ tasks.register('renameJar') {
 }
 
 jar {
-    finalizedBy shadowJar
-    manifest {
-        attributes 'Main-Class': 'com.darksoldier1404.dppc.DPPCore'
-    }
     destinationDirectory.set(file("$rootDir/jars"))
 }
 shadowJar {

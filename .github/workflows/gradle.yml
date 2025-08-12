@@ -31,7 +31,7 @@ jobs:
         env:
           REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
           REPO_DPP: ${{ secrets.REPO_DPP }}
-        run: ./gradlew jar
+        run: ./gradlew shadowJar
       - name: Run read-yaml action
         id: yaml-data
         uses: KJ002/read-yaml@main
