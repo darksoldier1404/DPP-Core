@@ -1,5 +1,5 @@
 Settings:
   # Global Language setting for the all DP-Plugins.
-  Lang: English
+  Lang: en_US
 
   prefix: "&f[ &bDPP-Core &f] "

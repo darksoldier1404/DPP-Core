@@ -1,5 +1,3 @@
-Lang: English
-
 g:
   cmd:
     player_only: "This command can only be used by players."

@@ -1,96 +1,87 @@
 package com.darksoldier1404.dppc.lang;
 
-import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 public class DLang {
-    private final JavaPlugin plugin;
-    private final Logger log = DPPCore.getInstance().log;
-    private YamlConfiguration currentLang;
-    private Map<String, YamlConfiguration> langFiles = new HashMap<>();
+    private static final Set<DLangContext> langContexts = new HashSet<>();
+    public static Locale currentLang = Locale.forLanguageTag("en-US");
 
-    public DLang(@NotNull String langKey, JavaPlugin plugin) {
-        this.plugin = plugin;
-        loadDefaultLangFiles();
-        try {
-            currentLang = langFiles.get(langKey);
-        } catch (Exception e) {
-            log.warning("[DLang] Error: Language file not found!");
-        }
+    public static Set<DLangContext> getLangContexts() {
+        return langContexts;
     }
 
-    public void setLangFile(YamlConfiguration lang) {
+    public static void setCurrentLang(Locale lang) {
         currentLang = lang;
     }
 
-    public YamlConfiguration getCurrentLang() {
+    public static Locale getCurrentLang() {
         return currentLang;
     }
 
-    public void setCurrentLang(YamlConfiguration currentLang) {
-        this.currentLang = currentLang;
-    }
-
-    public Map<String, YamlConfiguration> getLangFiles() {
-        return langFiles;
-    }
-
-    public void setLangFiles(Map<String, YamlConfiguration> langFiles) {
-        this.langFiles = langFiles;
-    }
-
-    public void setLang(String lang) {
-        try {
-            currentLang = langFiles.get(lang);
-        } catch (Exception e) {
-            log.warning("[DLang] Error: Language file not found!");
-            log.warning("[DLang] input: " + lang);
+    public static void initPluginLang(JavaPlugin plugin) {
+        File f = new File(plugin.getDataFolder() + "/lang", "en_US.yml");
+        if (!f.exists()) {
+            plugin.saveResource("lang/en_US.yml", false);
+            plugin.saveResource("lang/ko_KR.yml", false);
         }
-    }
-
-    @NotNull
-    public String get(String key) {
-        String s = currentLang.getString(key);
-        if (s == null) {
-            return "[DLang] Error: Language key not found: " + key;
-        }
-        return ChatColor.translateAlternateColorCodes('&', s);
-    }
-
-    @NotNull
-    public String getWithArgs(String key, String... args) {
-        String s = currentLang.getString(key);
-        if (s != null) {
-            for (int i = 0; i < args.length; i++) {
-                s = s.replace("{" + i + "}", args[i]);
+        ConfigUtils.loadCustomDataMap(plugin, "lang").forEach((name, data) -> {
+            try {
+                loadDefaultLangFiles(plugin, data, name);
+            } catch (Exception e) {
+                plugin.getLogger().warning("[DLang] Error loading lang file: " + data.getName());
             }
-            return ChatColor.translateAlternateColorCodes('&', s);
+        });
+    }
+
+    public static void loadDefaultLangFiles(JavaPlugin plugin, YamlConfiguration data, String fileName) {
+        DLangContext context = new DLangContext(plugin, Locale.forLanguageTag(fileName.split("\\.")[0].replace("_", "-")));
+        for (String key : data.getKeys(false)) {
+            String value = data.getString(key);
+            if (value != null) {
+                if (context.hasValue(key)) {
+                    plugin.getLogger().warning("Language key '" + key + "' already exists in the context.");
+                } else {
+                    context.initDefaultValues(key, value);
+                }
+            } else {
+                plugin.getLogger().warning("Language key '" + key + "' has no value in the configuration file. Please ensure it is set correctly.");
+            }
+        }
+        langContexts.add(context);
+    }
+
+    public static String find(String key) {
+        for (DLangContext context : langContexts) {
+            System.out.println(currentLang + " vs " + context.getLang());
+            if (context.getLang().getLanguage().equals(currentLang.getLanguage())) {
+                if (context.hasValue(key)) {
+                    return context.getValue(key);
+                }
+            }
         }
         return "[DLang] Error: Language key not found: " + key;
     }
 
-    public void loadDefaultLangFiles() {
-        File f = new File(plugin.getDataFolder() + "/lang", "English.yml");
-        if (!f.exists()) {
-            plugin.saveResource("lang/English.yml", false);
-            plugin.saveResource("lang/Korean.yml", false);
+    @NotNull
+    public static String get(String key) {
+        return find(key);
+    }
+
+    @NotNull
+    public static String getWithArgs(String key, String... args) {
+        String s = find(key);
+        for (int i = 0; i < args.length; i++) {
+            s = s.replace("{" + i + "}", args[i]);
         }
-        for (YamlConfiguration data : ConfigUtils.loadCustomDataList(plugin, "lang")) {
-            try {
-                langFiles.put(data.getString("Lang"), data);
-            } catch (Exception e) {
-                log.warning("[DLang] Error loading lang file: " + data.getName());
-            }
-        }
+        return ChatColor.translateAlternateColorCodes('&', s);
     }
 }

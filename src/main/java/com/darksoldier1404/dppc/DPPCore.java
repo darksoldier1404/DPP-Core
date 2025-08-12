@@ -4,8 +4,6 @@ import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
 import com.darksoldier1404.dppc.data.DPlugin;
-import com.darksoldier1404.dppc.lang.DLangContainer;
-import com.darksoldier1404.dppc.lang.Lang;
 import com.darksoldier1404.dppc.plugin.commands.DPPCACommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCCommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCPCommand;
@@ -53,8 +51,6 @@ public class DPPCore extends DPlugin {
     public void onEnable() {
         log = getLogger();
         config = ConfigUtils.loadDefaultPluginConfig(plugin);
-        DLangContainer.loadDefaultLangFiles(plugin);
-        DLangContainer.setCurrentLang(Lang.valueOf(config.getString("Settings.Lang", "English").toUpperCase()));
         PluginUtil.loadALLPlugins();
         PluginUtil.initializeSoftDependPlugins();
         PluginUtil.loadALLAction();
