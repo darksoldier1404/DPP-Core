@@ -128,9 +128,9 @@ public class ConfigUtils {
     }
 
     @Nullable
-    public static YamlConfiguration createCustomData(@NotNull JavaPlugin plugin, @NotNull String fileName, @NotNull String path) {
+    public static YamlConfiguration createCustomData(@NotNull JavaPlugin plugin, @NotNull String fileName) {
         try {
-            File file = new File(plugin.getDataFolder() + "/" + path, fileName + ".yml");
+            File file = new File(plugin.getDataFolder(), fileName + ".yml");
             if (!file.exists()) {
                 file.createNewFile();
                 log.info(plugin.getName() + " " + fileName + " file created.");
@@ -146,9 +146,9 @@ public class ConfigUtils {
     }
 
     @Nullable
-    public static YamlConfiguration createCustomData(@NotNull JavaPlugin plugin, @NotNull String fileName) {
+    public static YamlConfiguration createCustomData(@NotNull JavaPlugin plugin, @NotNull String fileName, @NotNull String path) {
         try {
-            File file = new File(plugin.getDataFolder(), fileName + ".yml");
+            File file = new File(plugin.getDataFolder() + "/" + path, fileName + ".yml");
             if (!file.exists()) {
                 file.createNewFile();
                 log.info(plugin.getName() + " " + fileName + " file created.");
