@@ -43,6 +43,10 @@ public class PlaySoundAction implements Action {
                 }
             }
         } catch (IllegalArgumentException e) {
+            System.err.println("Invalid sound name: " + soundName);
+        } catch (Exception e) {
+            System.err.println("Error executing PlaySoundAction: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
