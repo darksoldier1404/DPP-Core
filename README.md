@@ -1,4 +1,9 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/dp-plugins/dpp-core/badge)](https://www.codefactor.io/repository/github/dp-plugins/dpp-core)
 [![Crowdin](https://badges.crowdin.net/dp-plugins/localized.svg)](https://crowdin.com/project/dp-plugins)
+[![DPP-Core](https://github.com/DP-Plugins/DPP-Core/workflows/DPP-Core/badge.svg)](https://github.com/DP-Plugins/DPP-Core/actions?query=workflow:"DPP-Core")
+[![GitHub Release](https://img.shields.io/github/v/release/DP-Plugins/DPP-Core?label=Release)](https://github.com/DP-Plugins/DPP-Core/releases)
+[![Discord](https://img.shields.io/discord/1329803090865684564?logo=discord&color=7289DA&label=Discord)](https://discord.com/invite/JnMCqkn2FX)
+[![Ko-fi](https://img.shields.io/badge/Support%20Us-Ko--fi-F16061)](https://ko-fi.com/deadpoolio)
 
 <details>
 	<summary>korean</summary>

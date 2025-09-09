@@ -6,45 +6,40 @@ plugins {
 }
 
 group = 'com.darksoldier1404'
-version = '5.0.6.51'
+version = '5.1.0.54'
 
 repositories {
-    gradlePluginPortal()
     mavenCentral()
     maven {
         url System.getenv("REPO_PUBLIC") ?: getProperty("REPO_PUBLIC")
         allowInsecureProtocol = true
     }
-    maven { url 'https://repo.bstats.org/repository/releases/' }
-    maven { url 'https://repo.extendedclip.com/releases/' }
-    maven { url 'https://repo.papermc.io/repository/maven-public/' }
 }
 
 dependencies {
-    // Test dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    implementation 'org.jetbrains:annotations:26.0.2'
+    compileOnly 'com.bukkit:craftbukkit:1.14.4'
+    compileOnly 'com.bukkit:spigot:1.14.4'
 
-    // Compile-only dependencies
-    compileOnly 'org.bstats:bstats-bukkit:3.0.0'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-    compileOnly 'com.mojang.authlib:authlib:4.0.43@jar'
-    compileOnly 'com.mojang:brigadier:1.1.8@jar'
-    compileOnly 'com.mojang.datafixers:datafixerupper:6.0.8@jar'
-    compileOnly 'com.earth2me.essentials:EssentialsX:2.20.1@jar'
-    compileOnly 'net.luckperms:LuckPerms:5.4.134@jar'
-    compileOnly 'com.sk89q.worldedit:WorldEdit:7.3.1@jar'
-    compileOnly 'com.sk89q.worldguard:WorldGuard:7.0.9:dist@jar'
-    compileOnly 'com.github.philippheuer.events4j:events4j-api:0.10.0'
-    compileOnly 'com.github.philippheuer.events4j:events4j-core:0.10.0'
-    compileOnly 'com.github.philippheuer.events4j:events4j-handler-simple:0.10.0'
-    compileOnly 'com.github.vladimir-bukhtoyarov:bucket4j:7.5.0'
-    compileOnly 'io.socket:socket.io-client:1.0.0'
-    compileOnly 'io.reactivex.rxjava2:rxjava:2.1.16'
-    compileOnly 'org.jsoup:jsoup:1.13.1'
-    compileOnly 'com.googlecode.json-simple:json-simple:1.1.1'
-    compileOnly('com.bukkit:craftbukkit:1.21.7')
-    compileOnly('com.bukkit:spigot:1.21.7')
+    compileOnly 'com.earth2me.essentials:EssentialsX:2.22.0'
+    compileOnly 'net.luckperms:LuckPerms:5.5.10'
+    compileOnly 'com.sk89q.worldedit:WorldEdit:7.2.13'
+    compileOnly 'com.sk89q.worldguard:WorldGuard:7.0.3'
+
+//    compileOnly 'com.mojang.authlib:authlib:4.0.43@jar'
+//    compileOnly 'com.mojang:brigadier:1.1.8@jar'
+//    compileOnly 'com.mojang.datafixers:datafixerupper:6.0.8@jar'
+//    compileOnly 'com.github.philippheuer.events4j:events4j-api:0.10.0'
+//    compileOnly 'com.github.philippheuer.events4j:events4j-core:0.10.0'
+//    compileOnly 'com.github.philippheuer.events4j:events4j-handler-simple:0.10.0'
+//    compileOnly 'com.github.vladimir-bukhtoyarov:bucket4j:7.5.0'
+//    compileOnly 'io.socket:socket.io-client:1.0.0'
+//    compileOnly 'io.reactivex.rxjava2:rxjava:2.1.16'
+//    compileOnly 'org.jsoup:jsoup:1.13.1'
+//    compileOnly 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
 compileJava.options.encoding = 'UTF-8'
@@ -109,37 +104,37 @@ publishing {
     }
 }
 
-hangarPublish {
-    publications {
-        register("publishPluginPublicationToHangar") {
-            version = project.version.toString()
-            channel = "Snapshot"
-            id = "DPP-Core"
-            apiKey = System.getenv("HANGAR_API_TOKEN")
-
-            platforms {
-                paper {
-                    url = "https://github.com/darksoldier1404/DPP-Core/releases"
-                    platformVersions = List.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5", "1.21.6", "1.21.7")
-                    dependencies {
-                        hangar("Essentials") {
-                            required = false
-                        }
-                        hangar("PlaceholderAPI") {
-                            required = false
-                        }
-                        url("WorldGuard", "https://dev.bukkit.org/projects/worldguard/files") {
-                            required.set(false)
-                        }
-                        url("LuckPerms", "https://luckperms.net/download") {
-                            required.set(false)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+//hangarPublish {
+//    publications {
+//        register("publishPluginPublicationToHangar") {
+//            version = project.version.toString()
+//            channel = "Snapshot"
+//            id = "DPP-Core"
+//            apiKey = System.getenv("HANGAR_API_TOKEN")
+//
+//            platforms {
+//                paper {
+//                    url = "https://github.com/darksoldier1404/DPP-Core/releases"
+//                    platformVersions = List.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6", "1.21.4", "1.21.5", "1.21.6", "1.21.7")
+//                    dependencies {
+//                        hangar("Essentials") {
+//                            required = false
+//                        }
+//                        hangar("PlaceholderAPI") {
+//                            required = false
+//                        }
+//                        url("WorldGuard", "https://dev.bukkit.org/projects/worldguard/files") {
+//                            required.set(false)
+//                        }
+//                        url("LuckPerms", "https://luckperms.net/download") {
+//                            required.set(false)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 //modrinth {
 //    if (!project.hasProperty('modrinthApiKey') || !project.hasProperty('modrinthProjectId')) {

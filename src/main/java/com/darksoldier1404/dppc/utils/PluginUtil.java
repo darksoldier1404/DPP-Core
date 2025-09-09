@@ -48,6 +48,14 @@ public class PluginUtil {
         return loadedPlugins;
     }
 
+    @Nullable
+    public static JavaPlugin getPluginByName(String name) {
+        return loadedPlugins.keySet().stream()
+                .filter(plugin -> plugin.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
+
     public static void loadALLPlugins() {
         for (JavaPlugin pl : loadedPlugins.keySet()) {
             if (pl != null) {

@@ -1,13 +1,5 @@
 Settings:
-  
-  update-check: true
-  
-  update-check-interval: 3600
+  # Global Language setting for the all DP-Plugins.
+  Lang: en_US
 
-  use-metrics: true
-
-  update-check-excluded: [ ]
-
-  # ex)
-#  update-check-excluded:
-#    - DPP-Core
+  prefix: "&f[ &bDPP-Core &f] "
