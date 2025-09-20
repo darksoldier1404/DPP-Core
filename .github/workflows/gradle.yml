@@ -26,15 +26,11 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: Execute Gradle shadowJar
+      - name: Execute Gradle build
         env:
           REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
           REPO_DPP: ${{ secrets.REPO_DPP }}
         run: ./gradlew shadowJar
-      - name: Copy shadowJar to jars directory
-        run: |
-          mkdir -p jars
-          cp build/libs/*-all.jar jars/
       - name: Run read-yaml action
         id: yaml-data
         uses: KJ002/read-yaml@main
@@ -43,11 +39,6 @@ jobs:
           key-path: '["version"]'
       - name: Set env
         run: echo "RELEASE_VERSION=${{ steps.yaml-data.outputs.data }}" >> $GITHUB_ENV
-      - name: Upload shadowJar artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: shadow-jar
-          path: jars/*.jar
       - name: release
         uses: marvinpinto/action-automatic-releases@latest
         with:
@@ -67,11 +58,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21
-      - name: Download shadowJar artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: shadow-jar
-          path: jars
       - name: Publish
         env:
           HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
@@ -79,4 +65,3 @@ jobs:
           REPO_DPP: ${{ secrets.REPO_DPP }}
         run: |
           chmod +x ./gradlew
-          # 실제 publish 명령어를 여기에 추가하세요 (예: ./gradlew publishToHangar)
