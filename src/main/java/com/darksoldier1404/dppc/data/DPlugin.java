@@ -35,13 +35,13 @@ public class DPlugin extends JavaPlugin {
         this.config = ConfigUtils.loadDefaultPluginConfig(this);
         this.prefix = ColorUtils.applyColor(config.getString("Settings.prefix"));
         if (this.useDLang) {
-            this.lang = new DLang();
+            lang = new DLang();
             if (this.config.getString("Settings.Lang") == null) {
                 this.config.set("Settings.Lang", "en_US");
             }
 
-            this.lang.initPluginLang(this);
-            this.lang.setCurrentLang(Locale.forLanguageTag(this.config.getString("Settings.Lang").replace("_", "-")));
+            lang.initPluginLang(this);
+            lang.setCurrentLang(Locale.forLanguageTag(this.config.getString("Settings.Lang").replace("_", "-")));
         }
     }
 
