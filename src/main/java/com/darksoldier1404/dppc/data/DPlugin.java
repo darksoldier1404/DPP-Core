@@ -10,6 +10,7 @@ import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -20,6 +21,7 @@ public class DPlugin extends JavaPlugin {
     private String prefix;
     private final Map<String, DataContainer<?, ?>> data = new HashMap<>();
     private final boolean useDLang;
+    private @Nullable DLang lang;
 
     public DPlugin() {
         this(false);
@@ -33,11 +35,13 @@ public class DPlugin extends JavaPlugin {
         this.config = ConfigUtils.loadDefaultPluginConfig(this);
         this.prefix = ColorUtils.applyColor(config.getString("Settings.prefix"));
         if (this.useDLang) {
-            if (config.getString("Settings.Lang") == null) {
-                config.set("Settings.Lang", "en_US");
+            this.lang = new DLang();
+            if (this.config.getString("Settings.Lang") == null) {
+                this.config.set("Settings.Lang", "en_US");
             }
-            DLang.initPluginLang(this);
-            DLang.setCurrentLang(Locale.forLanguageTag(config.getString("Settings.Lang").replace("_", "-")));
+
+            this.lang.initPluginLang(this);
+            this.lang.setCurrentLang(Locale.forLanguageTag(this.config.getString("Settings.Lang").replace("_", "-")));
         }
     }
 
@@ -67,15 +71,7 @@ public class DPlugin extends JavaPlugin {
     }
 
     public void reload() {
-        config = ConfigUtils.reloadPluginConfig(this, config);
-        prefix = ColorUtils.applyColor(config.getString("Settings.prefix"));
-        if (useDLang) {
-            if (config.getString("Settings.Lang") == null) {
-                config.set("Settings.Lang", "en_US");
-            }
-            DLang.initPluginLang(this);
-            DLang.setCurrentLang(Locale.forLanguageTag(config.getString("Settings.Lang").replace("_", "-")));
-        }
+        init();
     }
 
     public void saveDataContainer() {
@@ -94,5 +90,13 @@ public class DPlugin extends JavaPlugin {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean isUseDLang() {
+        return useDLang;
+    }
+
+    public @Nullable DLang getLang() {
+        return this.lang;
     }
 }
