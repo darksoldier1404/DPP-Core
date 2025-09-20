@@ -32,8 +32,8 @@ dependencies {
     compileOnly 'com.earth2me.essentials:EssentialsX:2.22.0@jar'
     compileOnly 'net.luckperms:LuckPerms:5.5.10@jar'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.3.0@jar'
-    compileOnly 'com.sk89q.worldguard:WorldGuard:7.0.14:dist@jar'
-    compileOnly 'com.sk89q.worldedit:WorldEdit:7.3.1@jar'
+    compileOnly 'com.sk89q.worldguard:WorldGuard:7.0.5:dist@jar'
+    compileOnly 'com.sk89q.worldedit:WorldEdit:7.2.20@jar'
 
     compileOnly 'com.bukkit:craftbukkit:' + api_version
     compileOnly 'com.bukkit:spigot:' + api_version
