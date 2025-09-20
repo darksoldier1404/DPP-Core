@@ -4,14 +4,10 @@ import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.utils.enums.DependPlugin;
-import com.earth2me.essentials.Essentials;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.worldguard.WorldGuard;
-import me.clip.placeholderapi.PlaceholderAPI;
-import me.clip.placeholderapi.PlaceholderAPIPlugin;
-import me.clip.placeholderapi.PlaceholderHook;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
@@ -177,7 +173,7 @@ public class PluginUtil {
                     int responseCode = connection.getResponseCode();
                     if (responseCode != HttpURLConnection.HTTP_OK) {
                         plugin.getLogger().warning("Warning: Unable to get version data for " + pluginName + ". HTTP Response Code: " + responseCode);
-                        future.complete("0.0.0.0");
+                        future.complete("0.0.0");
                         return;
                     }
 
@@ -192,25 +188,25 @@ public class PluginUtil {
                         JsonObject releases = jsonObject.getAsJsonObject("releases");
                         if (releases == null || !releases.has(pluginName)) {
                             plugin.getLogger().warning("Warning: Plugin " + pluginName + " not found in API response.");
-                            future.complete("0.0.0.0");
+                            future.complete("0.0.0");
                             return;
                         }
 
                         JsonArray pluginReleases = releases.getAsJsonArray(pluginName);
                         if (pluginReleases.isEmpty()) {
                             plugin.getLogger().warning("Warning: No releases found for plugin " + pluginName);
-                            future.complete("0.0.0.0");
+                            future.complete("0.0.0");
                             return;
                         }
 
                         JsonObject latestRelease = pluginReleases.get(0).getAsJsonObject();
                         String tag = latestRelease.get("tag").getAsString();
-                        future.complete(Objects.requireNonNullElse(tag, "0.0.0.0"));
+                        future.complete(Objects.requireNonNull(tag, "0.0.0"));
                     }
                 } catch (Exception e) {
                     plugin.getLogger().warning("Error fetching version for " + pluginName + ": " + e.getMessage());
                     e.printStackTrace();
-                    future.complete("0.0.0.0");
+                    future.complete("0.0.0");
                 }
             }
         }.runTaskAsynchronously(plugin);
@@ -219,7 +215,7 @@ public class PluginUtil {
         } catch (Exception e) {
             plugin.getLogger().warning("Error waiting for version result for " + pluginName + ": " + e.getMessage());
             e.printStackTrace();
-            return "0.0.0.0";
+            return "0.0.0";
         }
     }
 
