@@ -57,14 +57,30 @@ public class DataContainer<K, V> extends HashMap<K, V> {
                 break;
             case YAML:
                 for (Map.Entry<K, V> entry : entrySet()) {
-                    String fileName = (String) entry.getKey();
+                    String fileName;
+                    if (entry.getKey() instanceof UUID) {
+                        fileName = entry.getKey().toString();
+                    } else if (entry.getKey() instanceof String) {
+                        fileName = (String) entry.getKey();
+                    } else {
+                        System.err.println("Invalid key type: Expected UUID or String but found " + entry.getKey().getClass().getSimpleName());
+                        continue;
+                    }
                     YamlConfiguration yamlData = (YamlConfiguration) entry.getValue();
                     ConfigUtils.saveCustomData(plugin, yamlData, fileName, path != null ? path : "data");
                 }
                 break;
             case CUSTOM:
                 for (Map.Entry<K, V> entry : entrySet()) {
-                    String fileName = (String) entry.getKey();
+                    String fileName;
+                    if (entry.getKey() instanceof UUID) {
+                        fileName = entry.getKey().toString();
+                    } else if (entry.getKey() instanceof String) {
+                        fileName = (String) entry.getKey();
+                    } else {
+                        System.err.println("Invalid key type: Expected UUID or String but found " + entry.getKey().getClass().getSimpleName());
+                        continue;
+                    }
                     DataCargo dataCargo = (DataCargo) entry.getValue();
                     Object serializedData = dataCargo.serialize();
                     if (serializedData instanceof YamlConfiguration) {
