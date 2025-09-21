@@ -61,7 +61,6 @@ public class DLang {
 
     public String find(String key) {
         for (DLangContext context : langContexts) {
-            System.out.println(currentLang + " vs " + context.getLang());
             if (context.getLang().getLanguage().equals(currentLang.getLanguage())) {
                 if (context.hasValue(key)) {
                     return context.getValue(key);
