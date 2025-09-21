@@ -374,16 +374,20 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.useDefaultPageTools = data.getBoolean("DInventory.useDefaultPageTools") && usePageTools;
         this.pages = data.getInt("DInventory.pages");
         this.currentPage = data.getInt("DInventory.currentPage");
-        for (String itemPath : data.getConfigurationSection("DInventory.contents").getKeys(false)) {
-            if (!data.isItemStack("DInventory.contents." + itemPath)) continue;
-            int slot = Integer.parseInt(itemPath);
-            if (slot < 0 || slot >= inventory.getSize()) continue;
-            inventory.setItem(slot, data.getItemStack("DInventory.contents." + itemPath));
+        if(data.contains("DInventory.contents")) {
+            for (String itemPath : data.getConfigurationSection("DInventory.contents").getKeys(false)) {
+                if (!data.isItemStack("DInventory.contents." + itemPath)) continue;
+                int slot = Integer.parseInt(itemPath);
+                if (slot < 0 || slot >= inventory.getSize()) continue;
+                inventory.setItem(slot, data.getItemStack("DInventory.contents." + itemPath));
+            }
         }
         this.pageTools = new ItemStack[toolSlots];
-        for (int i = 0; i < toolSlots; i++) {
-            String itemPath = "DInventory.pageTools." + i;
-            pageTools[i] = data.contains(itemPath) ? data.getItemStack(itemPath) : null;
+        if(data.contains("DInventory.pageTools")) {
+            for (int i = 0; i < toolSlots; i++) {
+                String itemPath = "DInventory.pageTools." + i;
+                pageTools[i] = data.contains(itemPath) ? data.getItemStack(itemPath) : null;
+            }
         }
         this.pageItems = new HashMap<>();
         if (data.contains("DInventory.pageItems")) {
