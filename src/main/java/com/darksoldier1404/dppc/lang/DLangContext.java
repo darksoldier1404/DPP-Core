@@ -37,7 +37,6 @@ public class DLangContext {
     public void initDefaultValues(String key, String value) {
         defaultValueMap.put(key, value);
         valueMap.put(key, value);
-        System.out.println("[DLang] Initialized default value for key: " + key + " with value: " + value);
     }
 
     public void setDefaultValue(String key, String value) {
