@@ -116,7 +116,7 @@ public class ConfigUtils {
                     try {
                         YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
                         log.info(plugin.getName() + " " + file.getName() + " file loaded.");
-                        dataMap.put(file.getName(), data);
+                        dataMap.put(file.getName().replace(".yml", ""), data);
                     } catch (Exception e) {
                         log.warning(plugin.getName() + " " + file.getName() + " file load failed.");
                         e.printStackTrace();

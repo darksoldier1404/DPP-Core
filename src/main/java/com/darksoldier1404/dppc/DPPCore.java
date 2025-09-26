@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 @SuppressWarnings("all")
 public class DPPCore extends DPlugin {
     public static DPPCore plugin;
-    public YamlConfiguration config;
     public Logger log;
     public static Plugin ess;
     public static Plugin lp;
@@ -50,7 +49,6 @@ public class DPPCore extends DPlugin {
     @Override
     public void onEnable() {
         log = getLogger();
-        config = ConfigUtils.loadDefaultPluginConfig(plugin);
         PluginUtil.loadALLPlugins();
         PluginUtil.initializeSoftDependPlugins();
         PluginUtil.loadALLAction();
@@ -64,7 +62,6 @@ public class DPPCore extends DPlugin {
 
     @Override
     public void onDisable() {
-        log.info("plugin disabled.");
-        ConfigUtils.savePluginConfig(plugin, config);
+        saveDataContainer();
     }
 }

@@ -10,18 +10,17 @@ import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class DPlugin extends JavaPlugin {
-    private YamlConfiguration config;
-    private String prefix;
+    public YamlConfiguration config;
+    public String prefix;
     private final Map<String, DataContainer<?, ?>> data = new HashMap<>();
     private final boolean useDLang;
-    private @Nullable DLang lang;
+    private DLang lang;
 
     public DPlugin() {
         this(false);
@@ -78,14 +77,14 @@ public class DPlugin extends JavaPlugin {
         ConfigUtils.savePluginConfig(this, config);
         for (Map.Entry<String, DataContainer<?, ?>> entry : data.entrySet()) {
             DataContainer<?, ?> data = entry.getValue();
-            data.save();
+            data.saveAll();
         }
     }
 
-    public DataContainer loadDataContainer(DataContainer container, Class<?> clazz) {
+    public <K, V> DataContainer<K, V> loadDataContainer(DataContainer<K, V> container, Class<?> clazz) {
         try {
             data.put(container.getPath(), container);
-            return container.load(clazz);
+            return container.loadAll(clazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,7 +95,7 @@ public class DPlugin extends JavaPlugin {
         return useDLang;
     }
 
-    public @Nullable DLang getLang() {
+    public DLang getLang() {
         return this.lang;
     }
 }
