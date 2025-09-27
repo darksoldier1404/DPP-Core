@@ -38,7 +38,6 @@ public class DPlugin extends JavaPlugin {
             if (this.config.getString("Settings.Lang") == null) {
                 this.config.set("Settings.Lang", "en_US");
             }
-
             lang.initPluginLang(this);
             lang.setCurrentLang(Locale.forLanguageTag(this.config.getString("Settings.Lang").replace("_", "-")));
         }
