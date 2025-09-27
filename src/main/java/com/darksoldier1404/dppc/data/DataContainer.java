@@ -225,7 +225,7 @@ public class DataContainer<K, V> extends HashMap<K, V> {
         String loadPath = path;
         YamlConfiguration data = ConfigUtils.loadCustomData(plugin, fileName, loadPath);
         if (data == null) {
-            return this; // No data found, silently return
+            return this;
         }
         if (dataType == DataType.CUSTOM) {
             if (!DataCargo.class.isAssignableFrom(clazz)) {
@@ -273,7 +273,6 @@ public class DataContainer<K, V> extends HashMap<K, V> {
                 if (dataType == DataType.USER) {
                     key = (K) UUID.fromString(strKey);
                 } else {
-                    // For YAML and CUSTOM, try UUID first, then fall back to String
                     try {
                         key = (K) UUID.fromString(strKey);
                     } catch (IllegalArgumentException e) {

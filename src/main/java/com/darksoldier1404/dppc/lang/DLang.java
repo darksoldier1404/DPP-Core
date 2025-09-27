@@ -1,5 +1,6 @@
 package com.darksoldier1404.dppc.lang;
 
+import com.darksoldier1404.dppc.utils.ColorUtils;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -72,7 +73,7 @@ public class DLang {
 
     @NotNull
     public String get(String key) {
-        return find(key);
+        return ColorUtils.applyColor(find(key));
     }
 
     @NotNull
@@ -81,6 +82,6 @@ public class DLang {
         for (int i = 0; i < args.length; i++) {
             s = s.replace("{" + i + "}", args[i]);
         }
-        return ChatColor.translateAlternateColorCodes('&', s);
+        return ColorUtils.applyColor(s);
     }
 }
