@@ -3,6 +3,7 @@ package com.darksoldier1404.dppc.data;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -255,12 +256,18 @@ public class DataContainer<K, V> extends HashMap<K, V> {
      * @param clazz The expected class of the values (must implement DataCargo for CUSTOM).
      * @return This DataContainer for method chaining.
      */
-    public DataContainer<K, V> loadAll(Class<?> clazz) {
+    public DataContainer<K, V> loadAll(@Nullable Class<?> clazz) {
         String loadPath = path;
         HashMap<String, YamlConfiguration> dataMap = ConfigUtils.loadCustomDataMap(plugin, loadPath);
-        if (dataType == DataType.CUSTOM && !DataCargo.class.isAssignableFrom(clazz)) {
-            logger.warning("Class " + clazz.getSimpleName() + " does not implement DataCargo.");
-            return this;
+        if (dataType == DataType.CUSTOM) {
+            if (clazz == null) {
+                logger.warning("Class parameter is null for CUSTOM data type.");
+                return this;
+            }
+            if (!DataCargo.class.isAssignableFrom(clazz)) {
+                logger.warning("Class " + clazz.getSimpleName() + " does not implement DataCargo.");
+                return this;
+            }
         }
         for (Map.Entry<String, YamlConfiguration> entry : dataMap.entrySet()) {
             String strKey = entry.getKey();
@@ -293,7 +300,7 @@ public class DataContainer<K, V> extends HashMap<K, V> {
             } catch (IllegalArgumentException e) {
                 logger.warning("Invalid UUID format for USER key: " + strKey);
             } catch (Exception e) {
-                logger.warning("Failed to load data for key " + strKey + " in " + clazz.getSimpleName() + ": " + e.getMessage());
+                logger.warning("Failed to load data for key " + strKey + (clazz != null ? " in " + clazz.getSimpleName() : "") + ": " + e.getMessage());
             }
         }
         return this;

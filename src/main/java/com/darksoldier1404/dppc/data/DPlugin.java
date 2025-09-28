@@ -10,6 +10,7 @@ import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -80,6 +81,12 @@ public class DPlugin extends JavaPlugin {
         }
     }
 
+    @Nullable
+    public <K, V> DataContainer<K, V> loadDataContainer(DataContainer<K, V> container) {
+        return loadDataContainer(container, null);
+    }
+
+    @Nullable
     public <K, V> DataContainer<K, V> loadDataContainer(DataContainer<K, V> container, Class<?> clazz) {
         try {
             data.put(container.getPath(), container);
