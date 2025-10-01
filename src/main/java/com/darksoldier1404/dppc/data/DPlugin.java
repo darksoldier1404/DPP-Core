@@ -81,6 +81,13 @@ public class DPlugin extends JavaPlugin {
         }
     }
 
+    public void saveDataContainerWithoutConfig() {
+        for (Map.Entry<String, DataContainer<?, ?>> entry : data.entrySet()) {
+            DataContainer<?, ?> data = entry.getValue();
+            data.saveAll();
+        }
+    }
+
     @Nullable
     public <K, V> DataContainer<K, V> loadDataContainer(DataContainer<K, V> container) {
         return loadDataContainer(container, null);
