@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class DInventory implements InventoryHolder, Cloneable {
@@ -375,7 +374,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.useDefaultPageTools = data.getBoolean("DInventory.useDefaultPageTools") && usePageTools;
         this.pages = data.getInt("DInventory.pages");
         this.currentPage = data.getInt("DInventory.currentPage");
-        if (data.contains("DInventory.contents")) {
+        if(data.contains("DInventory.contents")) {
             for (String itemPath : data.getConfigurationSection("DInventory.contents").getKeys(false)) {
                 if (!data.isItemStack("DInventory.contents." + itemPath)) continue;
                 int slot = Integer.parseInt(itemPath);
@@ -384,7 +383,7 @@ public class DInventory implements InventoryHolder, Cloneable {
             }
         }
         this.pageTools = new ItemStack[toolSlots];
-        if (data.contains("DInventory.pageTools")) {
+        if(data.contains("DInventory.pageTools")) {
             for (int i = 0; i < toolSlots; i++) {
                 String itemPath = "DInventory.pageTools." + i;
                 pageTools[i] = data.contains(itemPath) ? data.getItemStack(itemPath) : null;
@@ -601,7 +600,7 @@ public class DInventory implements InventoryHolder, Cloneable {
     public static class PageItemSet {
         private final int page;
         private final int slot;
-        private ItemStack item;
+        private final ItemStack item;
 
         public PageItemSet(int page, int slot, ItemStack item) {
             this.page = page;
@@ -620,20 +619,16 @@ public class DInventory implements InventoryHolder, Cloneable {
         public ItemStack getItem() {
             return item;
         }
-
-        public void setItem(ItemStack item) {
-            this.item = item;
-        }
     }
 
-    public void applyAllItemChanges(Function<PageItemSet, PageItemSet> consumer) {
+    public void applyAllItemChanges(Consumer<PageItemSet> consumer) {
         if (pageItems.isEmpty()) return;
         for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
             int page = entry.getKey();
             ItemStack[] items = entry.getValue();
             for (int slot = 0; slot < items.length; slot++) {
                 if (items[slot] != null) {
-                    items[slot] = consumer.apply(new PageItemSet(page, slot, items[slot])).getItem();
+                    consumer.accept(new PageItemSet(page, slot, items[slot]));
                 }
             }
         }
