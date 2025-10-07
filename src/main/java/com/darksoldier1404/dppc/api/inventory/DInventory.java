@@ -601,7 +601,7 @@ public class DInventory implements InventoryHolder, Cloneable {
     public static class PageItemSet {
         private final int page;
         private final int slot;
-        private final ItemStack item;
+        private ItemStack item;
 
         public PageItemSet(int page, int slot, ItemStack item) {
             this.page = page;
@@ -619,6 +619,10 @@ public class DInventory implements InventoryHolder, Cloneable {
 
         public ItemStack getItem() {
             return item;
+        }
+
+        public void setItem(ItemStack item) {
+            this.item = item;
         }
     }
 
