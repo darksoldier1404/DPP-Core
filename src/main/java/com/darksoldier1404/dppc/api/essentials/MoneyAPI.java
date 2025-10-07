@@ -54,8 +54,6 @@ public class MoneyAPI {
         }
     }
 
-    // now amount is BigDecimal
-
     public static void addMoney(Player p, BigDecimal amount) {
         if (!isEnabled()) return;
         try {

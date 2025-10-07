@@ -14,11 +14,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class DInventory implements InventoryHolder, Cloneable {
@@ -226,6 +224,27 @@ public class DInventory implements InventoryHolder, Cloneable {
         pages++;
     }
 
+    public void addPageItems(List<ItemStack> items) {
+        final int PAGE_SIZE = 45;
+        int itemIndex = 0;
+        int pageIndex = 0;
+        while (itemIndex < items.size()) {
+            if (!pageItems.containsKey(pageIndex)) {
+                pageItems.put(pageIndex, new ItemStack[PAGE_SIZE]);
+            }
+            ItemStack[] currentPageItems = pageItems.get(pageIndex);
+            int slot = 0;
+            while (slot < PAGE_SIZE && itemIndex < items.size()) {
+                if (currentPageItems[slot] == null) {
+                    currentPageItems[slot] = items.get(itemIndex++);
+                }
+                slot++;
+            }
+            pageIndex++;
+        }
+        pages = pageIndex - 1;
+    }
+
     public void updatePageTools() {
         if (!usePageTools) return;
         if (useDefaultPageTools) {
@@ -374,7 +393,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.useDefaultPageTools = data.getBoolean("DInventory.useDefaultPageTools") && usePageTools;
         this.pages = data.getInt("DInventory.pages");
         this.currentPage = data.getInt("DInventory.currentPage");
-        if(data.contains("DInventory.contents")) {
+        if (data.contains("DInventory.contents")) {
             for (String itemPath : data.getConfigurationSection("DInventory.contents").getKeys(false)) {
                 if (!data.isItemStack("DInventory.contents." + itemPath)) continue;
                 int slot = Integer.parseInt(itemPath);
@@ -383,7 +402,7 @@ public class DInventory implements InventoryHolder, Cloneable {
             }
         }
         this.pageTools = new ItemStack[toolSlots];
-        if(data.contains("DInventory.pageTools")) {
+        if (data.contains("DInventory.pageTools")) {
             for (int i = 0; i < toolSlots; i++) {
                 String itemPath = "DInventory.pageTools." + i;
                 pageTools[i] = data.contains(itemPath) ? data.getItemStack(itemPath) : null;
@@ -600,7 +619,7 @@ public class DInventory implements InventoryHolder, Cloneable {
     public static class PageItemSet {
         private final int page;
         private final int slot;
-        private final ItemStack item;
+        private ItemStack item;
 
         public PageItemSet(int page, int slot, ItemStack item) {
             this.page = page;
@@ -619,6 +638,10 @@ public class DInventory implements InventoryHolder, Cloneable {
         public ItemStack getItem() {
             return item;
         }
+
+        public void setItem(ItemStack item) {
+            this.item = item;
+        }
     }
 
     public void applyAllItemChanges(Consumer<PageItemSet> consumer) {
@@ -629,6 +652,19 @@ public class DInventory implements InventoryHolder, Cloneable {
             for (int slot = 0; slot < items.length; slot++) {
                 if (items[slot] != null) {
                     consumer.accept(new PageItemSet(page, slot, items[slot]));
+                }
+            }
+        }
+    }
+
+    public void applyAllItemChanges(Function<PageItemSet, PageItemSet> consumer) {
+        if (pageItems.isEmpty()) return;
+        for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
+            int page = entry.getKey();
+            ItemStack[] items = entry.getValue();
+            for (int slot = 0; slot < items.length; slot++) {
+                if (items[slot] != null) {
+                    items[slot] = consumer.apply(new PageItemSet(page, slot, items[slot])).getItem();
                 }
             }
         }
@@ -674,3 +710,4 @@ public class DInventory implements InventoryHolder, Cloneable {
         }
     }
 }
+
