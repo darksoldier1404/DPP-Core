@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class InventoryUtils {
@@ -25,6 +26,7 @@ public class InventoryUtils {
     }
 
     public static boolean hasEnoughSpace(ItemStack[] content, ItemStack item) {
+        if (item == null) return false;
         Inventory inv = Bukkit.createInventory(null, 36);
         inv.setContents(content);
         HashMap<Integer, ItemStack> leftover = new HashMap<>();
@@ -33,10 +35,26 @@ public class InventoryUtils {
     }
 
     public static boolean hasEnoughSpace(ItemStack[] content, ItemStack... items) {
+        if (items == null || items.length == 0) return false;
+        for (ItemStack item : items) {
+            if (item == null) return false;
+        }
         Inventory inv = Bukkit.createInventory(null, 36);
         inv.setContents(content);
         HashMap<Integer, ItemStack> leftover = new HashMap<>();
         leftover.putAll(inv.addItem(items));
+        return leftover.isEmpty();
+    }
+
+    public static boolean hasEnoughSpace(ItemStack[] content, List<ItemStack> items) {
+        if (items == null || items.size() == 0) return false;
+        for (ItemStack item : items) {
+            if (item == null) return false;
+        }
+        Inventory inv = Bukkit.createInventory(null, 36);
+        inv.setContents(content);
+        HashMap<Integer, ItemStack> leftover = new HashMap<>();
+        leftover.putAll(inv.addItem(items.toArray(new ItemStack[0])));
         return leftover.isEmpty();
     }
 

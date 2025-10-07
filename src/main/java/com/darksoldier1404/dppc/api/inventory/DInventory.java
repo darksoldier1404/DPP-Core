@@ -14,10 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -225,6 +222,27 @@ public class DInventory implements InventoryHolder, Cloneable {
             pageItems.put(pages, items);
         }
         pages++;
+    }
+
+    public void addPageItems(List<ItemStack> items) {
+        final int PAGE_SIZE = 45;
+        int itemIndex = 0;
+        int pageIndex = 0;
+        while (itemIndex < items.size()) {
+            if (!pageItems.containsKey(pageIndex)) {
+                pageItems.put(pageIndex, new ItemStack[PAGE_SIZE]);
+            }
+            ItemStack[] currentPageItems = pageItems.get(pageIndex);
+            int slot = 0;
+            while (slot < PAGE_SIZE && itemIndex < items.size()) {
+                if (currentPageItems[slot] == null) {
+                    currentPageItems[slot] = items.get(itemIndex++);
+                }
+                slot++;
+            }
+            pageIndex++;
+        }
+        pages = pageIndex - 1;
     }
 
     public void updatePageTools() {
@@ -692,3 +710,4 @@ public class DInventory implements InventoryHolder, Cloneable {
         }
     }
 }
+
