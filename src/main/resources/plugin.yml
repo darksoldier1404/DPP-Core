@@ -1,5 +1,5 @@
 name: DPP-Core
-version: 5.2.1
+version: 5.2.2
 description: All DP-PLUGINS plugins require this plugin.
 main: com.darksoldier1404.dppc.DPPCore
 authors: [ DEAD_POOLIO_ ]
