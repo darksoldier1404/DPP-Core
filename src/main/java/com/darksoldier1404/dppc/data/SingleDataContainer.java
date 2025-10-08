@@ -6,68 +6,102 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
- * A type-safe container for managing data in a Bukkit plugin, extending HashMap.
- * Stores key-value pairs with specific type constraints based on DataType:
- * - USER: Keys must be UUID, values must be YamlConfiguration.
- * - YAML: Keys must be UUID or String, values must be YamlConfiguration.
- * - CUSTOM: Keys must be UUID or String, values must implement DataCargo.
+ * A type-safe container for managing a single piece of data in a Bukkit plugin.
+ * Based on DataContainer, but holds only one key-value pair instead of a map.
+ * Supports the same DataType constraints:
+ * - USER: Key must be UUID, value must be YamlConfiguration.
+ * - YAML: Key must be UUID or String, value must be YamlConfiguration.
+ * - CUSTOM: Key must be UUID or String, value must implement DataCargo.
  *
  * @param <K> The key type (UUID for USER; UUID or String for YAML and CUSTOM)
  * @param <V> The value type (YamlConfiguration for USER and YAML, DataCargo for CUSTOM)
  */
 @DPPCoreVersion(since = "5.3.0")
-public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K, V> {
+public class SingleDataContainer<K, V> implements IDataHandler<K, V> {
     private final JavaPlugin plugin;
     private final DataType dataType;
     private final Logger logger;
     private String path;
+    private K key;
+    private V value;
 
     /**
-     * Constructs a DataContainer with the specified plugin and data type.
+     * Constructs a SingleDataContainer with the specified plugin and data type.
      *
      * @param plugin   The JavaPlugin instance.
      * @param dataType The type of data to manage (USER, YAML, or CUSTOM).
      */
-    public DataContainer(JavaPlugin plugin, DataType dataType) {
-        super();
+    public SingleDataContainer(JavaPlugin plugin, DataType dataType) {
         this.plugin = plugin;
         this.dataType = dataType;
         this.logger = plugin.getLogger();
         this.path = dataType == DataType.USER ? "udata" : "data";
+        this.key = null;
+        this.value = null;
     }
 
     /**
-     * Constructs a DataContainer with a custom path.
+     * Constructs a SingleDataContainer with a custom path.
      *
      * @param plugin   The JavaPlugin instance.
      * @param dataType The type of data to manage (USER, YAML, or CUSTOM).
      * @param path     The custom directory path for data storage.
      */
-    public DataContainer(JavaPlugin plugin, DataType dataType, String path) {
+    public SingleDataContainer(JavaPlugin plugin, DataType dataType, String path) {
         this(plugin, dataType);
         this.path = path != null ? path : this.path;
     }
 
+    @Override
     public JavaPlugin getPlugin() {
         return plugin;
     }
 
+    @Override
     public DataType getDataType() {
         return dataType;
     }
 
+    @Override
     public String getPath() {
         return path;
     }
 
+    @Override
     public void setPath(String path) {
         this.path = path != null ? path : (dataType == DataType.USER ? "udata" : "data");
+    }
+
+    public K getKey() {
+        return key;
+    }
+
+    public V getValue() {
+        return value;
+    }
+
+    /**
+     * Sets the key and value, validating types based on DataType.
+     *
+     * @param key   The key to set.
+     * @param value The value to set.
+     * @throws IllegalArgumentException If the key or value type is invalid.
+     */
+    public void set(K key, V value) {
+        try {
+            validateKey(key);
+            validateValue(value, key);
+            this.key = key;
+            this.value = value;
+        } catch (IllegalArgumentException e) {
+            logger.warning(e.getMessage());
+            this.key = null;
+            this.value = null;
+        }
     }
 
     /**
@@ -94,6 +128,16 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
     }
 
     /**
+     * Validates the key type for the given DataType.
+     *
+     * @param key The key to validate.
+     * @throws IllegalArgumentException If the key type is invalid.
+     */
+    private void validateKey(K key) {
+        getFileName(key); // Reuses validation from getFileName
+    }
+
+    /**
      * Validates the value type for the given DataType.
      *
      * @param value The value to validate.
@@ -116,24 +160,26 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
     }
 
     /**
-     * Saves the data associated with the specified key to a file.
+     * Saves the data to a file using the current key and path.
      *
-     * @param key  The key to save.
      * @param path The custom directory path (optional).
-     * @throws IllegalArgumentException If the key or value type is invalid.
+     * @throws IllegalArgumentException If the key or value is invalid or null.
      */
-    public void save(K key, String path) {
+    public void save(String path) {
         setPath(path);
-        save(key);
+        save();
     }
 
     /**
-     * Saves the data associated with the specified key to a file.
+     * Saves the data to a file using the current key and path.
      *
-     * @param key The key to save.
-     * @throws IllegalArgumentException If the key or value type is invalid.
+     * @throws IllegalArgumentException If the key or value is invalid or null.
      */
-    public void save(K key) {
+    public void save() {
+        if (key == null || value == null) {
+            logger.warning("Cannot save: Key or value is null");
+            return;
+        }
         String fileName;
         try {
             fileName = getFileName(key);
@@ -141,7 +187,6 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
             logger.warning(e.getMessage());
             return;
         }
-        V value = get(key);
         try {
             validateValue(value, key);
         } catch (IllegalArgumentException e) {
@@ -162,62 +207,29 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
     }
 
     /**
-     * Saves all data entries to files.
-     */
-    public void saveAll() {
-        String savePath = path;
-        for (Map.Entry<K, V> entry : entrySet()) {
-            K key = entry.getKey();
-            String fileName;
-            try {
-                fileName = getFileName(key);
-            } catch (IllegalArgumentException e) {
-                logger.warning(e.getMessage());
-                continue;
-            }
-            V value = entry.getValue();
-            try {
-                validateValue(value, key);
-            } catch (IllegalArgumentException e) {
-                logger.warning(e.getMessage());
-                continue;
-            }
-            if (dataType == DataType.CUSTOM) {
-                Object serialized = ((DataCargo) value).serialize();
-                if (!(serialized instanceof YamlConfiguration)) {
-                    logger.warning("Serialized data is not a YamlConfiguration for key: " + key);
-                    continue;
-                }
-                ConfigUtils.saveCustomData(plugin, (YamlConfiguration) serialized, fileName, savePath);
-            } else {
-                ConfigUtils.saveCustomData(plugin, (YamlConfiguration) value, fileName, savePath);
-            }
-        }
-    }
-
-    /**
-     * Loads data for the specified key from a file.
+     * Loads data from a file using the specified key and populates the value.
      *
      * @param key   The key to load.
      * @param clazz The expected class of the value (must implement DataCargo for CUSTOM).
      * @param path  The custom directory path (optional).
-     * @return This DataContainer for method chaining.
+     * @return This SingleDataContainer for method chaining.
      * @throws IllegalArgumentException If the key type or clazz is invalid.
      */
-    public DataContainer<K, V> load(K key, Class<?> clazz, String path) {
+    public SingleDataContainer<K, V> load(K key, Class<?> clazz, String path) {
         setPath(path);
         return load(key, clazz);
     }
 
     /**
-     * Loads data for the specified key from a file.
+     * Loads data from a file using the specified key and populates the value.
      *
      * @param key   The key to load.
      * @param clazz The expected class of the value (must implement DataCargo for CUSTOM).
-     * @return This DataContainer for method chaining.
+     * @return This SingleDataContainer for method chaining.
      * @throws IllegalArgumentException If the key type or clazz is invalid.
      */
-    public DataContainer<K, V> load(K key, Class<?> clazz) {
+    public SingleDataContainer<K, V> load(K key, Class<?> clazz) {
+        this.key = key; // Set the key
         String fileName;
         try {
             fileName = getFileName(key);
@@ -228,6 +240,7 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
         String loadPath = path;
         YamlConfiguration data = ConfigUtils.loadCustomData(plugin, fileName, loadPath);
         if (data == null) {
+            this.value = null;
             return this;
         }
         if (dataType == DataType.CUSTOM) {
@@ -237,73 +250,51 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
             }
             try {
                 DataCargo dataCargo = (DataCargo) clazz.getDeclaredConstructor().newInstance();
-                Object value = dataCargo.deserialize(data);
-                if (clazz.isInstance(value)) {
-                    put(key, (V) value);
+                Object loadedValue = dataCargo.deserialize(data);
+                if (clazz.isInstance(loadedValue)) {
+                    this.value = (V) loadedValue;
                 } else {
                     logger.warning("Type mismatch on load for key " + key + ": Value not compatible with " + clazz.getSimpleName());
+                    this.value = null;
                 }
             } catch (Exception e) {
                 logger.warning("Failed to load CUSTOM data for key " + key + " in " + clazz.getSimpleName() + ": " + e.getMessage());
+                this.value = null;
             }
         } else {
-            put(key, (V) data);
+            this.value = (V) data;
         }
         return this;
     }
 
     /**
-     * Loads all data from the specified directory.
-     *
-     * @param clazz The expected class of the values (must implement DataCargo for CUSTOM).
-     * @return This DataContainer for method chaining.
+     * Clears the key and value.
      */
-    public DataContainer<K, V> loadAll(@Nullable Class<?> clazz) {
-        String loadPath = path;
-        HashMap<String, YamlConfiguration> dataMap = ConfigUtils.loadCustomDataMap(plugin, loadPath);
-        if (dataType == DataType.CUSTOM) {
-            if (clazz == null) {
-                logger.warning("Class parameter is null for CUSTOM data type.");
-                return this;
-            }
-            if (!DataCargo.class.isAssignableFrom(clazz)) {
-                logger.warning("Class " + clazz.getSimpleName() + " does not implement DataCargo.");
-                return this;
-            }
-        }
-        for (Map.Entry<String, YamlConfiguration> entry : dataMap.entrySet()) {
-            String strKey = entry.getKey();
-            YamlConfiguration data = entry.getValue();
-            if (data == null) {
-                continue;
-            }
-            try {
-                K key;
-                if (dataType == DataType.USER) {
-                    key = (K) UUID.fromString(strKey);
-                } else {
-                    try {
-                        key = (K) UUID.fromString(strKey);
-                    } catch (IllegalArgumentException e) {
-                        key = (K) strKey;
-                    }
-                }
-                if (dataType == DataType.CUSTOM) {
-                    DataCargo dataCargo = (DataCargo) clazz.getDeclaredConstructor().newInstance();
-                    Object value = dataCargo.deserialize(data);
-                    if (clazz.isInstance(value)) {
-                        put(key, (V) value);
-                    } else {
-                        logger.warning("Type mismatch on loadAll for key " + strKey + ": Value not compatible with " + clazz.getSimpleName());
-                    }
-                } else {
-                    put(key, (V) data);
-                }
-            } catch (IllegalArgumentException e) {
-                logger.warning("Invalid UUID format for USER key: " + strKey);
-            } catch (Exception e) {
-                logger.warning("Failed to load data for key " + strKey + (clazz != null ? " in " + clazz.getSimpleName() : "") + ": " + e.getMessage());
-            }
+    public void clear() {
+        this.key = null;
+        this.value = null;
+    }
+
+    /**
+     * Checks if this container has valid data.
+     *
+     * @return true if key and value are both non-null.
+     */
+    public boolean hasData() {
+        return key != null && value != null;
+    }
+
+    @Override
+    public void saveAll() {
+        save();
+    }
+
+    @Override
+    public SingleDataContainer<K, V> loadAll(@Nullable Class<?> clazz) {
+        if (hasData()) {
+            load(key, clazz);
+        } else {
+            logger.warning("Cannot loadAll: No key set for SingleDataContainer with path '" + path + "'");
         }
         return this;
     }
