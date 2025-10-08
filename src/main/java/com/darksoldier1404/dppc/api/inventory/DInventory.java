@@ -125,18 +125,22 @@ public class DInventory implements InventoryHolder, Cloneable {
         return usePageTools;
     }
 
+    @MultiPageOnly
     public int getPages() {
         return pages;
     }
 
+    @MultiPageOnly
     public int getCurrentPage() {
         return currentPage;
     }
 
+    @MultiPageOnly
     public ItemStack[] getPageTools() {
         return pageTools;
     }
 
+    @MultiPageOnly
     public Map<Integer, ItemStack[]> getPageItems() {
         return pageItems;
     }
@@ -150,35 +154,43 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.usePageTools = usePageTools;
     }
 
+    @MultiPageOnly
     public boolean isUseDefaultPageTools() {
         return useDefaultPageTools;
     }
 
+    @MultiPageOnly
     public void setUseDefaultPageTools(boolean useDefaultPageTools) {
         this.useDefaultPageTools = useDefaultPageTools;
     }
 
+    @MultiPageOnly
     public void setPages(int pages) {
         this.pages = pages;
     }
 
+    @MultiPageOnly
     public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
     }
 
+    @MultiPageOnly
     public void setPageTools(ItemStack[] pageTools) {
         this.pageTools = pageTools;
     }
 
+    @MultiPageOnly
     public void setPageTool(int index, ItemStack item) {
         pageTools[index] = item;
     }
 
+    @MultiPageOnly
     public boolean setPageItems(Map<Integer, ItemStack[]> pageItems) {
         this.pageItems = pageItems;
         return true;
     }
 
+    @MultiPageOnly
     public boolean setPageItem(int slot, ItemStack item) {
         if (slot < 0 || slot >= contentSlots) return false;
         if (!pageItems.containsKey(currentPage)) {
@@ -188,6 +200,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return true;
     }
 
+    @MultiPageOnly
     public boolean setPageItem(int page, int slot, ItemStack item) {
         if (page < 0 || page > pages) return false;
         if (slot < 0 || slot >= contentSlots) return false;
@@ -198,6 +211,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return true;
     }
 
+    @MultiPageOnly
     public boolean setPageContent(int page, ItemStack[] items) {
         if (page < 0 || page > pages) return false;
         if (items.length > contentSlots) return false;
@@ -213,6 +227,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.name = name;
     }
 
+    @MultiPageOnly
     public void addPageContent(ItemStack[] items) {
         if (items.length > contentSlots) {
             ItemStack[] trimmed = new ItemStack[contentSlots];
@@ -224,6 +239,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         pages++;
     }
 
+    @MultiPageOnly
     public void addPageItems(List<ItemStack> items) {
         final int PAGE_SIZE = 45;
         int itemIndex = 0;
@@ -245,6 +261,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         pages = pageIndex - 1;
     }
 
+    @MultiPageOnly
     public void updatePageTools() {
         if (!usePageTools) return;
         if (useDefaultPageTools) {
@@ -258,6 +275,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         }
     }
 
+    @MultiPageOnly
     public void applyChanges() {
         ItemStack[] contents = new ItemStack[contentSlots];
         for (int i = 0; i < contentSlots; i++) {
@@ -281,6 +299,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         }
     }
 
+    @MultiPageOnly
     public boolean nextPage() {
         if (!usePage || currentPage >= pages) return false;
         currentPage++;
@@ -288,6 +307,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return true;
     }
 
+    @MultiPageOnly
     public boolean prevPage() {
         if (!usePage || currentPage <= 0) return false;
         currentPage--;
@@ -295,6 +315,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return true;
     }
 
+    @MultiPageOnly
     public boolean turnPage(int page) {
         if (!usePage || page < 0 || page > pages) return false;
         currentPage = page;
@@ -318,6 +339,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return this.channel == channel;
     }
 
+    @MultiPageOnly
     public Map<Integer, ItemStack[]> getPageItemsWithoutTools() {
         if (pageItems.isEmpty()) return new HashMap<>();
         Map<Integer, ItemStack[]> resultItems = new HashMap<>();
@@ -332,6 +354,35 @@ public class DInventory implements InventoryHolder, Cloneable {
         return resultItems;
     }
 
+    @MultiPageOnly
+    public List<ItemStack> getAllPageItems() {
+        List<ItemStack> items = new ArrayList<>();
+        if (pageItems.isEmpty()) return items;
+        for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
+            ItemStack[] value = entry.getValue();
+            Collections.addAll(items, value);
+        }
+        items.removeIf(Objects::isNull);
+        return items;
+    }
+
+    @MultiPageOnly
+    public List<PageItemSet> getAllPageItemSets() {
+        List<PageItemSet> items = new ArrayList<>();
+        if (pageItems.isEmpty()) return items;
+        for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
+            int page = entry.getKey();
+            ItemStack[] value = entry.getValue();
+            for (int slot = 0; slot < value.length; slot++) {
+                if (value[slot] != null) {
+                    items.add(new PageItemSet(page, slot, value[slot]));
+                }
+            }
+        }
+        return items;
+    }
+
+    @MultiPageOnly
     public void applyDefaultPageTools() {
         if (!useDefaultPageTools || !usePageTools) return;
         ItemStack[] defaultPageTools = new ItemStack[toolSlots];
@@ -644,6 +695,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         }
     }
 
+    @MultiPageOnly
     public void applyAllItemChanges(Consumer<PageItemSet> consumer) {
         if (pageItems.isEmpty()) return;
         for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
@@ -657,6 +709,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         }
     }
 
+    @MultiPageOnly
     public void applyAllItemChanges(Function<PageItemSet, PageItemSet> consumer) {
         if (pageItems.isEmpty()) return;
         for (Map.Entry<Integer, ItemStack[]> entry : pageItems.entrySet()) {
