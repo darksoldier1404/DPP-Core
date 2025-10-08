@@ -1,5 +1,7 @@
 package com.darksoldier1404.dppc.api.inventory;
 
+import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
+import com.darksoldier1404.dppc.annotation.MultiPageOnly;
 import com.darksoldier1404.dppc.utils.DInventoryManager;
 import com.darksoldier1404.dppc.utils.NBT;
 import org.bukkit.Bukkit;
@@ -11,6 +13,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -354,6 +357,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return resultItems;
     }
 
+    @DPPCoreVersion("5.2.3")
     @MultiPageOnly
     public List<ItemStack> getAllPageItems() {
         List<ItemStack> items = new ArrayList<>();
@@ -366,6 +370,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return items;
     }
 
+    @DPPCoreVersion("5.2.3")
     @MultiPageOnly
     public List<PageItemSet> getAllPageItemSets() {
         List<PageItemSet> items = new ArrayList<>();
