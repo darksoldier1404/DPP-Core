@@ -1,4 +1,4 @@
-package com.darksoldier1404.dppc.api.inventory;
+package com.darksoldier1404.dppc.annotation;
 
 import java.lang.annotation.*;
 
