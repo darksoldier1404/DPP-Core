@@ -2,6 +2,7 @@ package com.darksoldier1404.dppc.annotation;
 
 import java.lang.annotation.*;
 
+@Documented
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.CLASS)
 public @interface MultiPageOnly{
