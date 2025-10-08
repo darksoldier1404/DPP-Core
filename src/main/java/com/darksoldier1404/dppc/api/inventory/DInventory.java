@@ -357,7 +357,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return resultItems;
     }
 
-    @DPPCoreVersion("5.2.3")
+    @DPPCoreVersion(since = "5.2.3")
     @MultiPageOnly
     public List<ItemStack> getAllPageItems() {
         List<ItemStack> items = new ArrayList<>();
@@ -370,7 +370,7 @@ public class DInventory implements InventoryHolder, Cloneable {
         return items;
     }
 
-    @DPPCoreVersion("5.2.3")
+    @DPPCoreVersion(since = "5.2.3")
     @MultiPageOnly
     public List<PageItemSet> getAllPageItemSets() {
         List<PageItemSet> items = new ArrayList<>();
