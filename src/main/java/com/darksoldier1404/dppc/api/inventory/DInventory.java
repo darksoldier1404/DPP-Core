@@ -25,7 +25,7 @@ public class DInventory implements InventoryHolder, Cloneable {
     private Inventory inventory;
     private String handlerName;
     private final String title;
-    private JavaPlugin plugin;
+    private final @NotNull JavaPlugin plugin;
     private String name;
     private UUID uuid;
     private boolean usePage;
@@ -669,6 +669,10 @@ public class DInventory implements InventoryHolder, Cloneable {
 
     public org.bukkit.Location getLocation() {
         return inventory.getLocation();
+    }
+
+    public JavaPlugin getPlugin() {
+        return plugin;
     }
 
     public static class PageItemSet {

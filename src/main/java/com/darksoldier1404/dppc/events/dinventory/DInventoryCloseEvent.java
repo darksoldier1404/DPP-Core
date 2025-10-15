@@ -1,12 +1,13 @@
 package com.darksoldier1404.dppc.events.dinventory;
 
 import com.darksoldier1404.dppc.api.inventory.DInventory;
-import org.bukkit.event.Cancellable;
+import com.darksoldier1404.dppc.events.dinventory.obj.DInventoryEvent;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
-public class DInventoryCloseEvent extends DInventoryEvent implements Cancellable {
+public class DInventoryCloseEvent extends DInventoryEvent {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
     private boolean isCancelled;
 
@@ -14,14 +15,8 @@ public class DInventoryCloseEvent extends DInventoryEvent implements Cancellable
         super(transaction, inventory);
     }
 
-    @Override
-    public boolean isCancelled() {
-        return isCancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.isCancelled = cancelled;
+    public HumanEntity getPlayer() {
+        return transaction.getPlayer();
     }
 
     @Override

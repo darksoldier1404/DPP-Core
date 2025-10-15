@@ -1,4 +1,4 @@
-package com.darksoldier1404.dppc.events.dinventory;
+package com.darksoldier1404.dppc.events.dinventory.obj;
 
 import com.darksoldier1404.dppc.api.inventory.DInventory;
 import org.bukkit.event.inventory.InventoryEvent;

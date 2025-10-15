@@ -8,11 +8,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
-public class DInventoryOpenEvent extends DInventoryEvent implements Cancellable {
+public class DInventoryClickEvent extends DInventoryEvent implements Cancellable {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
     private boolean isCancelled;
 
-    public DInventoryOpenEvent(@NotNull InventoryView transaction, DInventory inventory) {
+    public DInventoryClickEvent(@NotNull InventoryView transaction, DInventory inventory) {
         super(transaction, inventory);
     }
 
