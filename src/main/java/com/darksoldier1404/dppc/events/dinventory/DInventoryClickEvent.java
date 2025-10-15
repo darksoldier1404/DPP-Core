@@ -1,23 +1,31 @@
 package com.darksoldier1404.dppc.events.dinventory;
 
 import com.darksoldier1404.dppc.api.inventory.DInventory;
-import com.darksoldier1404.dppc.events.dinventory.obj.DInventoryEvent;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
-public class DInventoryClickEvent extends DInventoryEvent implements Cancellable {
+public class DInventoryClickEvent extends InventoryClickEvent {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
     private boolean isCancelled;
+    private final DInventory inventory;
 
-    public DInventoryClickEvent(@NotNull InventoryView transaction, DInventory inventory) {
-        super(transaction, inventory);
+    public DInventoryClickEvent(@NotNull InventoryView transaction, DInventory inventory, @NotNull InventoryType.SlotType type, int slot, @NotNull ClickType click, @NotNull InventoryAction action) {
+        super(transaction, type, slot, click, action);
+        this.inventory = inventory;
     }
 
-    public HumanEntity getPlayer() {
-        return transaction.getPlayer();
+    public DInventoryClickEvent(@NotNull InventoryView transaction, DInventory inventory, @NotNull InventoryType.SlotType type, int slot, @NotNull ClickType click, @NotNull InventoryAction action, int key) {
+        super(transaction, type, slot, click, action, key);
+        this.inventory = inventory;
+    }
+
+    public @NotNull DInventory getDInventory() {
+        return inventory;
     }
 
     @Override

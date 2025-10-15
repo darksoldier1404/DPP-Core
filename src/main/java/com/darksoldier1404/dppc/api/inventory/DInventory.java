@@ -25,7 +25,7 @@ public class DInventory implements InventoryHolder, Cloneable {
     private Inventory inventory;
     private String handlerName;
     private final String title;
-    private final @NotNull JavaPlugin plugin;
+    private @NotNull JavaPlugin plugin;
     private String name;
     private UUID uuid;
     private boolean usePage;
