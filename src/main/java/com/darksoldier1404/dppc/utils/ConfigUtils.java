@@ -164,6 +164,7 @@ public class ConfigUtils {
     }
 
     @NotNull
+    @Deprecated
     public static YamlConfiguration initUserData(@NotNull JavaPlugin plugin, @NotNull String fileName, @NotNull String path) {
         File file = new File(plugin.getDataFolder() + "/" + path, fileName + ".yml");
         if (!file.exists()) {
@@ -183,6 +184,7 @@ public class ConfigUtils {
     }
 
     @NotNull
+    @Deprecated
     public static YamlConfiguration initUserData(@NotNull JavaPlugin plugin, @NotNull String fileName) {
         File file = new File(plugin.getDataFolder() + "/data", fileName + ".yml");
         if (!file.exists()) {

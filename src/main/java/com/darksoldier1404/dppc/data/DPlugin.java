@@ -23,7 +23,7 @@ public class DPlugin extends JavaPlugin {
     public String prefix;
     private final Map<String, IDataHandler<?, ?>> data = new HashMap<>();
     private final boolean useDLang;
-    private DLang lang;
+    private @Nullable DLang lang;
 
     public DPlugin() {
         this(false);
@@ -36,14 +36,7 @@ public class DPlugin extends JavaPlugin {
     public void init() {
         this.config = ConfigUtils.loadDefaultPluginConfig(this);
         this.prefix = ColorUtils.applyColor(config.getString("Settings.prefix"));
-        if (this.useDLang) {
-            lang = new DLang();
-            if (this.config.getString("Settings.Lang") == null) {
-                this.config.set("Settings.Lang", "en_US");
-            }
-            lang.initPluginLang(this);
-            lang.setCurrentLang(Locale.forLanguageTag(this.config.getString("Settings.Lang").replace("_", "-")));
-        }
+        initDLang();
     }
 
     @Override
@@ -81,6 +74,19 @@ public class DPlugin extends JavaPlugin {
         ConfigUtils.savePluginConfig(this, config);
     }
 
+    public void initDLang() {
+        if (this.useDLang) {
+            if (this.config.getString("Settings.Lang") == null) {
+                this.config.set("Settings.Lang", "en_US");
+            }
+            lang = new DLang();
+            lang.initPluginLang(this);
+            lang.setCurrentLang(Locale.forLanguageTag(this.config.getString("Settings.Lang").replace("_", "-")));
+        } else {
+            lang = null;
+        }
+    }
+
     public void saveDataContainer() {
         ConfigUtils.savePluginConfig(this, config);
         for (Map.Entry<String, IDataHandler<?, ?>> entry : data.entrySet()) {
@@ -102,11 +108,11 @@ public class DPlugin extends JavaPlugin {
     }
 
     @Nullable
-    @SuppressWarnings("unchecked")
     public <K, V, T extends IDataHandler<K, V>> T loadDataContainer(T container, Class<?> clazz) {
         try {
-            data.put(container.getPath(), container);
-            return (T) container.loadAll(clazz);
+            IDataHandler<K, V> idh = container.loadAll(clazz);
+            data.put(container.getPath(), idh);
+            return (T) idh;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -117,7 +123,7 @@ public class DPlugin extends JavaPlugin {
         return useDLang;
     }
 
-    public DLang getLang() {
-        return this.lang;
+    public @Nullable DLang getLang() {
+        return lang;
     }
 }
