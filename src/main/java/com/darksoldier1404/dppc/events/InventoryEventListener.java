@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
 public class InventoryEventListener implements Listener {
@@ -15,12 +16,16 @@ public class InventoryEventListener implements Listener {
     public void onInventoryOpen(InventoryOpenEvent e) {
         if (e.getInventory().getHolder() != null && e.getInventory().getHolder() instanceof DInventory) {
             DInventory inv = (DInventory) e.getInventory().getHolder();
-            inv.getPlugin().getServer().getPluginManager().callEvent(new DInventoryOpenEvent(e.getView(), inv));
+            DInventoryOpenEvent event = new DInventoryOpenEvent(e.getView(), inv);
+            inv.getPlugin().getServer().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                e.setCancelled(true);
+            }
         }
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryOpenEvent e) {
+    public void onInventoryClose(InventoryCloseEvent e) {
         if (e.getInventory().getHolder() != null && e.getInventory().getHolder() instanceof DInventory) {
             DInventory inv = (DInventory) e.getInventory().getHolder();
             Bukkit.getServer().getPluginManager().callEvent(new DInventoryCloseEvent(e.getView(), inv));
@@ -31,8 +36,11 @@ public class InventoryEventListener implements Listener {
     public void onInventoryClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() != null && e.getInventory().getHolder() instanceof DInventory) {
             DInventory inv = (DInventory) e.getInventory().getHolder();
-            Bukkit.getServer().getPluginManager().callEvent(new DInventoryClickEvent(e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), e.getHotbarButton()));
+            DInventoryClickEvent event = new DInventoryClickEvent(e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), e.getHotbarButton());
+            Bukkit.getServer().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                e.setCancelled(true);
+            }
         }
     }
-
 }

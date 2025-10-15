@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class DInventoryClickEvent extends InventoryClickEvent {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
-    private boolean isCancelled;
     private final DInventory inventory;
 
     public DInventoryClickEvent(@NotNull InventoryView transaction, DInventory inventory, @NotNull InventoryType.SlotType type, int slot, @NotNull ClickType click, @NotNull InventoryAction action) {
@@ -26,16 +25,6 @@ public class DInventoryClickEvent extends InventoryClickEvent {
 
     public @NotNull DInventory getDInventory() {
         return inventory;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return isCancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.isCancelled = cancelled;
     }
 
     @Override
