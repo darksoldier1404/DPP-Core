@@ -5,6 +5,8 @@
 package com.darksoldier1404.dppc.data;
 
 import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
+import com.darksoldier1404.dppc.api.logger.DLogManager;
+import com.darksoldier1404.dppc.api.logger.DLogNode;
 import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.utils.ColorUtils;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
@@ -24,6 +26,7 @@ public class DPlugin extends JavaPlugin {
     private final Map<String, IDataHandler<?, ?>> data = new HashMap<>();
     private final boolean useDLang;
     private @Nullable DLang lang;
+    public @NotNull DLogNode log;
 
     public DPlugin() {
         this(false);
@@ -31,6 +34,7 @@ public class DPlugin extends JavaPlugin {
 
     public DPlugin(boolean useDLang) {
         this.useDLang = useDLang;
+        log = DLogManager.init(this);
     }
 
     public void init() {
@@ -65,6 +69,10 @@ public class DPlugin extends JavaPlugin {
         return (T) data.get(key);
     }
 
+    public @NotNull DLogNode getLog() {
+        return log;
+    }
+
     public void reload() {
         init();
     }
@@ -87,15 +95,16 @@ public class DPlugin extends JavaPlugin {
         }
     }
 
-    public void saveDataContainer() {
+    public void saveAllData() {
         ConfigUtils.savePluginConfig(this, config);
         for (Map.Entry<String, IDataHandler<?, ?>> entry : data.entrySet()) {
             IDataHandler<?, ?> handler = entry.getValue();
             handler.saveAll();
         }
+        saveLog();
     }
 
-    public void saveDataContainerWithoutConfig() {
+    public void saveDataContainer() {
         for (Map.Entry<String, IDataHandler<?, ?>> entry : data.entrySet()) {
             IDataHandler<?, ?> handler = entry.getValue();
             handler.saveAll();
@@ -125,5 +134,9 @@ public class DPlugin extends JavaPlugin {
 
     public @Nullable DLang getLang() {
         return lang;
+    }
+
+    public void saveLog() {
+        DLogManager.saveLogNode(this, false);
     }
 }

@@ -1,5 +1,7 @@
 package com.darksoldier1404.dppc.builder.command;
 
+import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
+import com.darksoldier1404.dppc.api.logger.DLogManager;
 import com.darksoldier1404.dppc.data.DPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,6 +19,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+@DPPCoreVersion(since = "5.3.0")
 public class CommandBuilder implements CommandExecutor, TabCompleter {
     private final Map<String, SubCommand> subCommands = new HashMap<>();
     private final DPlugin plugin;
@@ -168,6 +171,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        plugin.getLog().info("Command executed: " + command.getName() + " by " + sender.getName() + " with args: " + String.join(", ", args), DLogManager.printCommandLogs);
         if (args.length == 0) {
             defaultAction.accept(sender, args);
             return false;
