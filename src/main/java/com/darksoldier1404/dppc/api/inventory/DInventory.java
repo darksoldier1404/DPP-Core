@@ -242,26 +242,46 @@ public class DInventory implements InventoryHolder, Cloneable {
         pages++;
     }
 
+    @DPPCoreVersion(since = "5.3.0")
     @MultiPageOnly
-    public void addPageItems(List<ItemStack> items) {
-        final int PAGE_SIZE = 45;
-        int itemIndex = 0;
+    public void addPageItem(ItemStack item) {
         int pageIndex = 0;
-        while (itemIndex < items.size()) {
+        while (true) {
             if (!pageItems.containsKey(pageIndex)) {
-                pageItems.put(pageIndex, new ItemStack[PAGE_SIZE]);
+                pageItems.put(pageIndex, new ItemStack[contentSlots]);
             }
             ItemStack[] currentPageItems = pageItems.get(pageIndex);
-            int slot = 0;
-            while (slot < PAGE_SIZE && itemIndex < items.size()) {
+            boolean added = false;
+            for (int slot = 0; slot < contentSlots; slot++) {
                 if (currentPageItems[slot] == null) {
-                    currentPageItems[slot] = items.get(itemIndex++);
+                    currentPageItems[slot] = item;
+                    added = true;
+                    break;
                 }
-                slot++;
+            }
+            if (added) {
+                break;
             }
             pageIndex++;
         }
-        pages = pageIndex - 1;
+        pages = Math.max(pages, pageIndex + 1);
+    }
+
+    @DPPCoreVersion(since = "5.3.0")
+    @MultiPageOnly
+    public void addPageItems(List<ItemStack> items) {
+        Iterator<ItemStack> iterator = items.iterator();
+        int pageIndex = 0;
+        while (iterator.hasNext()) {
+            ItemStack[] currentPageItems = pageItems.computeIfAbsent(pageIndex, k -> new ItemStack[contentSlots]);
+            for (int slot = 0; slot < contentSlots && iterator.hasNext(); slot++) {
+                if (currentPageItems[slot] == null) {
+                    currentPageItems[slot] = iterator.next();
+                }
+            }
+            pageIndex++;
+        }
+        pages = Math.max(pages, pageIndex + 1);
     }
 
     @MultiPageOnly

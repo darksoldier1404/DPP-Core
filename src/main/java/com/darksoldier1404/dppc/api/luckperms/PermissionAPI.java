@@ -54,13 +54,13 @@ public class PermissionAPI {
 
     public static void delPermission(UUID uuid, String permission, CommandSender sender) {
         if(!delPermission(uuid, permission)) {
-            sender.sendMessage(prefix + "존재하지 않는 유저입니다.");
+            sender.sendMessage(prefix + "User not found.");
         }
     }
     public static void delPermission(String name, String permission, CommandSender sender) {
         Player p = Bukkit.getPlayer(name);
         if(p == null) {
-            sender.sendMessage(prefix + "존재하지 않는 유저이거나 오프라인 유저입니다.");
+            sender.sendMessage(prefix + "User not found or offline.");
             return;
         }
         UUID uuid = p.getUniqueId();
