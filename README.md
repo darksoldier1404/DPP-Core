@@ -17,7 +17,7 @@ DPP-Core는 Spigot 또는 Paper 서버용 코어 플러그인입니다. DP-Shop,
 ## 기능
 
 - DP-PLUGINS를 위한 필수 API 제공
-- Minecraft 1.14\~1.21.7 지원
+- Minecraft 1.16\~1.21.10 지원
 - 한국어 및 영어 지원
 
 ## 설치
@@ -47,7 +47,7 @@ DPP-Core is a core plugin for Spigot or Paper servers. It serves as a dependency
 ## Features
 
 - Provides essential APIs for DP-Plugins
-- Supports Minecraft 1.14 to 1.21.7
+- Supports Minecraft 1.16 to 1.21.10
 - Supports Korean and English
 
 ## Installation
