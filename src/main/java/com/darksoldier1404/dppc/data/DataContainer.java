@@ -7,6 +7,7 @@ import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -113,6 +114,17 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
                 throw new IllegalArgumentException("Invalid value type for " + dataType + ": Expected YamlConfiguration but found " + value.getClass().getSimpleName() + " for key " + key);
             }
         }
+    }
+
+    public void delete(K key) {
+        String fileName;
+        try {
+            fileName = getFileName(key);
+        } catch (IllegalArgumentException e) {
+            logger.warning(e.getMessage(), DLogManager.printDataContainerLogs);
+            return;
+        }
+        boolean isDeleted = new File(plugin.getDataFolder(), path + "/" + fileName + ".yml").delete();
     }
 
     /**

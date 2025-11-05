@@ -41,21 +41,23 @@ public class InventoryEventListener implements Listener {
     public void onInventoryClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() != null && e.getInventory().getHolder() instanceof DInventory) {
             DInventory inv = (DInventory) e.getInventory().getHolder();
+            if (handlePagination(e, inv)) {
+                return;
+            }
             DInventoryClickEvent event = new DInventoryClickEvent(e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), e.getHotbarButton());
             Bukkit.getServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 e.setCancelled(true);
+                System.out.println("Cancelled click event on " + e.getView().getTitle() + " by " + e.getWhoClicked().getName() + " on slot " + e.getRawSlot());
             }
             inv.getPlugin().getLog().info("Inventory Clicked: " + e.getView().getTitle() + " by " + e.getWhoClicked().getName() + " on slot " + e.getRawSlot(), DLogManager.printDInventoryLogs);
         }
     }
 
-    @EventHandler
-    public void onDInventoryClick(DInventoryClickEvent e) {
-        DInventory inv = e.getDInventory();
+    private boolean handlePagination(InventoryClickEvent e, DInventory inv) {
         ItemStack item = e.getCurrentItem();
         if (item == null || item.getType().isAir()) {
-            return;
+            return false;
         }
         if (NBT.hasTagKey(item, "dppc_prevpage")) {
             DInventoryPreviousPageEvent pageEvent = new DInventoryPreviousPageEvent(e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), e.getHotbarButton());
@@ -64,7 +66,7 @@ public class InventoryEventListener implements Listener {
             if (!pageEvent.isCancelled()) {
                 inv.applyChanges();
                 inv.prevPage();
-                return;
+                return true;
             }
         }
         if (NBT.hasTagKey(item, "dppc_nextpage")) {
@@ -75,10 +77,12 @@ public class InventoryEventListener implements Listener {
                 inv.applyChanges();
                 inv.nextPage();
             }
-            return;
+            return true;
         }
         if (NBT.hasTagKey(item, "dppc_clickcancel")) {
             e.setCancelled(true);
+            return true;
         }
+        return false;
     }
 }

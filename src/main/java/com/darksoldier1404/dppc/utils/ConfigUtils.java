@@ -1,6 +1,7 @@
 package com.darksoldier1404.dppc.utils;
 
 import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.api.logger.DLogManager;
 import com.darksoldier1404.dppc.api.logger.DLogNode;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -211,6 +212,7 @@ public class ConfigUtils {
         return new YamlConfiguration();
     }
 
+    @DPPCoreVersion(since = "5.3.0")
     public static YamlConfiguration missingKeyFix(@NotNull YamlConfiguration config, @NotNull YamlConfiguration defaultConfig) {
         for (String key : defaultConfig.getKeys(true)) {
             if (!config.contains(key)) {

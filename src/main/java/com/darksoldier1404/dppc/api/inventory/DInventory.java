@@ -8,10 +8,7 @@ import com.darksoldier1404.dppc.utils.NBT;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -84,14 +81,6 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.contentSlots = size - toolSlots;
         this.pageTools = new ItemStack[toolSlots];
         DInventoryManager.addInventory(plugin, this);
-    }
-
-    public void updateTitle(String title) { // use only not opened inventory
-        if (title == null || title.isEmpty()) {
-            throw new IllegalArgumentException("Title cannot be null or empty");
-        }
-        this.inventory = Bukkit.createInventory(this, inventory.getSize(), title);
-        update();
     }
 
     @Override
