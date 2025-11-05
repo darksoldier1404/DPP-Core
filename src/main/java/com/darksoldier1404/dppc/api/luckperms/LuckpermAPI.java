@@ -1,12 +1,14 @@
 package com.darksoldier1404.dppc.api.luckperms;
 
 import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.api.logger.DLogNode;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.PrefixNode;
 import net.luckperms.api.node.types.SuffixNode;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -16,10 +18,10 @@ import java.util.logging.Logger;
 
 public class LuckpermAPI {
     private static final DPPCore plugin = DPPCore.getInstance();
-    private static final LuckPerms lp = (LuckPerms) plugin.lp;
+    private static final LuckPerms lp = (LuckPerms) DPPCore.lp;
     private static final String PREFIX = "[DPP-Core.LuckpermAPI] ";
     private static final String MSG_USER_NOT_FOUND = PREFIX + "User not found.";
-    private static final Logger logger = plugin.getLogger();
+    private static final @NotNull DLogNode logger = plugin.getLog();
 
     @Nullable
     public static User getUser(OfflinePlayer p) {
@@ -37,7 +39,7 @@ public class LuckpermAPI {
             User user = lp.getUserManager().getUser(p.getUniqueId());
             return user;
         } catch (Exception e) {
-            logger.severe("Failed to get user for " + p.getName() + ": " + e.getMessage());
+            logger.severe("Failed to get user for " + p.getName() + ": " + e.getMessage(), true);
             return null;
         }
     }
@@ -47,7 +49,7 @@ public class LuckpermAPI {
         if (user != null) {
             user.data().add(node);
             lp.getUserManager().saveUser(user);
-            logger.info("Added node for player " + p.getName());
+            logger.info("Added node for player " + p.getName(), true);
         }
     }
 
@@ -66,7 +68,7 @@ public class LuckpermAPI {
                     .orElse(false);
             if (modified) {
                 lp.getUserManager().saveUser(user);
-                logger.info("Removed node for player " + p.getName());
+                logger.info("Removed node for player " + p.getName(), true);
             }
         }
     }
