@@ -22,7 +22,7 @@ import java.util.function.Function;
 public class DInventory implements InventoryHolder, Cloneable {
     private Inventory inventory;
     private String handlerName;
-    private final String title;
+    private String title;
     private @NotNull DPlugin plugin;
     private String name;
     private UUID uuid;
@@ -107,6 +107,14 @@ public class DInventory implements InventoryHolder, Cloneable {
 
     public boolean isValidHandler(JavaPlugin plugin) {
         return plugin.getName().equals(handlerName);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public boolean isUsePage() {
