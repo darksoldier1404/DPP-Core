@@ -109,10 +109,12 @@ public class DInventory implements InventoryHolder, Cloneable {
         return plugin.getName().equals(handlerName);
     }
 
+    @DPPCoreVersion(since = "5.3.1")
     public String getTitle() {
         return title;
     }
 
+    @DPPCoreVersion(since = "5.3.1")
     public void setTitle(String title) {
         this.title = title;
     }
