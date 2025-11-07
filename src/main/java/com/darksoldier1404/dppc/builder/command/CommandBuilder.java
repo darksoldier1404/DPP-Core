@@ -3,6 +3,7 @@ package com.darksoldier1404.dppc.builder.command;
 import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.api.logger.DLogManager;
 import com.darksoldier1404.dppc.data.DPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,13 +12,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @DPPCoreVersion(since = "5.3.0")
 public class CommandBuilder implements CommandExecutor, TabCompleter {
@@ -57,6 +56,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
 
     public void build(@NotNull String command) {
         plugin.getCommand(command).setExecutor(this);
+        plugin.getCommand(command).setTabCompleter(this);
     }
 
     public void addSubCommand(String name, String usage, BiFunction<CommandSender, String[], Boolean> action) {
@@ -72,8 +72,14 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
     }
 
     public void addSubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiFunction<CommandSender, String[], Boolean> action) {
-        subCommands.put(name.toLowerCase(), new SubCommand(name, permission, usage, isPlayerOnly, action));
+        SubCommand sub = new SubCommand(name, permission, usage, isPlayerOnly);
+        sub.setLegacyAction(action);
+        subCommands.put(name.toLowerCase(), sub);
         subCommandNames.add(name.toLowerCase());
+    }
+
+    public SubCommandBuilder beginSubCommand(String name, String usage) {
+        return new SubCommandBuilder(name, usage);
     }
 
     public void addTabCompletion(String subCommand, Function<String[], List<String>> completion) {
@@ -83,7 +89,6 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
     }
 
-    // Overloaded method to support CommandSender in tab completion
     public void addTabCompletion(String subCommand, BiFunction<CommandSender, String[], List<String>> completion) {
         SubCommand cmd = this.subCommands.get(subCommand.toLowerCase());
         if (cmd != null) {
@@ -115,21 +120,70 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         return noSubCommandsMessage;
     }
 
+    public class SubCommandBuilder {
+        private final SubCommand subCommand;
+
+        public SubCommandBuilder(String name, String usage) {
+            this.subCommand = new SubCommand(name, null, usage, false);
+        }
+
+        public SubCommandBuilder withPermission(String permission) {
+            this.subCommand.permission = permission;
+            return this;
+        }
+
+        public SubCommandBuilder playerOnly() {
+            this.subCommand.isPlayerOnly = true;
+            return this;
+        }
+
+        public SubCommandBuilder withArgument(String name, ArgumentType type) {
+            this.subCommand.arguments.add(new Argument(name, type, true));
+            return this;
+        }
+
+        public SubCommandBuilder executes(GenericCommandExecutor executor) {
+            this.subCommand.genericExecutor = executor;
+            build();
+            return this;
+        }
+
+        public SubCommandBuilder executesPlayer(PlayerCommandExecutor executor) {
+            this.subCommand.isPlayerOnly = true;
+            this.subCommand.playerExecutor = executor;
+            build();
+            return this;
+        }
+
+        private void build() {
+            subCommands.put(subCommand.name.toLowerCase(), subCommand);
+            if (!subCommandNames.contains(subCommand.name.toLowerCase())) {
+                subCommandNames.add(subCommand.name.toLowerCase());
+            }
+        }
+    }
+
     private static class SubCommand {
         private final String name;
-        private final String permission; // Nullable for no permission check
+        private String permission;
         private final String usage;
-        private final boolean isPlayerOnly;
-        private final BiFunction<CommandSender, String[], Boolean> action;
+        private boolean isPlayerOnly;
+        private final List<Argument> arguments = new ArrayList<>();
+        private BiFunction<CommandSender, String[], Boolean> legacyAction;
+        private GenericCommandExecutor genericExecutor;
+        private PlayerCommandExecutor playerExecutor;
         private Function<String[], List<String>> tabCompletion;
         private BiFunction<CommandSender, String[], List<String>> tabCompletionWithSender;
 
-        public SubCommand(String name, String permission, String usage, boolean isPlayerOnly, BiFunction<CommandSender, String[], Boolean> action) {
+        public SubCommand(String name, String permission, String usage, boolean isPlayerOnly) {
             this.name = name;
             this.permission = permission;
             this.usage = usage;
             this.isPlayerOnly = isPlayerOnly;
-            this.action = action;
+        }
+
+        public void setLegacyAction(BiFunction<CommandSender, String[], Boolean> legacyAction) {
+            this.legacyAction = legacyAction;
         }
 
         public void setTabCompletion(Function<String[], List<String>> tabCompletion) {
@@ -139,34 +193,6 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         public void setTabCompletionWithSender(BiFunction<CommandSender, String[], List<String>> tabCompletionWithSender) {
             this.tabCompletionWithSender = tabCompletionWithSender;
         }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getPermission() {
-            return permission;
-        }
-
-        public String getUsage() {
-            return usage;
-        }
-
-        public boolean isPlayerOnly() {
-            return isPlayerOnly;
-        }
-
-        public BiFunction<CommandSender, String[], Boolean> getAction() {
-            return action;
-        }
-
-        public Function<String[], List<String>> getTabCompletion() {
-            return tabCompletion;
-        }
-
-        public BiFunction<CommandSender, String[], List<String>> getTabCompletionWithSender() {
-            return tabCompletionWithSender;
-        }
     }
 
     @Override
@@ -174,56 +200,117 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         plugin.getLog().info("Command executed: " + command.getName() + " by " + sender.getName() + " with args: " + String.join(", ", args), DLogManager.printCommandLogs);
         if (args.length == 0) {
             defaultAction.accept(sender, args);
-            return false;
+            return true;
         }
 
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
         if (subCommand == null) {
             sender.sendMessage(plugin.getPrefix() + "Unknown subcommand.");
-            return false;
+            return true;
         }
 
         if (subCommand.isPlayerOnly && !(sender instanceof Player)) {
             sender.sendMessage(plugin.getPrefix() + "This command can only be used by players.");
-            return false;
+            return true;
         }
 
         if (subCommand.permission != null && !sender.hasPermission(subCommand.permission)) {
             sender.sendMessage(plugin.getPrefix() + "You do not have permission to use this command.");
-            return false;
+            return true;
         }
 
-        if (!subCommand.action.apply(sender, args)) {
+        if (subCommand.legacyAction != null) {
+            if (!subCommand.legacyAction.apply(sender, args)) {
+                sender.sendMessage(plugin.getPrefix() + "Usage: " + subCommand.usage);
+            }
+            return true;
+        }
+
+        String[] commandArgs = Arrays.copyOfRange(args, 1, args.length);
+        if (commandArgs.length < subCommand.arguments.size()) {
+            sender.sendMessage(plugin.getPrefix() + "Usage: " + subCommand.usage);
+            return true;
+        }
+
+        Map<String, Object> parsedArgs = new HashMap<>();
+        for (int i = 0; i < subCommand.arguments.size(); i++) {
+            Argument argDef = subCommand.arguments.get(i);
+            String rawArg = commandArgs[i];
+            Object parsed;
+            try {
+                switch (argDef.type) {
+                    case PLAYER:
+                        Player p = Bukkit.getPlayer(rawArg);
+                        if (p == null) {
+                            sender.sendMessage(plugin.getPrefix() + "Player not found: " + rawArg);
+                            return true;
+                        }
+                        parsed = p;
+                        break;
+                    case INTEGER:
+                        parsed = Integer.parseInt(rawArg);
+                        break;
+                    case DOUBLE:
+                        parsed = Double.parseDouble(rawArg);
+                        break;
+                    case BOOLEAN:
+                        parsed = Boolean.parseBoolean(rawArg);
+                        break;
+                    case STRING:
+                    default:
+                        parsed = rawArg;
+                        break;
+                }
+                parsedArgs.put(argDef.name, parsed);
+            } catch (NumberFormatException e) {
+                sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.name + "': " + rawArg);
+                return true;
+            }
+        }
+
+        CommandArguments finalArgs = new CommandArguments(parsedArgs);
+        boolean success = false;
+        if (subCommand.playerExecutor != null) {
+            success = subCommand.playerExecutor.execute((Player) sender, finalArgs);
+        } else if (subCommand.genericExecutor != null) {
+            success = subCommand.genericExecutor.execute(sender, finalArgs);
+        }
+
+        if (!success) {
             sender.sendMessage(plugin.getPrefix() + "Usage: " + subCommand.usage);
         }
-        return false;
+
+        return true;
     }
 
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            List<String> completions = new ArrayList<>();
-            for (String cmd : subCommandNames) {
-                SubCommand sub = subCommands.get(cmd);
-                if ((sub.permission == null || sender.hasPermission(sub.permission)) &&
-                        (!sub.isPlayerOnly || sender instanceof Player)) {
-                    completions.add(cmd);
-                }
-            }
-            return completions;
+            return subCommandNames.stream()
+                    .map(s -> subCommands.get(s.toLowerCase()))
+                    .filter(sub -> (sub.permission == null || sender.hasPermission(sub.permission)) && (!sub.isPlayerOnly || sender instanceof Player))
+                    .map(sub -> sub.name)
+                    .collect(Collectors.toList());
         }
 
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
-        if (subCommand != null &&
-                (subCommand.permission == null || sender.hasPermission(subCommand.permission)) &&
-                (!subCommand.isPlayerOnly || sender instanceof Player)) {
+        if (subCommand != null && (subCommand.permission == null || sender.hasPermission(subCommand.permission)) && (!subCommand.isPlayerOnly || sender instanceof Player)) {
             if (subCommand.tabCompletionWithSender != null) {
                 return subCommand.tabCompletionWithSender.apply(sender, args);
             } else if (subCommand.tabCompletion != null) {
                 return subCommand.tabCompletion.apply(args);
             }
+            int argIndex = args.length - 2;
+            if(argIndex >= 0 && argIndex < subCommand.arguments.size()){
+                if(subCommand.arguments.get(argIndex).type == ArgumentType.PLAYER) {
+                    return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                }
+                if(subCommand.arguments.get(argIndex).type == ArgumentType.BOOLEAN) {
+                    return Arrays.asList("true", "false");
+                }
+            }
         }
-        return null;
+        return Collections.emptyList();
     }
 }
