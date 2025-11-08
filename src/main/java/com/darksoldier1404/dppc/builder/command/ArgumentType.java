@@ -8,5 +8,7 @@ public enum ArgumentType {
     BOOLEAN,
     STRING,
     STRING_ARRAY,
-    WORLD
+    WORLD,
+    MATERIAL,
+    ENTITY_TYPE
 }

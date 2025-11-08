@@ -4,10 +4,12 @@ import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.api.logger.DLogManager;
 import com.darksoldier1404.dppc.data.DPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -262,6 +264,24 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                         }
                         argIndex++;
                         break;
+                    case MATERIAL:
+                        Material mat = Material.matchMaterial(commandArgs[argIndex]);
+                        if (mat == null) {
+                            sender.sendMessage(plugin.getPrefix() + "Material not found: " + commandArgs[argIndex]);
+                            return true;
+                        }
+                        parsed = mat;
+                        argIndex++;
+                        break;
+                    case ENTITY_TYPE:
+                        EntityType type = EntityType.fromName(commandArgs[argIndex]);
+                        if (type == null) {
+                            sender.sendMessage(plugin.getPrefix() + "EntityType not found: " + commandArgs[argIndex]);
+                            return true;
+                        }
+                        parsed = type;
+                        argIndex++;
+                        break;
                     case INTEGER:
                         parsed = Integer.parseInt(commandArgs[argIndex]);
                         argIndex++;
@@ -279,10 +299,9 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                         argIndex++;
                         break;
                     case STRING_ARRAY:
-                        // 남은 모든 인자를 배열로 처리
                         String[] arr = Arrays.copyOfRange(commandArgs, argIndex, commandArgs.length);
                         parsed = arr;
-                        argIndex = commandArgs.length; // 이후 인자 없음
+                        argIndex = commandArgs.length;
                         break;
                     default:
                         parsed = commandArgs[argIndex];
@@ -330,7 +349,6 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 return subCommand.tabCompletion.apply(args);
             }
             int argIndex = args.length - 2;
-            // 인자 타입별 자동 탭 컴플리트
             if(argIndex >= 0 && argIndex < subCommand.arguments.size()){
                 ArgumentType type = subCommand.arguments.get(argIndex).type;
                 switch(type) {
@@ -340,6 +358,10 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                         return Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList());
                     case WORLD:
                         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+                    case MATERIAL:
+                        return Arrays.stream(Material.values()).map(Material::name).collect(Collectors.toList());
+                    case ENTITY_TYPE:
+                        return Arrays.stream(EntityType.values()).map(EntityType::name).collect(Collectors.toList());
                     case BOOLEAN:
                         return Arrays.asList("TRUE", "FALSE");
                     case STRING_ARRAY:
@@ -347,7 +369,6 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                     case DOUBLE:
                     case STRING:
                     default:
-                        // 특별한 값이 없으므로 빈 리스트 반환
                         return Collections.emptyList();
                 }
             }

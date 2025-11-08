@@ -2,7 +2,9 @@ package com.darksoldier1404.dppc.builder.command;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.Material;
 
 import java.util.Map;
 
@@ -57,6 +59,22 @@ public class CommandArguments {
         Object value = parsedArgs.get(key);
         if (value instanceof World) {
             return (World) value;
+        }
+        return null;
+    }
+
+    public Material getMaterial(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof Material) {
+            return (Material) value;
+        }
+        return null;
+    }
+
+    public EntityType getEntityType(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof EntityType) {
+            return (EntityType) value;
         }
         return null;
     }
