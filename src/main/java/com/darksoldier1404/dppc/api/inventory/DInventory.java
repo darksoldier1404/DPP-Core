@@ -117,6 +117,9 @@ public class DInventory implements InventoryHolder, Cloneable {
     @DPPCoreVersion(since = "5.3.1")
     public void setTitle(String title) {
         this.title = title;
+        Inventory newInventory = Bukkit.createInventory(this, inventory.getSize(), title);
+        newInventory.setContents(inventory.getContents());
+        this.inventory = newInventory;
     }
 
     public boolean isUsePage() {
