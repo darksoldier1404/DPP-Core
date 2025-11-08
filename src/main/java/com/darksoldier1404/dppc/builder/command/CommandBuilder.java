@@ -9,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -233,37 +235,63 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
 
         Map<String, Object> parsedArgs = new HashMap<>();
+        int argIndex = 0;
         for (int i = 0; i < subCommand.arguments.size(); i++) {
             Argument argDef = subCommand.arguments.get(i);
-            String rawArg = commandArgs[i];
             Object parsed;
             try {
                 switch (argDef.type) {
                     case PLAYER:
-                        Player p = Bukkit.getPlayer(rawArg);
+                        Player p = Bukkit.getPlayer(commandArgs[argIndex]);
                         if (p == null) {
-                            sender.sendMessage(plugin.getPrefix() + "Player not found: " + rawArg);
+                            sender.sendMessage(plugin.getPrefix() + "Player not found: " + commandArgs[argIndex]);
                             return true;
                         }
                         parsed = p;
+                        argIndex++;
+                        break;
+                    case OFFLINE_PLAYER:
+                        parsed = Bukkit.getOfflinePlayer(commandArgs[argIndex]);
+                        argIndex++;
+                        break;
+                    case WORLD:
+                        parsed = Bukkit.getWorld(commandArgs[argIndex]);
+                        if (parsed == null) {
+                            sender.sendMessage(plugin.getPrefix() + "World not found: " + commandArgs[argIndex]);
+                            return true;
+                        }
+                        argIndex++;
                         break;
                     case INTEGER:
-                        parsed = Integer.parseInt(rawArg);
+                        parsed = Integer.parseInt(commandArgs[argIndex]);
+                        argIndex++;
                         break;
                     case DOUBLE:
-                        parsed = Double.parseDouble(rawArg);
+                        parsed = Double.parseDouble(commandArgs[argIndex]);
+                        argIndex++;
                         break;
                     case BOOLEAN:
-                        parsed = Boolean.parseBoolean(rawArg);
+                        parsed = Boolean.parseBoolean(commandArgs[argIndex]);
+                        argIndex++;
                         break;
                     case STRING:
+                        parsed = commandArgs[argIndex];
+                        argIndex++;
+                        break;
+                    case STRING_ARRAY:
+                        // 남은 모든 인자를 배열로 처리
+                        String[] arr = Arrays.copyOfRange(commandArgs, argIndex, commandArgs.length);
+                        parsed = arr;
+                        argIndex = commandArgs.length; // 이후 인자 없음
+                        break;
                     default:
-                        parsed = rawArg;
+                        parsed = commandArgs[argIndex];
+                        argIndex++;
                         break;
                 }
                 parsedArgs.put(argDef.name, parsed);
             } catch (NumberFormatException e) {
-                sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.name + "': " + rawArg);
+                sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.name + "': " + commandArgs[argIndex]);
                 return true;
             }
         }
@@ -302,12 +330,25 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 return subCommand.tabCompletion.apply(args);
             }
             int argIndex = args.length - 2;
+            // 인자 타입별 자동 탭 컴플리트
             if(argIndex >= 0 && argIndex < subCommand.arguments.size()){
-                if(subCommand.arguments.get(argIndex).type == ArgumentType.PLAYER) {
-                    return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
-                }
-                if(subCommand.arguments.get(argIndex).type == ArgumentType.BOOLEAN) {
-                    return Arrays.asList("true", "false");
+                ArgumentType type = subCommand.arguments.get(argIndex).type;
+                switch(type) {
+                    case PLAYER:
+                        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                    case OFFLINE_PLAYER:
+                        return Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList());
+                    case WORLD:
+                        return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+                    case BOOLEAN:
+                        return Arrays.asList("TRUE", "FALSE");
+                    case STRING_ARRAY:
+                    case INTEGER:
+                    case DOUBLE:
+                    case STRING:
+                    default:
+                        // 특별한 값이 없으므로 빈 리스트 반환
+                        return Collections.emptyList();
                 }
             }
         }

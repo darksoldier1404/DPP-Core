@@ -1,5 +1,7 @@
 package com.darksoldier1404.dppc.builder.command;
 
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -33,5 +35,29 @@ public class CommandArguments {
 
     public Object get(String key) {
         return parsedArgs.get(key);
+    }
+
+    public String[] getStringArray(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof String[]) {
+            return (String[]) value;
+        }
+        return null;
+    }
+
+    public OfflinePlayer getOfflinePlayer(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof OfflinePlayer) {
+            return (OfflinePlayer) value;
+        }
+        return null;
+    }
+
+    public World getWorld(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof World) {
+            return (World) value;
+        }
+        return null;
     }
 }
