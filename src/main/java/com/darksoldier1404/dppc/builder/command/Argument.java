@@ -41,7 +41,10 @@ public class Argument<T> {
                     stringSuggestions.add(((org.bukkit.entity.EntityType) suggestion).name());
                     break;
                 case OFFLINE_PLAYER:
-                    stringSuggestions.add(((org.bukkit.OfflinePlayer) suggestion).getName());
+                    String name = ((org.bukkit.OfflinePlayer) suggestion).getName();
+                    if (name != null) {
+                        stringSuggestions.add(name);
+                    }
                     break;
                 default:
                     stringSuggestions.add(suggestion.toString());
