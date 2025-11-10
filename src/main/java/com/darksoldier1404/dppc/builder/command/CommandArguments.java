@@ -16,23 +16,43 @@ public class CommandArguments {
     }
 
     public Player getPlayer(String key) {
-        return (Player) parsedArgs.get(key);
+        Object value = parsedArgs.get(key);
+        if (value instanceof Player) {
+            return (Player) value;
+        }
+        return null;
     }
 
     public Integer getInteger(String key) {
-        return (Integer) parsedArgs.get(key);
+        Object value = parsedArgs.get(key);
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        return null;
     }
 
     public Double getDouble(String key) {
-        return (Double) parsedArgs.get(key);
+        Object value = parsedArgs.get(key);
+        if (value instanceof Double) {
+            return (Double) value;
+        }
+        return null;
     }
 
     public Boolean getBoolean(String key) {
-        return (Boolean) parsedArgs.get(key);
+        Object value = parsedArgs.get(key);
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        return null;
     }
 
     public String getString(String key) {
-        return (String) parsedArgs.get(key);
+        Object value = parsedArgs.get(key);
+        if (value instanceof String) {
+            return (String) value;
+        }
+        return null;
     }
 
     public Object get(String key) {
