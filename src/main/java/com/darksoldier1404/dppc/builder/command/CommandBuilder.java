@@ -287,8 +287,20 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                         parsed = type;
                         argIndex++;
                         break;
+                    case BYTE:
+                        parsed = Byte.parseByte(commandArgs[argIndex]);
+                        argIndex++;
+                        break;
+                    case SHORT:
+                        parsed = Short.parseShort(commandArgs[argIndex]);
+                        argIndex++;
+                        break;
                     case INTEGER:
                         parsed = Integer.parseInt(commandArgs[argIndex]);
+                        argIndex++;
+                        break;
+                    case FLOAT:
+                        parsed = Float.parseFloat(commandArgs[argIndex]);
                         argIndex++;
                         break;
                     case DOUBLE:
@@ -297,6 +309,10 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                         break;
                     case BOOLEAN:
                         parsed = Boolean.parseBoolean(commandArgs[argIndex]);
+                        argIndex++;
+                        break;
+                    case CHAR:
+                        parsed = commandArgs[argIndex].charAt(0);
                         argIndex++;
                         break;
                     case STRING:
@@ -372,8 +388,12 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                     case BOOLEAN:
                         return Arrays.asList("TRUE", "FALSE");
                     case STRING_ARRAY:
+                    case BYTE:
+                    case SHORT:
                     case INTEGER:
+                    case FLOAT:
                     case DOUBLE:
+                    case CHAR:
                     case STRING:
                     default:
                         return Collections.emptyList();

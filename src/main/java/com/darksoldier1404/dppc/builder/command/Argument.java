@@ -25,8 +25,20 @@ public class Argument<T> {
                 case STRING:
                     stringSuggestions.add((String) suggestion);
                     break;
+                case CHAR:
+                    stringSuggestions.add(String.valueOf((Character) suggestion));
+                    break;
+                case BYTE:
+                    stringSuggestions.add(String.valueOf((Byte) suggestion));
+                    break;
+                case SHORT:
+                    stringSuggestions.add(String.valueOf((Short) suggestion));
+                    break;
                 case INTEGER:
                     stringSuggestions.add(String.valueOf((Integer) suggestion));
+                    break;
+                case FLOAT:
+                    stringSuggestions.add(String.valueOf((Float) suggestion));
                     break;
                 case DOUBLE:
                     stringSuggestions.add(String.valueOf((Double) suggestion));
