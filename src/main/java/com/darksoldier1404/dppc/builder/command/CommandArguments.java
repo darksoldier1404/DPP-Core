@@ -23,10 +23,34 @@ public class CommandArguments {
         return null;
     }
 
+    public Byte getByte(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof Byte) {
+            return (Byte) value;
+        }
+        return null;
+    }
+
+    public Short getShort(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof Short) {
+            return (Short) value;
+        }
+        return null;
+    }
+
     public Integer getInteger(String key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Integer) {
             return (Integer) value;
+        }
+        return null;
+    }
+
+    public Float getFloat(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof Float) {
+            return (Float) value;
         }
         return null;
     }
@@ -43,6 +67,14 @@ public class CommandArguments {
         Object value = parsedArgs.get(key);
         if (value instanceof Boolean) {
             return (Boolean) value;
+        }
+        return null;
+    }
+
+    public Character getCharacter(String key) {
+        Object value = parsedArgs.get(key);
+        if (value instanceof Character) {
+            return (Character) value;
         }
         return null;
     }
