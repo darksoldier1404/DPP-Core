@@ -43,13 +43,6 @@ dependencies {
 compileJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-    sourceCompatibility = isLatest ? JavaVersion.VERSION_21 : JavaVersion.VERSION_1_8
-    targetCompatibility = isLatest ? JavaVersion.VERSION_21 : JavaVersion.VERSION_1_8
-}
-
-java {
-    sourceCompatibility = isLatest ? JavaVersion.VERSION_21 : JavaVersion.VERSION_1_8
-    targetCompatibility = isLatest ? JavaVersion.VERSION_21 : JavaVersion.VERSION_1_8
 }
 
 test {

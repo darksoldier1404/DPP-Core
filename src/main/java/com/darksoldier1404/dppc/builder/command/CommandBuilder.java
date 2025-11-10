@@ -142,7 +142,12 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
 
         public SubCommandBuilder withArgument(String name, ArgumentType type) {
-            this.subCommand.arguments.add(new Argument(name, type, true));
+            this.subCommand.arguments.add(new Argument(name, type, true, null));
+            return this;
+        }
+
+        public SubCommandBuilder withArgument(String name, ArgumentType type, List<String> suggestions) {
+            this.subCommand.arguments.add(new Argument(name, type, true, suggestions));
             return this;
         }
 
@@ -349,9 +354,12 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 return subCommand.tabCompletion.apply(args);
             }
             int argIndex = args.length - 2;
-            if(argIndex >= 0 && argIndex < subCommand.arguments.size()){
+            if (argIndex >= 0 && argIndex < subCommand.arguments.size()) {
+                if (subCommand.arguments.get(argIndex).suggestions != null) {
+                    return subCommand.arguments.get(argIndex).suggestions;
+                }
                 ArgumentType type = subCommand.arguments.get(argIndex).type;
-                switch(type) {
+                switch (type) {
                     case PLAYER:
                         return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
                     case OFFLINE_PLAYER:
