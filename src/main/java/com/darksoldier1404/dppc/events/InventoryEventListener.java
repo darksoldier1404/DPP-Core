@@ -47,7 +47,6 @@ public class InventoryEventListener implements Listener {
             Bukkit.getServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 e.setCancelled(true);
-                System.out.println("Cancelled click event on " + e.getView().getTitle() + " by " + e.getWhoClicked().getName() + " on slot " + e.getRawSlot());
             }
             inv.getPlugin().getLog().info("Inventory Clicked: " + e.getView().getTitle() + " by " + e.getWhoClicked().getName() + " on slot " + e.getRawSlot(), DLogManager.printDInventoryLogs);
         }
