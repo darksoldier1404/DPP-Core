@@ -12,9 +12,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
-import static com.darksoldier1404.dppc.DPPCore.plugin;
-
 public class InventoryEventListener implements Listener {
+
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
         if (e.getInventory().getHolder() != null && e.getInventory().getHolder() instanceof DInventory) {

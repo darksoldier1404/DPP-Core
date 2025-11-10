@@ -1,7 +1,6 @@
 package com.darksoldier1404.dppc;
 
 import com.darksoldier1404.dppc.api.logger.DLogManager;
-import com.darksoldier1404.dppc.api.logger.DLogNode;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
