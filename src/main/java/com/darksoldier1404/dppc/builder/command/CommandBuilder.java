@@ -146,7 +146,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             return this;
         }
 
-        public SubCommandBuilder withArgument(String name, ArgumentType type, List<String> suggestions) {
+        public SubCommandBuilder withArgument(String name, ArgumentType type, List<?> suggestions) {
             this.subCommand.arguments.add(new Argument(name, type, true, suggestions));
             return this;
         }
@@ -177,7 +177,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         private String permission;
         private final String usage;
         private boolean isPlayerOnly;
-        private final List<Argument> arguments = new ArrayList<>();
+        private final List<Argument<?>> arguments = new ArrayList<>();
         private BiFunction<CommandSender, String[], Boolean> legacyAction;
         private GenericCommandExecutor genericExecutor;
         private PlayerCommandExecutor playerExecutor;
@@ -244,7 +244,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         Map<String, Object> parsedArgs = new HashMap<>();
         int argIndex = 0;
         for (int i = 0; i < subCommand.arguments.size(); i++) {
-            Argument argDef = subCommand.arguments.get(i);
+            Argument<?> argDef = subCommand.arguments.get(i);
             Object parsed;
             try {
                 switch (argDef.type) {
@@ -345,7 +345,6 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                     .map(sub -> sub.name)
                     .collect(Collectors.toList());
         }
-
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
         if (subCommand != null && (subCommand.permission == null || sender.hasPermission(subCommand.permission)) && (!subCommand.isPlayerOnly || sender instanceof Player)) {
             if (subCommand.tabCompletionWithSender != null) {
@@ -356,7 +355,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             int argIndex = args.length - 2;
             if (argIndex >= 0 && argIndex < subCommand.arguments.size()) {
                 if (subCommand.arguments.get(argIndex).suggestions != null) {
-                    return subCommand.arguments.get(argIndex).suggestions;
+                    return subCommand.arguments.get(argIndex).getSuggestionsAsStringList();
                 }
                 ArgumentType type = subCommand.arguments.get(argIndex).type;
                 switch (type) {
