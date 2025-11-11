@@ -9,13 +9,13 @@ import org.bukkit.Material;
 import java.util.Map;
 
 public class CommandArguments {
-    private final Map<String, Object> parsedArgs;
+    private final Map<ArgumentIndex, Object> parsedArgs;
 
-    public CommandArguments(Map<String, Object> parsedArgs) {
+    public CommandArguments(Map<ArgumentIndex, Object> parsedArgs) {
         this.parsedArgs = parsedArgs;
     }
 
-    public Player getPlayer(String key) {
+    public Player getPlayer(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Player) {
             return (Player) value;
@@ -23,7 +23,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Byte getByte(String key) {
+    public Byte getByte(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Byte) {
             return (Byte) value;
@@ -31,7 +31,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Short getShort(String key) {
+    public Short getShort(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Short) {
             return (Short) value;
@@ -39,7 +39,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Integer getInteger(String key) {
+    public Integer getInteger(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Integer) {
             return (Integer) value;
@@ -47,7 +47,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Float getFloat(String key) {
+    public Float getFloat(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Float) {
             return (Float) value;
@@ -55,7 +55,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Double getDouble(String key) {
+    public Double getDouble(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Double) {
             return (Double) value;
@@ -63,7 +63,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Boolean getBoolean(String key) {
+    public Boolean getBoolean(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Boolean) {
             return (Boolean) value;
@@ -71,7 +71,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Character getCharacter(String key) {
+    public Character getCharacter(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Character) {
             return (Character) value;
@@ -79,7 +79,7 @@ public class CommandArguments {
         return null;
     }
 
-    public String getString(String key) {
+    public String getString(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof String) {
             return (String) value;
@@ -87,11 +87,11 @@ public class CommandArguments {
         return null;
     }
 
-    public Object get(String key) {
+    public Object get(ArgumentIndex key) {
         return parsedArgs.get(key);
     }
 
-    public String[] getStringArray(String key) {
+    public String[] getStringArray(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof String[]) {
             return (String[]) value;
@@ -99,7 +99,7 @@ public class CommandArguments {
         return null;
     }
 
-    public OfflinePlayer getOfflinePlayer(String key) {
+    public OfflinePlayer getOfflinePlayer(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof OfflinePlayer) {
             return (OfflinePlayer) value;
@@ -107,7 +107,7 @@ public class CommandArguments {
         return null;
     }
 
-    public World getWorld(String key) {
+    public World getWorld(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof World) {
             return (World) value;
@@ -115,7 +115,7 @@ public class CommandArguments {
         return null;
     }
 
-    public Material getMaterial(String key) {
+    public Material getMaterial(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof Material) {
             return (Material) value;
@@ -123,7 +123,7 @@ public class CommandArguments {
         return null;
     }
 
-    public EntityType getEntityType(String key) {
+    public EntityType getEntityType(ArgumentIndex key) {
         Object value = parsedArgs.get(key);
         if (value instanceof EntityType) {
             return (EntityType) value;

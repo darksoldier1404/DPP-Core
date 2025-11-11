@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Argument<T> {
-    final String name;
+    final ArgumentIndex index;
     final ArgumentType type;
     final boolean required;
     final List<T> suggestions = new ArrayList<>();
 
-    public Argument(String name, ArgumentType type, boolean required, List<T> suggestions) {
-        this.name = name;
+    public Argument(ArgumentIndex index, ArgumentType type, boolean required, List<T> suggestions) {
+        this.index = index;
         this.type = type;
         this.required = required;
         if (suggestions != null) {
