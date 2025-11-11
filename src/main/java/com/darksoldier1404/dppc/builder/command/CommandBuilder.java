@@ -146,7 +146,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             return this;
         }
 
-        public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type, List<?> suggestions) {
+        public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type, Collection<?> suggestions) {
             this.subCommand.arguments.add(new Argument(index, type, true, suggestions));
             return this;
         }

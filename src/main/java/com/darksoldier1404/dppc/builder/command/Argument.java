@@ -1,25 +1,27 @@
 package com.darksoldier1404.dppc.builder.command;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Argument<T> {
     final ArgumentIndex index;
     final ArgumentType type;
     final boolean required;
-    final List<T> suggestions = new ArrayList<>();
+    Collection<T> suggestions;
 
-    public Argument(ArgumentIndex index, ArgumentType type, boolean required, List<T> suggestions) {
+    public Argument(ArgumentIndex index, ArgumentType type, boolean required, Collection<T> suggestions) {
         this.index = index;
         this.type = type;
         this.required = required;
-        if (suggestions != null) {
-            this.suggestions.addAll(suggestions);
-        }
+        this.suggestions = suggestions;
     }
 
     public List<String> getSuggestionsAsStringList() {
         List<String> stringSuggestions = new ArrayList<>();
+        if (suggestions == null) {
+            return stringSuggestions;
+        }
         for (T suggestion : suggestions) {
             switch (type) {
                 case STRING:
