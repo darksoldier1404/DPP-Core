@@ -1,6 +1,6 @@
-// Gemini Start
 package com.darksoldier1404.dppc.plugin.commands;
 
+import com.darksoldier1404.dppc.builder.command.ArgumentIndex;
 import com.darksoldier1404.dppc.builder.command.ArgumentType;
         import com.darksoldier1404.dppc.builder.command.CommandBuilder;
         import com.darksoldier1404.dppc.utils.PluginUtil;
@@ -16,9 +16,9 @@ public class DPPCPCommand {
     public DPPCPCommand() {
         builder.beginSubCommand("info", "/dppcp info <PluginName>")
                 .withPermission("dppc.admin")
-                .withArgument("pluginName", ArgumentType.STRING)
+                .withArgument(ArgumentIndex.ARG_0, ArgumentType.STRING)
                 .executes((p, args) -> {
-                    String pluginName = args.getString("pluginName");
+                    String pluginName = args.getString(ArgumentIndex.ARG_0);
                     if (pluginName.isEmpty()) {
                         p.sendMessage(plugin.getPrefix() + "§cPlease specify a plugin name.");
                         return false; // Returning false will show the usage message
@@ -59,4 +59,3 @@ public class DPPCPCommand {
         return builder;
     }
 }
-// Gemini End

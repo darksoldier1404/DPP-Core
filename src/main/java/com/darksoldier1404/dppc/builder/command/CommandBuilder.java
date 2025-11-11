@@ -141,13 +141,13 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             return this;
         }
 
-        public SubCommandBuilder withArgument(String name, ArgumentType type) {
-            this.subCommand.arguments.add(new Argument(name, type, true, null));
+        public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type) {
+            this.subCommand.arguments.add(new Argument(index, type, true, null));
             return this;
         }
 
-        public SubCommandBuilder withArgument(String name, ArgumentType type, List<?> suggestions) {
-            this.subCommand.arguments.add(new Argument(name, type, true, suggestions));
+        public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type, List<?> suggestions) {
+            this.subCommand.arguments.add(new Argument(index, type, true, suggestions));
             return this;
         }
 
@@ -241,7 +241,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        Map<String, Object> parsedArgs = new HashMap<>();
+        Map<ArgumentIndex, Object> parsedArgs = new HashMap<>();
         int argIndex = 0;
         for (int i = 0; i < subCommand.arguments.size(); i++) {
             Argument<?> argDef = subCommand.arguments.get(i);
@@ -329,9 +329,9 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                         argIndex++;
                         break;
                 }
-                parsedArgs.put(argDef.name, parsed);
+                parsedArgs.put(argDef.index, parsed);
             } catch (NumberFormatException e) {
-                sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.name + "': " + commandArgs[argIndex]);
+                sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.index + "': " + commandArgs[argIndex]);
                 return true;
             }
         }
