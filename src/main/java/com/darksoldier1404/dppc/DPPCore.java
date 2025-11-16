@@ -19,7 +19,7 @@ import java.util.Set;
 
 @SuppressWarnings("all")
 public class DPPCore extends DPlugin {
-    public static DPPCore plugin;
+    private static DPPCore plugin;
     public static Plugin ess;
     public static Plugin lp;
     public static Set<PlaceholderBuilder.InternalExpansion> placeholders = new HashSet<>();
@@ -52,9 +52,9 @@ public class DPPCore extends DPlugin {
     @Override
     public void onEnable() {
         DLogManager.initTask();
-        PluginUtil.loadALLPlugins();
+        PluginUtil.loadAllPlugins();
         PluginUtil.initializeSoftDependPlugins();
-        PluginUtil.loadALLAction();
+        PluginUtil.loadAllAction();
         PluginUtil.initPlaceholders();
         getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
         getServer().getPluginManager().registerEvents(new InventoryEventListener(), this);

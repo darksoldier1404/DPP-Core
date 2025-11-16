@@ -42,7 +42,7 @@ public class PluginUtil {
     }
 
     public static Map<JavaPlugin, Integer> getLoadedPlugins() {
-        return loadedPlugins;
+        return Collections.unmodifiableMap(loadedPlugins);
     }
 
     @Nullable
@@ -53,7 +53,7 @@ public class PluginUtil {
                 .orElse(null);
     }
 
-    public static void loadALLPlugins() {
+    public static void loadAllPlugins() {
         for (JavaPlugin pl : loadedPlugins.keySet()) {
             if (pl != null) {
                 if (isMetricsEnabled(pl.getName())) {
@@ -64,7 +64,7 @@ public class PluginUtil {
         }
     }
 
-    public static void loadALLAction() {
+    public static void loadAllAction() {
         for (YamlConfiguration raw : ConfigUtils.loadCustomDataList(plugin, "actions")) {
             String actionName = raw.getString("ACTION_NAME");
             if (actionName == null) {

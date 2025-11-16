@@ -123,7 +123,7 @@ public class DPPCACommand implements CommandExecutor, TabCompleter {
             return false;
         }
         if (args[0].equalsIgnoreCase("reload")) {
-            PluginUtil.loadALLAction();
+            PluginUtil.loadAllAction();
             sender.sendMessage("§aActions reloaded successfully!");
             return false;
         }

@@ -9,9 +9,8 @@ import org.bukkit.scheduler.BukkitTask;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.darksoldier1404.dppc.DPPCore.plugin;
-
 public class DLogManager {
+    private static final DPlugin plugin = DPPCore.getInstance();
     private static final HashMap<DPlugin, DLogNode> logNodes = new HashMap<>();
     private static BukkitTask logTask;
     public static boolean printConfigUtilsLogs = true;
