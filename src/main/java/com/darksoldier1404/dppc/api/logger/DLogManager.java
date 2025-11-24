@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DLogManager {
-    private static final DPlugin plugin = DPPCore.getInstance();
     private static final HashMap<DPlugin, DLogNode> logNodes = new HashMap<>();
     private static BukkitTask logTask;
     public static boolean printConfigUtilsLogs = true;
@@ -31,7 +30,7 @@ public class DLogManager {
             logTask = null;
         }
         long time = DPPCore.getInstance().getConfig().getInt("Settings.Log.save_period") * 20L;
-        logTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        logTask = DPPCore.getInstance().getServer().getScheduler().runTaskTimerAsynchronously(DPPCore.getInstance(), () -> {
             saveIntegratedLog();
             if (DPPCore.getInstance().getConfig().getBoolean("Settings.Log.save_separated")) {
                 for (DPlugin plugin : logNodes.keySet()) {
@@ -50,7 +49,7 @@ public class DLogManager {
             YamlConfiguration data = new YamlConfiguration();
             logContexts.sort(Comparator.comparingLong(DLogContext::getNanoTime));
             logContexts.forEach(l -> data.set(l.getFormatedTimestamp(), l.getFormatedContext()));
-            ConfigUtils.saveCustomData(plugin, data, new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()), "logs_integrated");
+            ConfigUtils.saveCustomData(DPPCore.getInstance(), data, new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()), "logs_integrated");
         }
     }
 

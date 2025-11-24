@@ -41,6 +41,10 @@ public class PluginUtil {
         loadedPlugins.put(plugin, id);
     }
 
+    public static void addPlugin(JavaPlugin plugin) {
+        loadedPlugins.put(plugin, 0);
+    }
+
     public static Map<JavaPlugin, Integer> getLoadedPlugins() {
         return Collections.unmodifiableMap(loadedPlugins);
     }
@@ -56,8 +60,10 @@ public class PluginUtil {
     public static void loadAllPlugins() {
         for (JavaPlugin pl : loadedPlugins.keySet()) {
             if (pl != null) {
+                int id = loadedPlugins.get(pl);
+                if (id == 0) continue;
                 if (isMetricsEnabled(pl.getName())) {
-                    new Metrics((JavaPlugin) pl, loadedPlugins.get(pl));
+                    new Metrics((JavaPlugin) pl, id);
                     DPPCore.getInstance().log.info(pl.getName() + " plugin metrics enabled.", DLogManager.printPluginUtilsLogs);
                 }
             }
