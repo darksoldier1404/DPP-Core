@@ -45,7 +45,7 @@ public class DPPCCommand implements CommandExecutor, TabCompleter {
         }
         if (args[0].equalsIgnoreCase("lang")) {
             if (args.length == 2) {
-                DPPCore.plugin.getLang().setCurrentLang(Locale.forLanguageTag(args[1]));
+                DPPCore.getInstance().getLang().setCurrentLang(Locale.forLanguageTag(args[1]));
                 sender.sendMessage("§aLanguage changed to: " + args[1]);
                 return true;
             } else {

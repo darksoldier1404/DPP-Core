@@ -1,16 +1,16 @@
 package com.darksoldier1404.dppc.plugin.commands;
 
+import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.builder.command.ArgumentIndex;
 import com.darksoldier1404.dppc.builder.command.ArgumentType;
-        import com.darksoldier1404.dppc.builder.command.CommandBuilder;
-        import com.darksoldier1404.dppc.utils.PluginUtil;
-        import org.bukkit.plugin.java.JavaPlugin;
+import com.darksoldier1404.dppc.builder.command.CommandBuilder;
+import com.darksoldier1404.dppc.utils.PluginUtil;
+import org.bukkit.plugin.java.JavaPlugin;
 
-        import java.util.stream.Collectors;
-
-        import static com.darksoldier1404.dppc.DPPCore.plugin;
+import java.util.stream.Collectors;
 
 public class DPPCPCommand {
+    private final DPPCore plugin = DPPCore.getInstance();
     private final CommandBuilder builder = new CommandBuilder(plugin);
 
     public DPPCPCommand() {
