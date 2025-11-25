@@ -16,19 +16,22 @@ public class DInventoryClickEvent extends InventoryClickEvent {
     private final DInventory inventory;
     private final @Nullable DInventory.PageItemSet pageItemSet;
     private final boolean isPlayerInventory;
+    private final boolean isOutSide;
 
     public DInventoryClickEvent(@NotNull InventoryView transaction, DInventory inventory, @NotNull InventoryType.SlotType type, int slot, @NotNull ClickType click, @NotNull InventoryAction action, boolean isPlayerInventory) {
         super(transaction, type, slot, click, action);
         this.inventory = inventory;
         this.isPlayerInventory = isPlayerInventory;
-        this.pageItemSet = inventory.isUsePage() && !isPlayerInventory ? new DInventory.PageItemSet(inventory.getCurrentPage(), slot, inventory.getItem(slot)) : null;
+        this.isOutSide = type == InventoryType.SlotType.OUTSIDE;
+        this.pageItemSet = inventory.isUsePage() && !isPlayerInventory && !isOutSide ? new DInventory.PageItemSet(inventory.getCurrentPage(), slot, inventory.getItem(slot)) : null;
     }
 
     public DInventoryClickEvent(@NotNull InventoryView transaction, DInventory inventory, @NotNull InventoryType.SlotType type, int slot, @NotNull ClickType click, @NotNull InventoryAction action, boolean isPlayerInventory, int key) {
         super(transaction, type, slot, click, action, key);
         this.inventory = inventory;
         this.isPlayerInventory = isPlayerInventory;
-        this.pageItemSet = inventory.isUsePage() && !isPlayerInventory ? new DInventory.PageItemSet(inventory.getCurrentPage(), slot, inventory.getItem(slot)) : null;
+        this.isOutSide = type == InventoryType.SlotType.OUTSIDE;
+        this.pageItemSet = inventory.isUsePage() && !isPlayerInventory && !isOutSide ? new DInventory.PageItemSet(inventory.getCurrentPage(), slot, inventory.getItem(slot)) : null;
     }
 
     public @NotNull DInventory getDInventory() {
@@ -43,6 +46,11 @@ public class DInventoryClickEvent extends InventoryClickEvent {
     @DPPCoreVersion(since = "3.5.2")
     public boolean isPlayerInventory() {
         return isPlayerInventory;
+    }
+
+    @DPPCoreVersion(since = "3.5.2")
+    public boolean isOutSide() {
+        return isOutSide;
     }
 
     @Override
