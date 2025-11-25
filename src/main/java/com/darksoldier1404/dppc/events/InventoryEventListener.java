@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryEventListener implements Listener {
@@ -43,7 +44,11 @@ public class InventoryEventListener implements Listener {
             if (handlePagination(e, inv)) {
                 return;
             }
-            DInventoryClickEvent event = new DInventoryClickEvent(e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), e.getHotbarButton());
+            boolean isPlayerInventory = false;
+            if (e.getClickedInventory() != null && e.getClickedInventory().getType() == InventoryType.PLAYER) {
+                isPlayerInventory = true;
+            }
+            DInventoryClickEvent event = new DInventoryClickEvent(e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), isPlayerInventory, e.getHotbarButton());
             Bukkit.getServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 e.setCancelled(true);
