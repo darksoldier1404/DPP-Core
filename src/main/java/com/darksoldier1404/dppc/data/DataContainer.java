@@ -7,7 +7,9 @@ import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -116,15 +118,20 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
         }
     }
 
-    public void delete(K key) {
+    public boolean delete(K key) {
         String fileName;
         try {
             fileName = getFileName(key);
         } catch (IllegalArgumentException e) {
             logger.warning(e.getMessage(), DLogManager.printDataContainerLogs);
-            return;
+            return false;
         }
-        boolean isDeleted = new File(plugin.getDataFolder(), path + "/" + fileName + ".yml").delete();
+        try {
+            return Files.deleteIfExists(Path.of(plugin.getDataFolder().getPath(), path + "/" + fileName + ".yml"));
+        } catch (IOException e) {
+            logger.warning("Failed to delete file for key " + key + ": " + e.getMessage(), DLogManager.printDataContainerLogs);
+            return false;
+        }
     }
 
     /**

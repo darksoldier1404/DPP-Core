@@ -13,7 +13,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -80,9 +82,14 @@ public class DPPCACommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("§cNo action found with this name!");
                 return false;
             }
-            new File(plugin.getDataFolder() + "/actions/" + name + ".yml").delete();
-            DPPCore.actions.remove(name);
-            sender.sendMessage("§aAction deleted successfully!");
+            try {
+                DPPCore.actions.remove(name);
+                sender.sendMessage("§aAction deleted successfully!");
+                Files.deleteIfExists(Path.of(plugin.getDataFolder() + "/actions/" + name + ".yml"));
+            } catch (IOException e) {
+                sender.sendMessage("Failed to delete file for key " + name + ": " + e.getMessage());
+                return false;
+            }
             return false;
         }
         if (args[0].equalsIgnoreCase("list")) {

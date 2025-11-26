@@ -11,12 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class ConfigUtils {
     private static final DLogNode log = DPPCore.getInstance().getLog();
@@ -42,17 +40,15 @@ public class ConfigUtils {
             log.info(plugin.getName() + " config file saved.", DLogManager.printConfigUtilsLogs);
         } catch (Exception e) {
             log.warning(plugin.getName() + " config file save failed.", DLogManager.printConfigUtilsLogs);
-            e.printStackTrace();
         }
     }
 
-    @Nullable
+    @Deprecated(since = "5.3.2", forRemoval = true)
     public static YamlConfiguration reloadPluginConfig(@NotNull JavaPlugin plugin, @NotNull YamlConfiguration config) {
         try {
             return YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "config.yml"));
         } catch (Exception e) {
             log.warning(plugin.getName() + " config file reload failed, file dose not exist.", DLogManager.printConfigUtilsLogs);
-            e.printStackTrace();
         }
         return null;
     }
@@ -63,7 +59,7 @@ public class ConfigUtils {
         return new File(dir, fileName + ".yml");
     }
 
-    public static void saveCustomData(@NotNull JavaPlugin plugin, @NotNull YamlConfiguration config, @NotNull String fileName, @NotNull String path) {
+    public static void saveCustomData(@NotNull JavaPlugin plugin, @NotNull YamlConfiguration config, @NotNull String fileName, String path) {
         File file = getCustomFile(plugin, fileName, path);
         try {
             config.save(file);
@@ -78,7 +74,7 @@ public class ConfigUtils {
     }
 
     @Nullable
-    public static YamlConfiguration loadCustomData(@NotNull JavaPlugin plugin, @NotNull String fileName, @NotNull String path) {
+    public static YamlConfiguration loadCustomData(@NotNull JavaPlugin plugin, @NotNull String fileName, String path) {
         File file = getCustomFile(plugin, fileName, path);
         if (!file.exists()) {
             log.warning(plugin.getName() + " " + fileName + " file does not exist. Path: " + file.getPath(), DLogManager.printConfigUtilsLogs);
@@ -107,7 +103,6 @@ public class ConfigUtils {
                         dataList.add(data);
                     } catch (Exception e) {
                         log.warning(plugin.getName() + " " + file.getName() + " file load failed.", DLogManager.printConfigUtilsLogs);
-                        e.printStackTrace();
                     }
                 }
             }
@@ -128,7 +123,6 @@ public class ConfigUtils {
                         dataMap.put(file.getName().replace(".yml", ""), data);
                     } catch (Exception e) {
                         log.warning(plugin.getName() + " " + file.getName() + " file load failed.", DLogManager.printConfigUtilsLogs);
-                        e.printStackTrace();
                     }
                 }
             }
@@ -141,7 +135,11 @@ public class ConfigUtils {
         try {
             File file = new File(plugin.getDataFolder() + "/" + path, fileName + ".yml");
             if (!file.exists()) {
-                file.createNewFile();
+                boolean isCreated = file.createNewFile();
+                if (!isCreated) {
+                    log.warning(plugin.getName() + " " + fileName + " file create failed.", DLogManager.printConfigUtilsLogs);
+                    return null;
+                }
                 log.info(plugin.getName() + " " + fileName + " file created.", DLogManager.printConfigUtilsLogs);
                 return YamlConfiguration.loadConfiguration(file);
             }
@@ -149,7 +147,6 @@ public class ConfigUtils {
             return YamlConfiguration.loadConfiguration(file);
         } catch (Exception e) {
             log.warning(plugin.getName() + " " + fileName + " file create failed.", DLogManager.printConfigUtilsLogs);
-            e.printStackTrace();
             return null;
         }
     }
@@ -159,7 +156,11 @@ public class ConfigUtils {
         try {
             File file = new File(plugin.getDataFolder(), fileName + ".yml");
             if (!file.exists()) {
-                file.createNewFile();
+                boolean isCreated = file.createNewFile();
+                if (!isCreated) {
+                    log.warning(plugin.getName() + " " + fileName + " file create failed.", DLogManager.printConfigUtilsLogs);
+                    return null;
+                }
                 log.info(plugin.getName() + " " + fileName + " file created.", DLogManager.printConfigUtilsLogs);
                 return YamlConfiguration.loadConfiguration(file);
             }
@@ -167,18 +168,22 @@ public class ConfigUtils {
             return YamlConfiguration.loadConfiguration(file);
         } catch (Exception e) {
             log.warning(plugin.getName() + " " + fileName + " file create failed.", DLogManager.printConfigUtilsLogs);
-            e.printStackTrace();
             return null;
         }
     }
 
     @NotNull
-    @Deprecated
+    @Deprecated(since = "5.3.2", forRemoval = true)
     public static YamlConfiguration initUserData(@NotNull JavaPlugin plugin, @NotNull String fileName, @NotNull String path) {
         File file = new File(plugin.getDataFolder() + "/" + path, fileName + ".yml");
         if (!file.exists()) {
             try {
-                file.createNewFile();
+                boolean isCreated = file.createNewFile();
+                if (!isCreated) {
+                    log.warning(plugin.getName() + " " + fileName + " file create failed.", DLogManager.printConfigUtilsLogs);
+                    log.warning(plugin.getName() + " return empty file.", DLogManager.printConfigUtilsLogs);
+                    return new YamlConfiguration();
+                }
                 log.info(plugin.getName() + " " + fileName + " file created.", DLogManager.printConfigUtilsLogs);
                 return YamlConfiguration.loadConfiguration(file);
             } catch (IOException e) {
@@ -193,7 +198,7 @@ public class ConfigUtils {
     }
 
     @NotNull
-    @Deprecated
+    @Deprecated(since = "5.3.2", forRemoval = true)
     public static YamlConfiguration initUserData(@NotNull JavaPlugin plugin, @NotNull String fileName) {
         File file = new File(plugin.getDataFolder() + "/data", fileName + ".yml");
         if (!file.exists()) {
