@@ -13,3 +13,12 @@ Settings:
     print_DInventory_Debug: false  # If true, DInventory debug messages will be printed to the console.
     print_DataContainer_Debug: true  # If true, DataContainer debug messages will be printed to the console.
     print_PluginUtils_Debug: true  # If true, PluginUtils debug messages will be printed to the console.
+
+
+  DB: # Settings for DP-Plugins database system. (MySQL or SQLite)
+    enabled: false
+    host: "localhost"
+    port: 3306
+    database: "dp_plugins"
+    username: "root"
+    password: "password"
