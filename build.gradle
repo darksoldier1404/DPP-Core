@@ -18,9 +18,9 @@ sonarqube {
 
 group = 'com.darksoldier1404'
 version = '5.3.2'
-def isLatest = false
+def isLatest = true
 def V20 = '1.20.1'
-def V21 = '1.21.8'
+def V21 = '1.21.11'
 def api_version = isLatest ? V21 : V20
 
 repositories {
