@@ -22,7 +22,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@DPPCoreVersion(since = "5.3.0")
+@DPPCoreVersion(since = "5.3.3")
 public class CommandBuilder implements CommandExecutor, TabCompleter {
     private final Map<String, SubCommand> subCommands = new HashMap<>();
     private final DPlugin plugin;
@@ -142,12 +142,32 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
 
         public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type) {
-            this.subCommand.arguments.add(new Argument(index, type, true, null));
+            this.subCommand.arguments.add(new Argument(index, type, true, (Collection) null));
             return this;
         }
 
         public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type, Collection<?> suggestions) {
             this.subCommand.arguments.add(new Argument(index, type, true, suggestions));
+            return this;
+        }
+
+        public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type, BiFunction<Player, String[], List<String>> conditionalSuggestions) {
+            this.subCommand.arguments.add(new Argument(index, type, true, conditionalSuggestions));
+            return this;
+        }
+
+        public SubCommandBuilder withOptionalArgument(ArgumentIndex index, ArgumentType type) {
+            this.subCommand.arguments.add(new Argument(index, type, false, (Collection) null));
+            return this;
+        }
+
+        public SubCommandBuilder withOptionalArgument(ArgumentIndex index, ArgumentType type, Collection<?> suggestions) {
+            this.subCommand.arguments.add(new Argument(index, type, false, suggestions));
+            return this;
+        }
+
+        public SubCommandBuilder withOptionalArgument(ArgumentIndex index, ArgumentType type, BiFunction<Player, String[], List<String>> conditionalSuggestions) {
+            this.subCommand.arguments.add(new Argument(index, type, false, conditionalSuggestions));
             return this;
         }
 
@@ -236,7 +256,15 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         }
 
         String[] commandArgs = Arrays.copyOfRange(args, 1, args.length);
-        if (commandArgs.length < subCommand.arguments.size()) {
+
+        int requiredArgsCount = 0;
+        for (Argument<?> arg : subCommand.arguments) {
+            if (arg.isRequired()) {
+                requiredArgsCount++;
+            }
+        }
+
+        if (commandArgs.length < requiredArgsCount) {
             sender.sendMessage(plugin.getPrefix() + "Usage: " + subCommand.usage);
             return true;
         }
@@ -245,7 +273,20 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         int argIndex = 0;
         for (int i = 0; i < subCommand.arguments.size(); i++) {
             Argument<?> argDef = subCommand.arguments.get(i);
-            Object parsed;
+
+            if (argIndex >= commandArgs.length) {
+                if (argDef.isRequired()) {
+                    sender.sendMessage(plugin.getPrefix() + "Missing required argument: " + argDef.index);
+                    sender.sendMessage(plugin.getPrefix() + "Usage: " + subCommand.usage);
+                    return true;
+                } else {
+                    // Optional argument not provided, so break or continue depending on logic.
+                    // For now, we just stop parsing and accept it as not provided.
+                    break;
+                }
+            }
+            
+            Object parsed = null;
             try {
                 switch (argDef.type) {
                     case PLAYER:
@@ -320,11 +361,17 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                         argIndex++;
                         break;
                     case STRING_ARRAY:
-                        String[] arr = Arrays.copyOfRange(commandArgs, argIndex, commandArgs.length);
-                        parsed = arr;
-                        argIndex = commandArgs.length;
+                        // If STRING_ARRAY is optional and no more args are present, provide an empty array
+                        if (!argDef.isRequired() && argIndex >= commandArgs.length) {
+                            parsed = new String[0];
+                        } else {
+                            String[] arr = Arrays.copyOfRange(commandArgs, argIndex, commandArgs.length);
+                            parsed = arr;
+                            argIndex = commandArgs.length; // Consume all remaining arguments
+                        }
                         break;
                     default:
+                        // Fallback for unhandled types
                         parsed = commandArgs[argIndex];
                         argIndex++;
                         break;
@@ -333,6 +380,18 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             } catch (NumberFormatException e) {
                 sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.index + "': " + commandArgs[argIndex]);
                 return true;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                // This catch handles cases where commandArgs[argIndex] is accessed but argIndex is out of bounds
+                // This should ideally be caught by the argIndex >= commandArgs.length check
+                // but as a fallback for other cases (e.g. charAt(0) on empty string)
+                if (argDef.isRequired()) {
+                    sender.sendMessage(plugin.getPrefix() + "Missing required argument: " + argDef.index);
+                    sender.sendMessage(plugin.getPrefix() + "Usage: " + subCommand.usage);
+                    return true;
+                } else {
+                    // Optional argument not provided
+                    break;
+                }
             }
         }
 
@@ -370,6 +429,10 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             }
             int argIndex = args.length - 2;
             if (argIndex >= 0 && argIndex < subCommand.arguments.size()) {
+                Argument<?> arg = subCommand.arguments.get(argIndex);
+                if (sender instanceof Player && arg.conditionalSuggestions != null) {
+                    return arg.conditionalSuggestions.apply((Player) sender, args);
+                }
                 if (subCommand.arguments.get(argIndex).suggestions != null) {
                     return subCommand.arguments.get(argIndex).getSuggestionsAsStringList();
                 }
