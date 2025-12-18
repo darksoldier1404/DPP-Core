@@ -3,7 +3,6 @@ package com.darksoldier1404.dppc.api.inventory;
 import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.annotation.MultiPageOnly;
 import com.darksoldier1404.dppc.data.DPlugin;
-import com.darksoldier1404.dppc.utils.DInventoryManager;
 import com.darksoldier1404.dppc.utils.NBT;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -50,7 +49,6 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.contentSlots = size; // 페이지 도구 없음
         this.toolSlots = 0;
         this.pageTools = new ItemStack[0];
-        DInventoryManager.addInventory(plugin, this);
     }
 
     public DInventory(String title, int size, boolean usePage, DPlugin plugin) {
@@ -65,7 +63,6 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.toolSlots = usePageTools && size >= 18 ? 9 : 0;
         this.contentSlots = size - toolSlots;
         this.pageTools = new ItemStack[toolSlots];
-        DInventoryManager.addInventory(plugin, this);
     }
 
     public DInventory(String title, int size, boolean usePage, boolean useDefaultPageTools, DPlugin plugin) {
@@ -80,7 +77,6 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.toolSlots = usePageTools ? 9 : 0;
         this.contentSlots = size - toolSlots;
         this.pageTools = new ItemStack[toolSlots];
-        DInventoryManager.addInventory(plugin, this);
     }
 
     @Override

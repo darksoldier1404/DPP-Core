@@ -44,7 +44,7 @@ public class DLangContext {
     }
 
     public void removeDefaultValue(Locale lang) {
-        defaultValueMap.remove(lang);
+        defaultValueMap.remove(lang.toString());
     }
 
     public void setValue(String key, String value) {

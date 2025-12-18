@@ -63,10 +63,8 @@ public class DLang {
 
     public String find(String key) {
         for (DLangContext context : langContexts) {
-            if (context.getLang().getLanguage().equals(currentLang.getLanguage())) {
-                if (context.hasValue(key)) {
-                    return context.getValue(key);
-                }
+            if (context.getLang().getLanguage().equals(currentLang.getLanguage()) && context.hasValue(key)) {
+                return context.getValue(key);
             }
         }
         return "[DLang] Error: Language key not found: " + key;

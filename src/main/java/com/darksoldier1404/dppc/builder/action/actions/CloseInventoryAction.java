@@ -2,7 +2,6 @@ package com.darksoldier1404.dppc.builder.action.actions;
 
 import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
-import com.darksoldier1404.dppc.utils.ColorUtils;
 import org.bukkit.entity.Player;
 
 public class CloseInventoryAction implements Action {
