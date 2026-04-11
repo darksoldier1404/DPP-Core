@@ -14,7 +14,7 @@ DPP-Core is a core plugin for Spigot or Paper servers. It serves as a dependency
 ## Features
 
 - Provides essential APIs for DP-Plugins
-- Supports Minecraft 1.20 to 1.21.10
+- Supports Minecraft 1.20 to latest
 - Supports Korean and English
 
 ## Installation
