@@ -1,9 +1,9 @@
 package com.darksoldier1404.dppc.api.inventory;
 
+import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.annotation.MultiPageOnly;
 import com.darksoldier1404.dppc.data.DPlugin;
-import com.darksoldier1404.dppc.utils.DInventoryManager;
 import com.darksoldier1404.dppc.utils.NBT;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -50,7 +50,6 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.contentSlots = size; // 페이지 도구 없음
         this.toolSlots = 0;
         this.pageTools = new ItemStack[0];
-        DInventoryManager.addInventory(plugin, this);
     }
 
     public DInventory(String title, int size, boolean usePage, DPlugin plugin) {
@@ -65,7 +64,6 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.toolSlots = usePageTools && size >= 18 ? 9 : 0;
         this.contentSlots = size - toolSlots;
         this.pageTools = new ItemStack[toolSlots];
-        DInventoryManager.addInventory(plugin, this);
     }
 
     public DInventory(String title, int size, boolean usePage, boolean useDefaultPageTools, DPlugin plugin) {
@@ -80,7 +78,6 @@ public class DInventory implements InventoryHolder, Cloneable {
         this.toolSlots = usePageTools ? 9 : 0;
         this.contentSlots = size - toolSlots;
         this.pageTools = new ItemStack[toolSlots];
-        DInventoryManager.addInventory(plugin, this);
     }
 
     @Override
@@ -409,31 +406,63 @@ public class DInventory implements InventoryHolder, Cloneable {
         return items;
     }
 
+    @DPPCoreVersion(since = "5.4.0")
     @MultiPageOnly
     public void applyDefaultPageTools() {
         if (!useDefaultPageTools || !usePageTools) return;
         ItemStack[] defaultPageTools = new ItemStack[toolSlots];
         ItemStack pane = NBT.setStringTag(new ItemStack(org.bukkit.Material.BLACK_STAINED_GLASS_PANE), "dppc_clickcancel", "true");
+        ItemStack customPane = DPPCore.getInstance().getConfig().getItemStack("Settings.DInventory.defaultPageToolItem.PANE");
+        if (customPane != null) {
+            customPane = customPane.clone();
+            pane = NBT.setStringTag(customPane, "dppc_clickcancel", "true");
+        }
         ItemMeta meta = pane.getItemMeta();
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         meta.setDisplayName(" ");
         pane.setItemMeta(meta);
         ItemStack nextPage = NBT.setStringTag(new ItemStack(org.bukkit.Material.ARROW), "dppc_clickcancel", "true");
+        ItemStack customNext = DPPCore.getInstance().getConfig().getItemStack("Settings.DInventory.defaultPageToolItem.NEXT");
+        if (customNext != null) {
+            customNext = customNext.clone();
+            nextPage = NBT.setStringTag(customNext, "dppc_clickcancel", "true");
+        }
         nextPage = NBT.setStringTag(nextPage, "dppc_nextpage", "true");
         ItemMeta nextMeta = nextPage.getItemMeta();
-        nextMeta.setDisplayName("§aNext Page");
+        if (customNext == null) {
+            nextMeta.setDisplayName("§aNext Page");
+        }
         nextMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         nextPage.setItemMeta(nextMeta);
         ItemStack prevPage = NBT.setStringTag(new ItemStack(org.bukkit.Material.ARROW), "dppc_clickcancel", "true");
+        ItemStack customPrev = DPPCore.getInstance().getConfig().getItemStack("Settings.DInventory.defaultPageToolItem.PREV");
+        if (customPrev != null) {
+            customPrev = customPrev.clone();
+            prevPage = NBT.setStringTag(customPrev, "dppc_clickcancel", "true");
+        }
         prevPage = NBT.setStringTag(prevPage, "dppc_prevpage", "true");
         ItemMeta prevMeta = prevPage.getItemMeta();
-        prevMeta.setDisplayName("§aPrevious Page");
+        if (customPrev == null) {
+            prevMeta.setDisplayName("§aPrevious Page");
+        }
         prevMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         prevPage.setItemMeta(prevMeta);
         ItemStack currentPageItem = NBT.setStringTag(new ItemStack(org.bukkit.Material.PAPER), "dppc_clickcancel", "true");
+        ItemStack customCurrent = DPPCore.getInstance().getConfig().getItemStack("Settings.DInventory.defaultPageToolItem.CURRENT");
         currentPageItem = NBT.setStringTag(currentPageItem, "dppc_currentpage", "true");
+        if (customCurrent != null) {
+            customCurrent = customCurrent.clone();
+            currentPageItem = NBT.setStringTag(customCurrent, "dppc_clickcancel", "true");
+            currentPageItem = NBT.setStringTag(currentPageItem, "dppc_currentpage", "true");
+        }
         ItemMeta currentMeta = currentPageItem.getItemMeta();
-        currentMeta.setDisplayName("§aCurrent Page: " + (currentPage + 1) + " / " + (pages + 1));
+        if (customCurrent == null) {
+            currentMeta.setDisplayName("§aCurrent Page: " + (currentPage + 1) + " / " + (pages + 1));
+        } else {
+            String displayName = currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : " ";
+            displayName = displayName.replace("{current}", String.valueOf(currentPage + 1)).replace("{total}", String.valueOf(pages + 1));
+            currentMeta.setDisplayName(displayName);
+        }
         currentMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         currentPageItem.setItemMeta(currentMeta);
         defaultPageTools[0] = pane; // Slot 0

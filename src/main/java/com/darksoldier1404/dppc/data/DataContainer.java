@@ -5,6 +5,7 @@ import com.darksoldier1404.dppc.api.logger.DLogManager;
 import com.darksoldier1404.dppc.api.logger.DLogNode;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.UUID;
  * @param <V> The value type (YamlConfiguration for USER and YAML, DataCargo for CUSTOM)
  */
 @DPPCoreVersion(since = "5.3.0")
-public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K, V> {
+public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K, V>, Creatable<K, V> {
     private final DPlugin plugin;
     private final DataType dataType;
     private final DLogNode logger;
@@ -127,7 +128,15 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
             return false;
         }
         try {
-            return Files.deleteIfExists(Path.of(plugin.getDataFolder().getPath(), path + "/" + fileName + ".yml"));
+            boolean success = Files.deleteIfExists(Path.of(plugin.getDataFolder().getPath(), path + "/" + fileName + ".yml"));
+            if (success) {
+                logger.info("Deleted file for key " + key, DLogManager.printDataContainerLogs);
+                remove(key);
+                return true;
+            } else {
+                logger.warning("No file found to delete for key " + key, DLogManager.printDataContainerLogs);
+                return false;
+            }
         } catch (IOException e) {
             logger.warning("Failed to delete file for key " + key + ": " + e.getMessage(), DLogManager.printDataContainerLogs);
             return false;
@@ -325,5 +334,39 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
             }
         }
         return this;
+    }
+
+    @DPPCoreVersion(since = "5.4.0")
+    @Nullable
+    @Override
+    public V create(@NotNull K key, @NotNull Class<V> clazz) {
+        try {
+            if (!DataCargo.class.isAssignableFrom(clazz) && dataType == DataType.CUSTOM) {
+                logger.warning("Class " + clazz.getSimpleName() + " does not implement DataCargo for CUSTOM data type.", DLogManager.printDataContainerLogs);
+                return null;
+            }
+            if (containsKey(key)) {
+                logger.warning("Key " + key + " already exists. Creation skipped.", DLogManager.printDataContainerLogs);
+                return get(key);
+            }
+            DataCargo dataCargo = (DataCargo) clazz.getDeclaredConstructor().newInstance();
+            put(key, (V) dataCargo);
+            return (V) dataCargo;
+        } catch (Exception e) {
+            logger.warning("Failed to create instance of " + clazz.getSimpleName() + ": " + e.getMessage(), DLogManager.printDataContainerLogs);
+            return null;
+        }
+    }
+
+    @DPPCoreVersion(since = "5.4.0")
+    @Nullable
+    @Override
+    public V createAndSave(@NotNull K key, @NotNull Class<V> clazz) {
+        V dataCargo = create(key, clazz);
+        if (dataCargo != null) {
+            save(key);
+            return dataCargo;
+        }
+        return null;
     }
 }
