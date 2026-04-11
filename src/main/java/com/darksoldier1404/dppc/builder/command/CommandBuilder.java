@@ -428,7 +428,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 return subCommand.tabCompletion.apply(args);
             }
             int argIndex = args.length - 2;
-            if (argIndex >= 0 && argIndex < subCommand.arguments.size()) {
+            if (argIndex < subCommand.arguments.size()) {
                 Argument<?> arg = subCommand.arguments.get(argIndex);
                 if (sender instanceof Player && arg.conditionalSuggestions != null) {
                     return arg.conditionalSuggestions.apply((Player) sender, args);

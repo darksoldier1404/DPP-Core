@@ -1,6 +1,7 @@
 package com.darksoldier1404.dppc.api.placeholder;
 
 import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import com.darksoldier1404.dppc.utils.enums.DependPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
+@DPPCoreVersion(since = "5.4.0")
 public class PlaceholderBuilder {
     private final String identifier;
     private final String author;
@@ -50,6 +52,11 @@ public class PlaceholderBuilder {
         @Override
         public @NotNull String getVersion() {
             return version;
+        }
+
+        @Override
+        public boolean persist() {
+            return true;
         }
 
         @Nullable
