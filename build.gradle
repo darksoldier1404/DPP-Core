@@ -17,7 +17,7 @@ sonarqube {
 }
 
 group = 'com.darksoldier1404'
-version = '5.3.3'
+version = '5.4.0'
 def isLatest = false
 def V20 = '1.20.1'
 def V21 = '1.21.11'
@@ -28,6 +28,10 @@ repositories {
     maven {
         url System.getenv("REPO_PUBLIC") ?: getProperty("REPO_PUBLIC")
         allowInsecureProtocol = true
+    }
+    maven {
+        name = "nexomcReleases"
+        url = uri("https://repo.nexomc.com/releases")
     }
 }
 
@@ -45,6 +49,8 @@ dependencies {
     compileOnly 'com.sk89q.worldguard:WorldGuard:7.0.5:dist@jar'
     compileOnly 'com.sk89q.worldedit:WorldEdit:7.2.20@jar'
     compileOnly 'net.milkbowl.vault:Vault:1.7.3@jar'
+    compileOnly 'com.nexomc:nexo:1.17.0@jar'
+    implementation("net.kyori:adventure-api:4.26.1")
 
     compileOnly 'com.bukkit:craftbukkit:' + api_version
     compileOnly 'com.bukkit:spigot:' + api_version
@@ -93,7 +99,7 @@ publishing {
             groupId = 'com.darksoldier1404.dppc'
             artifactId = "DPP-Core"
             artifact file("$rootDir/jars/DPP-Core-${version}-SNAPSHOT.jar")
-            version = "5.3-SNAPSHOT"
+            version = "5.4-SNAPSHOT"
         }
     }
     repositories {
