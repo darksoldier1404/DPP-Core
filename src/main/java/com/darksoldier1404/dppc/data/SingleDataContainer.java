@@ -205,6 +205,8 @@ public class SingleDataContainer<K, V> implements IDataHandler<K, V> {
         } else {
             ConfigUtils.saveCustomData(plugin, (YamlConfiguration) value, fileName, savePath);
         }
+        // DB 연동: useDB=true이면 단일 키 upsert
+        plugin.syncKeyToDB(this, fileName);
     }
 
     /**
@@ -238,6 +240,8 @@ public class SingleDataContainer<K, V> implements IDataHandler<K, V> {
             logger.warning(e.getMessage(), DLogManager.printDataContainerLogs);
             return this;
         }
+        // DB 연동: load 전에 DB에서 최신 데이터를 디스크로 다운로드
+        plugin.syncKeyFromDB(this, fileName);
         String loadPath = path;
         YamlConfiguration data = ConfigUtils.loadCustomData(plugin, fileName, loadPath);
         if (data == null) {

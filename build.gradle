@@ -53,6 +53,7 @@ dependencies {
     implementation("net.kyori:adventure-api:4.26.1")
 
     implementation "com.mysql:mysql-connector-j:9.5.0"
+    implementation "org.xerial:sqlite-jdbc:3.49.1.0"
 
     compileOnly 'com.bukkit:craftbukkit:' + api_version
     compileOnly 'com.bukkit:spigot:' + api_version
@@ -91,6 +92,7 @@ shadowJar {
     dependencies {
         include(dependency('com.google.code.gson:gson:2.13.1'))
         include(dependency('com.mysql:mysql-connector-j:9.5.0'))
+        include(dependency('org.xerial:sqlite-jdbc:3.49.1.0'))
     }
     archiveFileName.set("DPP-Core-${version}-SNAPSHOT.jar")
     destinationDirectory.set(file("$rootDir/jars"))

@@ -187,6 +187,8 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
         } else {
             ConfigUtils.saveCustomData(plugin, (YamlConfiguration) value, fileName, savePath);
         }
+        // DB 연동: useDB=true이면 단일 키 upsert
+        plugin.syncKeyToDB(this, fileName);
     }
 
     /**
@@ -221,6 +223,8 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
                 ConfigUtils.saveCustomData(plugin, (YamlConfiguration) value, fileName, savePath);
             }
         }
+        // DB 연동: 전체 disk 저장 완료 후 양방향 sync
+        plugin.syncAllToDB(this, dataType == DataType.CUSTOM ? null : null);
     }
 
     /**
@@ -253,6 +257,8 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
             logger.warning(e.getMessage(), DLogManager.printDataContainerLogs);
             return this;
         }
+        // DB 연동: load 전에 DB에서 최신 데이터를 디스크로 다운로드
+        plugin.syncKeyFromDB(this, fileName);
         String loadPath = path;
         YamlConfiguration data = ConfigUtils.loadCustomData(plugin, fileName, loadPath);
         if (data == null) {
@@ -287,6 +293,8 @@ public class DataContainer<K, V> extends HashMap<K, V> implements IDataHandler<K
      * @return This DataContainer for method chaining.
      */
     public DataContainer<K, V> loadAll(@Nullable Class<?> clazz) {
+        // DB 연동: loadAll 전에 DB에서 최신 데이터를 디스크로 다운로드
+        plugin.syncAllFromDB(this);
         String loadPath = path;
         HashMap<String, YamlConfiguration> dataMap = ConfigUtils.loadCustomDataMap(plugin, loadPath);
         if (dataType == DataType.CUSTOM) {
