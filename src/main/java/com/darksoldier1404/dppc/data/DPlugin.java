@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @DPPCoreVersion(since = "5.3.0")
 public class DPlugin extends JavaPlugin {
@@ -194,6 +195,7 @@ public class DPlugin extends JavaPlugin {
 
     /**
      * Upserts a single YAML file to the database after a {@code save(key)} call.
+     * Runs <b>asynchronously</b> on {@link DBSyncUtils#DB_EXECUTOR} (fire-and-forget).
      * No-op if DB is not enabled or {@code dbConfig} is not set.
      *
      * @param handler Handler that owns the file
@@ -201,11 +203,20 @@ public class DPlugin extends JavaPlugin {
      */
     void syncKeyToDB(IDataHandler<?, ?> handler, String fileKey) {
         if (!useDB || dbConfig == null) return;
-        DBSyncUtils.upsertSingle(this, handler, fileKey, dbConfig);
+        CompletableFuture.runAsync(
+                () -> DBSyncUtils.upsertSingle(this, handler, fileKey, dbConfig),
+                DBSyncUtils.DB_EXECUTOR
+        ).exceptionally(ex -> {
+            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+            log.warning("[DPlugin] Async syncKeyToDB failed for '" + fileKey + "': " + cause.getMessage(),
+                    DLogManager.printDataContainerLogs);
+            return null;
+        });
     }
 
     /**
      * Performs a bidirectional disk ↔ DB sync after a {@code saveAll()} call.
+     * Runs <b>asynchronously</b> on {@link DBSyncUtils#DB_EXECUTOR} (fire-and-forget).
      * No-op if DB is not enabled or {@code dbConfig} is not set.
      *
      * @param handler     Handler to sync
@@ -213,32 +224,74 @@ public class DPlugin extends JavaPlugin {
      */
     void syncAllToDB(IDataHandler<?, ?> handler, @Nullable Class<?> customClass) {
         if (!useDB || dbConfig == null) return;
-        DBSyncUtils.syncFromDisk(this, handler, dbConfig, customClass);
+        CompletableFuture.runAsync(
+                () -> DBSyncUtils.syncFromDisk(this, handler, dbConfig, customClass),
+                DBSyncUtils.DB_EXECUTOR
+        ).exceptionally(ex -> {
+            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+            log.warning("[DPlugin] Async syncAllToDB failed for '" + handler.getPath() + "': " + cause.getMessage(),
+                    DLogManager.printDataContainerLogs);
+            return null;
+        });
     }
 
     /**
      * Downloads a single key from DB to disk before a {@code load(key)} call.
-     * Uses checksum + {@code updated_at} comparison; only overwrites when DB is newer.
-     * No-op if DB is not enabled or {@code dbConfig} is not set.
+     * Runs the DB download on {@link DBSyncUtils#DB_EXECUTOR} and waits for
+     * completion so that the disk file is available when the caller reads it.
+     * No-op if DB is not enabled, {@code dbConfig} is not set, or the current
+     * thread is already inside a DB sync operation (prevents nested double-sync).
+     *
+     * <p><b>Note:</b> This method blocks the calling thread until the DB
+     * download finishes. Call from an async thread (e.g. Bukkit async task)
+     * to avoid stalling the main server thread.
      *
      * @param handler Handler that owns the file
      * @param fileKey File key (= file name without {@code .yml})
      */
     void syncKeyFromDB(IDataHandler<?, ?> handler, String fileKey) {
         if (!useDB || dbConfig == null) return;
-        DBSyncUtils.downloadSingleKeyToDisk(this, handler, fileKey, dbConfig);
+        // 이미 DB sync 컨텍스트 안에서 호출된 경우(예: syncFromDisk → loadAll → load)
+        // 중첩 다운로드를 방지하기 위해 즉시 반환
+        if (DBSyncUtils.isInDbSyncContext()) return;
+        CompletableFuture.runAsync(
+                () -> DBSyncUtils.downloadSingleKeyToDisk(this, handler, fileKey, dbConfig),
+                DBSyncUtils.DB_EXECUTOR
+        ).exceptionally(ex -> {
+            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+            log.warning("[DPlugin] Async syncKeyFromDB failed for '" + fileKey + "': " + cause.getMessage(),
+                    DLogManager.printDataContainerLogs);
+            return null;
+        }).join();
     }
 
     /**
      * Downloads all keys from DB to disk before a {@code loadAll()} call.
-     * Uses checksum + {@code updated_at} comparison; only overwrites DB-newer files.
-     * No-op if DB is not enabled or {@code dbConfig} is not set.
+     * Runs the DB download on {@link DBSyncUtils#DB_EXECUTOR} and waits for
+     * completion so that disk files are available when the caller reads them.
+     * No-op if DB is not enabled, {@code dbConfig} is not set, or the current
+     * thread is already inside a DB sync operation (prevents nested double-sync).
+     *
+     * <p><b>Note:</b> This method blocks the calling thread until the DB
+     * download finishes. Call from an async thread (e.g. Bukkit async task)
+     * to avoid stalling the main server thread.
      *
      * @param handler Handler to sync
      */
     void syncAllFromDB(IDataHandler<?, ?> handler) {
         if (!useDB || dbConfig == null) return;
-        DBSyncUtils.downloadAllKeysToDisk(this, handler, dbConfig);
+        // 이미 DB sync 컨텍스트 안에서 호출된 경우(예: syncFromDisk → loadAll → loadAll)
+        // 중첩 다운로드를 방지하기 위해 즉시 반환
+        if (DBSyncUtils.isInDbSyncContext()) return;
+        CompletableFuture.runAsync(
+                () -> DBSyncUtils.downloadAllKeysToDisk(this, handler, dbConfig),
+                DBSyncUtils.DB_EXECUTOR
+        ).exceptionally(ex -> {
+            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+            log.warning("[DPlugin] Async syncAllFromDB failed for '" + handler.getPath() + "': " + cause.getMessage(),
+                    DLogManager.printDataContainerLogs);
+            return null;
+        }).join();
     }
 
     public @Nullable DLang getLang() {

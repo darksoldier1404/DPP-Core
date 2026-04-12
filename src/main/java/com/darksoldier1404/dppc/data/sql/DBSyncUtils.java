@@ -19,6 +19,10 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.*;
 import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Utility class for bidirectional synchronisation between a {@link DPlugin}'s
@@ -79,6 +83,38 @@ public final class DBSyncUtils {
 
     private static final Gson GSON = new Gson();
     private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
+
+    /**
+     * Dedicated thread pool for all asynchronous DB operations.
+     * Daemon threads so they don't prevent JVM shutdown.
+     */
+    public static final ExecutorService DB_EXECUTOR = Executors.newCachedThreadPool(r -> {
+        Thread t = new Thread(r, "DPP-DB-Worker");
+        t.setDaemon(true);
+        return t;
+    });
+
+    /** Cache of already-verified (host:port/database) combos to avoid repeated admin connections. */
+    private static final Set<String> VERIFIED_DATABASES = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Thread-local flag that is set to {@code true} while a DB sync operation
+     * (e.g. {@link #syncFromDisk} or {@link #downloadFromDB}) is in progress on
+     * the current thread.
+     *
+     * <p>Used to prevent nested sync loops: when {@link #syncFromDisk} calls
+     * {@code handler.loadAll()} to reload memory after a download, that call would
+     * otherwise re-trigger {@code syncAllFromDB} → {@code downloadAllKeysToDisk},
+     * causing a redundant second download. Checking this flag in
+     * {@link DPlugin#syncAllFromDB} and {@link DPlugin#syncKeyFromDB} short-circuits
+     * the inner call.
+     */
+    static final ThreadLocal<Boolean> DB_SYNC_IN_PROGRESS = ThreadLocal.withInitial(() -> false);
+
+    /** Returns {@code true} if the current thread is already inside a DB sync operation. */
+    public static boolean isInDbSyncContext() {
+        return DB_SYNC_IN_PROGRESS.get();
+    }
 
     private DBSyncUtils() {}
 
@@ -341,7 +377,13 @@ public final class DBSyncUtils {
                 plugin.getLog().info(
                         "[DBSyncUtils] ↓ Downloaded " + toDownload.size() + " row(s) ← '" + tableName + "'.",
                         DLogManager.printDataContainerLogs);
-                handler.loadAll(customClass);
+                // DB_SYNC_IN_PROGRESS 플래그를 설정하여 loadAll() 내부의 syncAllFromDB 중첩 호출 방지
+                DB_SYNC_IN_PROGRESS.set(true);
+                try {
+                    handler.loadAll(customClass);
+                } finally {
+                    DB_SYNC_IN_PROGRESS.remove();
+                }
             }
 
             plugin.getLog().info(
@@ -430,7 +472,13 @@ public final class DBSyncUtils {
                         e.getKey(), handler.getPath());
             }
 
-            handler.loadAll(customClass);
+            // DB_SYNC_IN_PROGRESS 플래그를 설정하여 loadAll() 내부의 syncAllFromDB 중첩 호출 방지
+            DB_SYNC_IN_PROGRESS.set(true);
+            try {
+                handler.loadAll(customClass);
+            } finally {
+                DB_SYNC_IN_PROGRESS.remove();
+            }
 
             plugin.getLog().info(
                     "[DBSyncUtils] ↓ Force-downloaded " + dbMeta.size() + " row(s) ← '" + tableName + "'.",
@@ -622,8 +670,11 @@ public final class DBSyncUtils {
 
     /**
      * Opens a fresh JDBC connection. Caller is responsible for closing it.
+     * <p>
+     * For MySQL, automatically ensures the configured database exists (creates it
+     * if absent) before establishing the connection.
      *
-     * @param plugin Owning plugin (needed for SQLite file path resolution)
+     * @param plugin Owning plugin (needed for SQLite file path resolution and logging)
      * @param config DB configuration
      * @return Open {@link Connection}
      * @throws SQLException           on JDBC error
@@ -632,6 +683,7 @@ public final class DBSyncUtils {
     public static Connection openConnection(DPlugin plugin, DBConfig config)
             throws SQLException, ClassNotFoundException {
         if (config.getDbType() == DBType.MYSQL) {
+            ensureMySQLDatabaseExists(config, plugin);
             String url = "jdbc:mysql://" + config.getHost() + ":" + config.getPort()
                     + "/" + config.getDatabase()
                     + "?useSSL=false&allowPublicKeyRetrieval=true"
@@ -647,6 +699,47 @@ public final class DBSyncUtils {
                         DLogManager.printDataContainerLogs);
             }
             return DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+        }
+    }
+
+    /**
+     * Ensures the MySQL database referenced by {@code config} exists.
+     * Connects to MySQL without specifying a database, then executes
+     * {@code CREATE DATABASE IF NOT EXISTS} with the configured (or default
+     * {@code "dpplugins"}) database name.
+     *
+     * <p>Results are cached per {@code host:port/database} tuple so that the
+     * admin connection is opened at most once per server lifetime.
+     *
+     * @param config DB configuration
+     * @param plugin Owning plugin for logging (may be {@code null})
+     */
+    private static void ensureMySQLDatabaseExists(DBConfig config, DPlugin plugin) {
+        String dbName   = (config.getDatabase() != null && !config.getDatabase().isEmpty())
+                ? config.getDatabase() : "dpplugins";
+        String cacheKey = config.getHost() + ":" + config.getPort() + "/" + dbName;
+        if (VERIFIED_DATABASES.contains(cacheKey)) return;
+
+        String adminUrl = "jdbc:mysql://" + config.getHost() + ":" + config.getPort()
+                + "?useSSL=false&allowPublicKeyRetrieval=true"
+                + "&characterEncoding=UTF-8&serverTimezone=UTC";
+        try (Connection conn = DriverManager.getConnection(adminUrl, config.getUsername(), config.getPassword());
+             Statement  stmt = conn.createStatement()) {
+            stmt.executeUpdate(
+                    "CREATE DATABASE IF NOT EXISTS `" + dbName + "` "
+                    + "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+            VERIFIED_DATABASES.add(cacheKey);
+            if (plugin != null) {
+                plugin.getLog().info(
+                        "[DBSyncUtils] Database '" + dbName + "' ensured (created if absent).",
+                        DLogManager.printDataContainerLogs);
+            }
+        } catch (SQLException e) {
+            if (plugin != null) {
+                plugin.getLog().warning(
+                        "[DBSyncUtils] Could not ensure database '" + dbName + "' exists: " + e.getMessage(),
+                        DLogManager.printDataContainerLogs);
+            }
         }
     }
 
