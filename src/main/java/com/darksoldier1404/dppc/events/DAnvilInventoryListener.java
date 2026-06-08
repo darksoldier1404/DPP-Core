@@ -5,7 +5,8 @@ import com.darksoldier1404.dppc.events.danvilinventory.DAnvilInventoryClickEvent
 import com.darksoldier1404.dppc.events.danvilinventory.DAnvilInventoryCloseEvent;
 import com.darksoldier1404.dppc.events.danvilinventory.DAnvilInventoryOpenEvent;
 import com.darksoldier1404.dppc.events.danvilinventory.DAnvilInventoryTextChangeEvent;
-import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,41 +16,45 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 
 /**
  * Translates Bukkit anvil-related events into {@link DAnvilInventory} custom events and dispatches them.
  *
  * <p>Plays the same role that {@link InventoryEventListener} does for
- * {@link com.darksoldier1404.dppc.api.inventory.DInventory} custom events. The library assigns no
- * meaning to individual slots; consuming plugins handle the custom events themselves.
- * Registered in {@code DPPCore#onEnable()}.</p>
+ * {@link com.darksoldier1404.dppc.api.inventory.DInventory} custom events. Open prompts are resolved
+ * through the per-player session registry ({@link DAnvilInventory#getOpen(Player)}) since a real
+ * anvil menu cannot carry a custom holder. The library assigns no meaning to individual slots;
+ * consuming plugins handle the custom events themselves. Registered in {@code DPPCore#onEnable()}.</p>
  */
 public class DAnvilInventoryListener implements Listener {
 
-    private static DAnvilInventory holderOf(Inventory inventory) {
-        if (inventory == null) return null;
-        InventoryHolder holder = inventory.getHolder();
-        return holder instanceof DAnvilInventory ? (DAnvilInventory) holder : null;
+    private static Player asPlayer(HumanEntity entity) {
+        return entity instanceof Player ? (Player) entity : null;
     }
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
-        DAnvilInventory inv = holderOf(e.getInventory());
-        if (inv == null) return;
+        Player player = asPlayer(e.getPlayer());
+        if (player == null) return;
+        DAnvilInventory inv = DAnvilInventory.getOpen(player);
+        if (inv == null || inv.getInventory() != e.getInventory()) return;
         DAnvilInventoryOpenEvent event = new DAnvilInventoryOpenEvent(e.getView(), inv);
         inv.getPlugin().getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             e.setCancelled(true);
+            inv.handleClose();
         }
     }
 
     @EventHandler
     public void onPrepareAnvil(PrepareAnvilEvent e) {
-        DAnvilInventory inv = holderOf(e.getInventory());
+        Player player = asPlayer(e.getView().getPlayer());
+        if (player == null) return;
+        DAnvilInventory inv = DAnvilInventory.getOpen(player);
         if (inv == null) return;
         e.getInventory().setRepairCost(0);
         String text = e.getInventory().getRenameText();
+        inv.setRenameText(text);
         DAnvilInventoryTextChangeEvent event = new DAnvilInventoryTextChangeEvent(e.getView(), inv, text);
         inv.getPlugin().getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
@@ -63,13 +68,16 @@ public class DAnvilInventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        Inventory top = e.getView().getTopInventory();
-        DAnvilInventory inv = holderOf(top);
+        Player player = asPlayer(e.getWhoClicked());
+        if (player == null) return;
+        DAnvilInventory inv = DAnvilInventory.getOpen(player);
         if (inv == null) return;
+        Inventory top = e.getView().getTopInventory();
+        if (!(top instanceof AnvilInventory)) return;
 
         boolean isPlayerInventory = e.getClickedInventory() != null
                 && e.getClickedInventory().getType() == InventoryType.PLAYER;
-        String renameText = top instanceof AnvilInventory ? ((AnvilInventory) top).getRenameText() : null;
+        String renameText = inv.getRenameText();
 
         DAnvilInventoryClickEvent event = new DAnvilInventoryClickEvent(
                 e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), renameText, isPlayerInventory);
@@ -81,9 +89,10 @@ public class DAnvilInventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
-        DAnvilInventory inv = holderOf(e.getView().getTopInventory());
-        if (inv == null) return;
-        if (!inv.isActive()) return;
+        Player player = asPlayer(e.getPlayer());
+        if (player == null) return;
+        DAnvilInventory inv = DAnvilInventory.getOpen(player);
+        if (inv == null || !inv.isActive()) return;
         DAnvilInventoryCloseEvent event = new DAnvilInventoryCloseEvent(e.getView(), inv);
         inv.getPlugin().getServer().getPluginManager().callEvent(event);
         inv.handleClose();

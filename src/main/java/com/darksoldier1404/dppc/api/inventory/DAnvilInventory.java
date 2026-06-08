@@ -4,11 +4,13 @@ import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.data.DPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,13 +19,20 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * A GUI helper for easily building anvil input prompts, much like {@link DInventory}.
  *
- * <p>Written against the Spigot Bukkit API. An anvil inventory created with
- * {@code Bukkit.createInventory(holder, InventoryType.ANVIL, title)} is backed by a real anvil menu
- * (ContainerAnvil) once opened, so the rename text field works. Like {@link DInventory}, it tracks
- * itself through a custom {@link InventoryHolder}.</p>
+ * <p>To capture the typed text, a real anvil menu must be opened. On the Bukkit API a real anvil is
+ * created through {@code MenuType.ANVIL} (added in 1.21, available on Spigot and Paper alike).
+ * Because the compile target is the 1.20.1 API, it is invoked via reflection. A real anvil menu
+ * cannot carry a custom {@link InventoryHolder}, so open prompts are tracked through a per-player
+ * session registry. On servers older than 1.21, where {@code MenuType} is unavailable, it falls back
+ * to a plain anvil inventory whose rename text cannot be read.</p>
  *
  * <p>The library assigns no fixed meaning (confirm, cancel, etc.) to the three anvil slots (0, 1, 2).
  * Consuming plugins place items freely with {@link #setItem(int, ItemStack)} and define click
@@ -51,6 +60,8 @@ public class DAnvilInventory implements InventoryHolder {
     /** Number of anvil inventory slots (0: input, 1: secondary input, 2: result). */
     public static final int SIZE = 3;
 
+    private static final Map<UUID, DAnvilInventory> SESSIONS = new ConcurrentHashMap<>();
+
     private final DPlugin plugin;
     private final String handlerName;
     private String title;
@@ -60,6 +71,7 @@ public class DAnvilInventory implements InventoryHolder {
 
     private Inventory inventory;
     private Player viewer;
+    private String renameText = "";
     private BukkitTask keepAliveTask;
     private boolean closed = false;
 
@@ -128,12 +140,27 @@ public class DAnvilInventory implements InventoryHolder {
     }
 
     /**
-     * The text currently entered the anvil rename field, or null if the prompt is not open.
+     * The text currently entered in the anvil rename field. Reads it live from the open anvil menu
+     * and falls back to the last value captured during a text change.
      */
     public @Nullable String getRenameText() {
-        if (viewer == null) return null;
-        Inventory top = viewer.getOpenInventory().getTopInventory();
-        return top instanceof AnvilInventory ? ((AnvilInventory) top).getRenameText() : null;
+        if (viewer != null) {
+            Inventory top = viewer.getOpenInventory().getTopInventory();
+            if (top instanceof AnvilInventory) {
+                String live = ((AnvilInventory) top).getRenameText();
+                if (live != null) {
+                    return live;
+                }
+            }
+        }
+        return renameText;
+    }
+
+    /**
+     * Updates the cached rename text. Invoked by {@code DAnvilInventoryListener} on text change.
+     */
+    public void setRenameText(String renameText) {
+        this.renameText = renameText == null ? "" : renameText;
     }
 
     public boolean isActive() {
@@ -151,18 +178,34 @@ public class DAnvilInventory implements InventoryHolder {
             items[0] = base;
         }
 
-        this.inventory = createAnvilInventory();
-        for (int i = 0; i < SIZE; i++) {
-            if (items[i] != null) {
-                inventory.setItem(i, items[i].clone());
-            }
+        this.viewer = player;
+        this.renameText = text != null ? text : "";
+        this.closed = false;
+        SESSIONS.put(player.getUniqueId(), this);
+
+        InventoryView view = createAnvilView(player, title);
+        if (view != null) {
+            this.inventory = view.getTopInventory();
+            applyItems(this.inventory);
+            player.openInventory(view);
+        } else {
+            Inventory inv = createFallbackInventory();
+            applyItems(inv);
+            this.inventory = inv;
+            player.openInventory(inv);
         }
 
-        this.viewer = player;
-        this.closed = false;
-        player.openInventory(inventory);
+        if (!closed) {
+            startKeepAlive(player);
+        }
+    }
 
-        startKeepAlive(player);
+    private void applyItems(Inventory inv) {
+        for (int i = 0; i < SIZE; i++) {
+            if (items[i] != null) {
+                inv.setItem(i, items[i].clone());
+            }
+        }
     }
 
     /**
@@ -174,11 +217,28 @@ public class DAnvilInventory implements InventoryHolder {
         Bukkit.getScheduler().runTask(plugin, () -> viewer.closeInventory());
     }
 
-    private Inventory createAnvilInventory() {
+    private Inventory createFallbackInventory() {
         try {
             return Bukkit.createInventory(this, InventoryType.ANVIL, title);
         } catch (Throwable t) {
             return Bukkit.createInventory(this, InventoryType.ANVIL);
+        }
+    }
+
+    /**
+     * Creates a real anvil menu view through {@code MenuType.ANVIL} (Bukkit API, 1.21+), invoked via
+     * reflection because the compile target is the 1.20.1 API. Returns null on older servers.
+     */
+    private InventoryView createAnvilView(Player player, String title) {
+        try {
+            Class<?> menuTypeClass = Class.forName("org.bukkit.inventory.MenuType");
+            Class<?> typedClass = Class.forName("org.bukkit.inventory.MenuType$Typed");
+            Object anvil = menuTypeClass.getField("ANVIL").get(null);
+            Method create = typedClass.getMethod("create", HumanEntity.class, String.class);
+            Object result = create.invoke(anvil, player, title);
+            return result instanceof InventoryView ? (InventoryView) result : null;
+        } catch (Throwable t) {
+            return null;
         }
     }
 
@@ -191,7 +251,7 @@ public class DAnvilInventory implements InventoryHolder {
                     return;
                 }
                 Inventory top = player.getOpenInventory().getTopInventory();
-                if (top.getHolder() != DAnvilInventory.this) {
+                if (!(top instanceof AnvilInventory) || getOpen(player) != DAnvilInventory.this) {
                     cancel();
                     return;
                 }
@@ -219,12 +279,13 @@ public class DAnvilInventory implements InventoryHolder {
         if (closed) return;
         closed = true;
         stopKeepAlive();
+        if (viewer != null) {
+            SESSIONS.remove(viewer.getUniqueId(), this);
+        }
     }
 
     public static DAnvilInventory getOpen(Player player) {
-        if (player == null) return null;
-        InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
-        return holder instanceof DAnvilInventory ? (DAnvilInventory) holder : null;
+        return player == null ? null : SESSIONS.get(player.getUniqueId());
     }
 
     public static boolean isOpen(Player player) {
