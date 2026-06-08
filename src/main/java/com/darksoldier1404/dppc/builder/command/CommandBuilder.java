@@ -209,6 +209,12 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 subCommandNames.add(subCommand.name.toLowerCase());
             }
             for (String alias : subCommand.aliases) {
+                SubCommand existing = subCommands.get(alias);
+                if (existing != null) {
+                    plugin.getLogger().warning("Alias '" + alias + "' for subcommand '" + subCommand.name
+                            + "' conflicts with an existing command/alias and was ignored.");
+                    continue;
+                }
                 subCommands.put(alias, subCommand);
             }
         }
@@ -444,7 +450,11 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                     continue;
                 }
                 completions.add(sub.name);
-                completions.addAll(sub.aliases);
+                for (String alias : sub.aliases) {
+                    if (subCommands.get(alias) == sub) {
+                        completions.add(alias);
+                    }
+                }
             }
             return completions;
         }

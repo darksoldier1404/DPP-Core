@@ -51,7 +51,7 @@ public class DAnvilInventoryListener implements Listener {
         Player player = asPlayer(e.getView().getPlayer());
         if (player == null) return;
         DAnvilInventory inv = DAnvilInventory.getOpen(player);
-        if (inv == null) return;
+        if (inv == null || inv.getInventory() != e.getInventory()) return;
         e.getInventory().setRepairCost(0);
         String text = e.getInventory().getRenameText();
         inv.setRenameText(text);
@@ -73,7 +73,7 @@ public class DAnvilInventoryListener implements Listener {
         DAnvilInventory inv = DAnvilInventory.getOpen(player);
         if (inv == null) return;
         Inventory top = e.getView().getTopInventory();
-        if (!(top instanceof AnvilInventory)) return;
+        if (!(top instanceof AnvilInventory) || inv.getInventory() != top) return;
 
         boolean isPlayerInventory = e.getClickedInventory() != null
                 && e.getClickedInventory().getType() == InventoryType.PLAYER;
@@ -92,7 +92,7 @@ public class DAnvilInventoryListener implements Listener {
         Player player = asPlayer(e.getPlayer());
         if (player == null) return;
         DAnvilInventory inv = DAnvilInventory.getOpen(player);
-        if (inv == null || !inv.isActive()) return;
+        if (inv == null || !inv.isActive() || inv.getInventory() != e.getInventory()) return;
         DAnvilInventoryCloseEvent event = new DAnvilInventoryCloseEvent(e.getView(), inv);
         inv.getPlugin().getServer().getPluginManager().callEvent(event);
         inv.handleClose();
