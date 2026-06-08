@@ -38,7 +38,7 @@ public class DAnvilInventoryListener implements Listener {
         DAnvilInventory inv = holderOf(e.getInventory());
         if (inv == null) return;
         DAnvilInventoryOpenEvent event = new DAnvilInventoryOpenEvent(e.getView(), inv);
-        Bukkit.getServer().getPluginManager().callEvent(event);
+        inv.getPlugin().getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             e.setCancelled(true);
         }
@@ -51,7 +51,7 @@ public class DAnvilInventoryListener implements Listener {
         e.getInventory().setRepairCost(0);
         String text = e.getInventory().getRenameText();
         DAnvilInventoryTextChangeEvent event = new DAnvilInventoryTextChangeEvent(e.getView(), inv, text);
-        Bukkit.getServer().getPluginManager().callEvent(event);
+        inv.getPlugin().getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             e.setResult(null);
             return;
@@ -73,7 +73,7 @@ public class DAnvilInventoryListener implements Listener {
 
         DAnvilInventoryClickEvent event = new DAnvilInventoryClickEvent(
                 e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), renameText, isPlayerInventory);
-        Bukkit.getServer().getPluginManager().callEvent(event);
+        inv.getPlugin().getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             e.setCancelled(true);
         }
@@ -85,7 +85,7 @@ public class DAnvilInventoryListener implements Listener {
         if (inv == null) return;
         if (!inv.isActive()) return;
         DAnvilInventoryCloseEvent event = new DAnvilInventoryCloseEvent(e.getView(), inv);
-        Bukkit.getServer().getPluginManager().callEvent(event);
+        inv.getPlugin().getServer().getPluginManager().callEvent(event);
         inv.handleClose();
     }
 }

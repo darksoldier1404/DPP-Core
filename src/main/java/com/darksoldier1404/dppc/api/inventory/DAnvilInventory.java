@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +52,7 @@ public class DAnvilInventory implements InventoryHolder {
     public static final int SIZE = 3;
 
     private final DPlugin plugin;
+    private final String handlerName;
     private String title;
     private String text;
 
@@ -64,6 +66,11 @@ public class DAnvilInventory implements InventoryHolder {
     public DAnvilInventory(String title, @NotNull DPlugin plugin) {
         this.title = title;
         this.plugin = plugin;
+        this.handlerName = plugin.getName();
+    }
+
+    public boolean isValidHandler(JavaPlugin plugin) {
+        return plugin.getName().equals(handlerName);
     }
 
     public DAnvilInventory title(String title) {
