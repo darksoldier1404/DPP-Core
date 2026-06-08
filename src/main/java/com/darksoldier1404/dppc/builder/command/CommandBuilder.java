@@ -407,7 +407,8 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 }
                 parsedArgs.put(argDef.index, parsed);
             } catch (NumberFormatException e) {
-                sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.index + "': " + commandArgs[argIndex]);
+                String providedValue = (argIndex >= 0 && argIndex < commandArgs.length) ? commandArgs[argIndex] : "<missing>";
+                sender.sendMessage(plugin.getPrefix() + "Invalid " + argDef.type.name().toLowerCase() + " for argument '" + argDef.index + "': " + providedValue);
                 return true;
             } catch (ArrayIndexOutOfBoundsException e) {
                 // This catch handles cases where commandArgs[argIndex] is accessed but argIndex is out of bounds
