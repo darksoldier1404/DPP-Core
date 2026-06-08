@@ -69,8 +69,10 @@ public class InventoryEventListener implements Listener {
             if (!pageEvent.isCancelled()) {
                 inv.applyChanges();
                 inv.prevPage();
+                inv.updatePageTools();
                 return true;
             }
+            return false;
         }
         if (NBT.hasTagKey(item, "dppc_nextpage")) {
             DInventoryNextPageEvent pageEvent = new DInventoryNextPageEvent(e.getView(), inv, e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), e.getHotbarButton());
@@ -79,8 +81,10 @@ public class InventoryEventListener implements Listener {
             if (!pageEvent.isCancelled()) {
                 inv.applyChanges();
                 inv.nextPage();
+                inv.updatePageTools();
+                return true;
             }
-            return true;
+            return false;
         }
         if (NBT.hasTagKey(item, "dppc_clickcancel")) {
             e.setCancelled(true);

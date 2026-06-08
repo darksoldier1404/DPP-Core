@@ -141,6 +141,25 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             return this;
         }
 
+        @DPPCoreVersion(since = "5.4.0")
+        public SubCommandBuilder addAlias(String alias) {
+            if (alias != null && !alias.trim().isEmpty()) {
+                String key = alias.toLowerCase();
+                if (!this.subCommand.aliases.contains(key)) {
+                    this.subCommand.aliases.add(key);
+                }
+            }
+            return this;
+        }
+
+        @DPPCoreVersion(since = "5.4.0")
+        public SubCommandBuilder addAliases(String... aliases) {
+            for (String alias : aliases) {
+                addAlias(alias);
+            }
+            return this;
+        }
+
         public SubCommandBuilder withArgument(ArgumentIndex index, ArgumentType type) {
             this.subCommand.arguments.add(new Argument(index, type, true, (Collection) null));
             return this;
@@ -189,6 +208,15 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
             if (!subCommandNames.contains(subCommand.name.toLowerCase())) {
                 subCommandNames.add(subCommand.name.toLowerCase());
             }
+            for (String alias : subCommand.aliases) {
+                SubCommand existing = subCommands.get(alias);
+                if (existing != null) {
+                    plugin.getLogger().warning("Alias '" + alias + "' for subcommand '" + subCommand.name
+                            + "' conflicts with an existing command/alias and was ignored.");
+                    continue;
+                }
+                subCommands.put(alias, subCommand);
+            }
         }
     }
 
@@ -197,6 +225,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
         private String permission;
         private final String usage;
         private boolean isPlayerOnly;
+        private final List<String> aliases = new ArrayList<>();
         private final List<Argument<?>> arguments = new ArrayList<>();
         private BiFunction<CommandSender, String[], Boolean> legacyAction;
         private GenericCommandExecutor genericExecutor;
@@ -414,11 +443,20 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return subCommandNames.stream()
-                    .map(s -> subCommands.get(s.toLowerCase()))
-                    .filter(sub -> (sub.permission == null || sender.hasPermission(sub.permission)) && (!sub.isPlayerOnly || sender instanceof Player))
-                    .map(sub -> sub.name)
-                    .collect(Collectors.toList());
+            List<String> completions = new ArrayList<>();
+            for (String name : subCommandNames) {
+                SubCommand sub = subCommands.get(name);
+                if (sub == null || (sub.permission != null && !sender.hasPermission(sub.permission)) || (sub.isPlayerOnly && !(sender instanceof Player))) {
+                    continue;
+                }
+                completions.add(sub.name);
+                for (String subAlias : sub.aliases) {
+                    if (subCommands.get(subAlias) == sub) {
+                        completions.add(subAlias);
+                    }
+                }
+            }
+            return completions;
         }
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
         if (subCommand != null && (subCommand.permission == null || sender.hasPermission(subCommand.permission)) && (!subCommand.isPlayerOnly || sender instanceof Player)) {
@@ -428,7 +466,7 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                 return subCommand.tabCompletion.apply(args);
             }
             int argIndex = args.length - 2;
-            if (argIndex >= 0 && argIndex < subCommand.arguments.size()) {
+            if (argIndex < subCommand.arguments.size()) {
                 Argument<?> arg = subCommand.arguments.get(argIndex);
                 if (sender instanceof Player && arg.conditionalSuggestions != null) {
                     return arg.conditionalSuggestions.apply((Player) sender, args);

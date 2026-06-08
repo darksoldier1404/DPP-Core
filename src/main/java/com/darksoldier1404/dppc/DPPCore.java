@@ -5,9 +5,11 @@ import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
 import com.darksoldier1404.dppc.data.DPlugin;
+import com.darksoldier1404.dppc.events.DAnvilInventoryListener;
 import com.darksoldier1404.dppc.events.InventoryEventListener;
 import com.darksoldier1404.dppc.plugin.commands.DPPCACommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCCommand;
+import com.darksoldier1404.dppc.plugin.commands.DPPCDICommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCPCommand;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import org.bukkit.plugin.Plugin;
@@ -19,7 +21,7 @@ import java.util.Set;
 
 @SuppressWarnings("all")
 public class DPPCore extends DPlugin {
-    private static DPPCore plugin;
+    public static DPPCore plugin;
     public static Plugin ess;
     public static Plugin lp;
     public static Set<PlaceholderBuilder.InternalExpansion> placeholders = new HashSet<>();
@@ -58,9 +60,11 @@ public class DPPCore extends DPlugin {
         PluginUtil.initPlaceholders();
         getServer().getPluginManager().registerEvents(new ActionGUIHandler(), this);
         getServer().getPluginManager().registerEvents(new InventoryEventListener(), this);
+        getServer().getPluginManager().registerEvents(new DAnvilInventoryListener(), this);
         getCommand("dppc").setExecutor(new DPPCCommand());
         getCommand("dppca").setExecutor(new DPPCACommand());
         getCommand("dppcp").setExecutor(new DPPCPCommand().getExecutor());
+        DPPCDICommand.init();
         PluginUtil.showBanner();
     }
 
