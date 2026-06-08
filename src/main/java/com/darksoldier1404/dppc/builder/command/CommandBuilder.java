@@ -450,9 +450,9 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                     continue;
                 }
                 completions.add(sub.name);
-                for (String alias : sub.aliases) {
-                    if (subCommands.get(alias) == sub) {
-                        completions.add(alias);
+                for (String subAlias : sub.aliases) {
+                    if (subCommands.get(subAlias) == sub) {
+                        completions.add(subAlias);
                     }
                 }
             }
