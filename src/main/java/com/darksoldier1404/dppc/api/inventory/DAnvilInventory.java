@@ -211,10 +211,20 @@ public class DAnvilInventory implements InventoryHolder {
     /**
      * Closes the prompt. Closing is deferred to the next tick so it is safe to call from within
      * click event handling.
+     *
+     * <p>The deferred task closes the player's inventory only while this prompt is still the one the
+     * player has open. This prevents clobbering a follow-up GUI that a handler may open right after
+     * closing the prompt (e.g. transitioning from the anvil input to another inventory): opening that
+     * GUI ends this session, so the guard skips the stale close.</p>
      */
     public void close() {
         if (viewer == null) return;
-        Bukkit.getScheduler().runTask(plugin, () -> viewer.closeInventory());
+        final Player target = viewer;
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (getOpen(target) == DAnvilInventory.this) {
+                target.closeInventory();
+            }
+        });
     }
 
     private Inventory createFallbackInventory() {
