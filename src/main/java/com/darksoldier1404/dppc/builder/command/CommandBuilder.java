@@ -443,6 +443,11 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        // The current (possibly partial) token the player is typing. Bukkit's legacy TabCompleter
+        // does not prefix-filter returned suggestions for the client, so we must do it ourselves;
+        // otherwise the client shows the full list and never focuses on the matching entry.
+        String token = args.length > 0 ? args[args.length - 1] : "";
+
         if (args.length == 1) {
             List<String> completions = new ArrayList<>();
             for (String name : subCommandNames) {
@@ -457,38 +462,45 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                     }
                 }
             }
-            return completions;
+            return filterByToken(completions, token);
         }
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
         if (subCommand != null && (subCommand.permission == null || sender.hasPermission(subCommand.permission)) && (!subCommand.isPlayerOnly || sender instanceof Player)) {
             if (subCommand.tabCompletionWithSender != null) {
-                return subCommand.tabCompletionWithSender.apply(sender, args);
+                return filterByToken(subCommand.tabCompletionWithSender.apply(sender, args), token);
             } else if (subCommand.tabCompletion != null) {
-                return subCommand.tabCompletion.apply(args);
+                return filterByToken(subCommand.tabCompletion.apply(args), token);
             }
             int argIndex = args.length - 2;
             if (argIndex < subCommand.arguments.size()) {
                 Argument<?> arg = subCommand.arguments.get(argIndex);
                 if (sender instanceof Player && arg.conditionalSuggestions != null) {
-                    return arg.conditionalSuggestions.apply((Player) sender, args);
+                    return filterByToken(arg.conditionalSuggestions.apply((Player) sender, args), token);
                 }
                 if (subCommand.arguments.get(argIndex).suggestions != null) {
-                    return subCommand.arguments.get(argIndex).getSuggestionsAsStringList();
+                    return filterByToken(subCommand.arguments.get(argIndex).getSuggestionsAsStringList(), token);
                 }
                 ArgumentType type = subCommand.arguments.get(argIndex).type;
+                List<String> typeSuggestions;
                 switch (type) {
                     case PLAYER:
-                        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                        typeSuggestions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                        break;
                     case OFFLINE_PLAYER:
-                        return Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList());
+                        typeSuggestions = Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).collect(Collectors.toList());
+                        break;
                     case WORLD:
-                        return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+                        typeSuggestions = Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+                        break;
                     case MATERIAL:
-                        return Arrays.stream(Material.values()).map(Material::name).collect(Collectors.toList());
+                        typeSuggestions = Arrays.stream(Material.values()).map(Material::name).collect(Collectors.toList());
+                        break;
                     case ENTITY_TYPE:
-                        return Arrays.stream(EntityType.values()).map(EntityType::name).collect(Collectors.toList());
+                        typeSuggestions = Arrays.stream(EntityType.values()).map(EntityType::name).collect(Collectors.toList());
+                        break;
                     case BOOLEAN:
-                        return Arrays.asList("TRUE", "FALSE");
+                        typeSuggestions = Arrays.asList("TRUE", "FALSE");
+                        break;
                     case STRING_ARRAY:
                     case BYTE:
                     case SHORT:
@@ -498,10 +510,33 @@ public class CommandBuilder implements CommandExecutor, TabCompleter {
                     case CHAR:
                     case STRING:
                     default:
-                        return Collections.emptyList();
+                        typeSuggestions = Collections.emptyList();
+                        break;
                 }
+                return filterByToken(typeSuggestions, token);
             }
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Filters the given suggestions to those that start with {@code token} (case-insensitive),
+     * so the client can focus on matching entries. An empty token returns the full list.
+     */
+    private static List<String> filterByToken(List<String> suggestions, String token) {
+        if (suggestions == null || suggestions.isEmpty()) {
+            return suggestions == null ? Collections.emptyList() : suggestions;
+        }
+        if (token == null || token.isEmpty()) {
+            return suggestions;
+        }
+        String lower = token.toLowerCase();
+        List<String> filtered = new ArrayList<>();
+        for (String s : suggestions) {
+            if (s != null && s.toLowerCase().startsWith(lower)) {
+                filtered.add(s);
+            }
+        }
+        return filtered;
     }
 }
