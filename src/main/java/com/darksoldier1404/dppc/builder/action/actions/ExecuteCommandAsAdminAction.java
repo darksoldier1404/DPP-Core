@@ -1,6 +1,7 @@
 package com.darksoldier1404.dppc.builder.action.actions;
 
 import com.darksoldier1404.dppc.builder.action.obj.Action;
+import com.darksoldier1404.dppc.builder.action.obj.ActionContext;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 import org.bukkit.entity.Player;
 
@@ -12,20 +13,21 @@ public class ExecuteCommandAsAdminAction implements Action {
     }
 
     @Override
-    public void execute(Player player) {
-        String parsedCommand = command.replace("{player}", player.getName());
+    public void execute(ActionContext context) {
+        Player player = context.getPlayer();
+        String parsed = context.applyVariables(command);
         if (player.isOp()) {
-            player.performCommand(parsedCommand);
+            player.performCommand(parsed);
         } else {
             player.setOp(true);
-            player.performCommand(parsedCommand);
+            player.performCommand(parsed);
             player.setOp(false);
         }
     }
 
     @Override
-    public ActionType getActionTypeName() {
-        return ActionType.EXECUTE_AS_ADMIN_ACTION;
+    public ActionType getActionType() {
+        return ActionType.EXECUTE_AS_ADMIN;
     }
 
     @Override
@@ -35,9 +37,7 @@ public class ExecuteCommandAsAdminAction implements Action {
 
     public static ExecuteCommandAsAdminAction parse(String line) {
         String[] parts = line.split("\\s+", 2);
-        if (parts.length < 2 || !parts[0].equalsIgnoreCase("execute_as_admin")) {
-            return null;
-        }
+        if (parts.length < 2 || !parts[0].equalsIgnoreCase("execute_as_admin")) return null;
         return new ExecuteCommandAsAdminAction(parts[1]);
     }
 }

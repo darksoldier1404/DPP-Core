@@ -1,11 +1,11 @@
 package com.darksoldier1404.dppc.builder.action.actions;
 
 import com.darksoldier1404.dppc.builder.action.obj.Action;
+import com.darksoldier1404.dppc.builder.action.obj.ActionContext;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 public class TeleportAction implements Action {
     private final String worldName;
@@ -21,39 +21,33 @@ public class TeleportAction implements Action {
     }
 
     @Override
-    public void execute(Player player) {
-        World world = Bukkit.getWorld(worldName);
-        if (world != null && player.isOnline()) {
-            Location loc = new Location(world, x, y, z);
-            player.teleport(loc);
+    public void execute(ActionContext context) {
+        World world = Bukkit.getWorld(context.applyVariables(worldName));
+        if (world != null && context.getPlayer().isOnline()) {
+            context.getPlayer().teleport(new Location(world, x, y, z));
         }
     }
 
     @Override
-    public ActionType getActionTypeName() {
-        return ActionType.TELEPORT_ACTION;
+    public ActionType getActionType() {
+        return ActionType.TELEPORT;
     }
 
     @Override
     public String serialize() {
-        return String.format("teleport %s %.1f,%.1f,%.1f", worldName, x, y, z);
+        return String.format("teleport %s %.2f,%.2f,%.2f", worldName, x, y, z);
     }
 
     public static TeleportAction parse(String line) {
         String[] parts = line.split("\\s+");
-        if (parts.length != 3 || !parts[0].equalsIgnoreCase("teleport")) {
-            return null;
-        }
+        if (parts.length != 3 || !parts[0].equalsIgnoreCase("teleport")) return null;
         try {
-            String worldName = parts[1];
             String[] coords = parts[2].split(",");
-            if (coords.length != 3) {
-                return null;
-            }
-            double x = Double.parseDouble(coords[0]);
-            double y = Double.parseDouble(coords[1]);
-            double z = Double.parseDouble(coords[2]);
-            return new TeleportAction(worldName, x, y, z);
+            if (coords.length != 3) return null;
+            return new TeleportAction(parts[1],
+                    Double.parseDouble(coords[0]),
+                    Double.parseDouble(coords[1]),
+                    Double.parseDouble(coords[2]));
         } catch (NumberFormatException e) {
             return null;
         }

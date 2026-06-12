@@ -4,37 +4,34 @@ import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.builder.action.obj.ActionContext;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 
-public class DelayAction implements Action {
-    private final long ticks;
+public class SetHealthAction implements Action {
+    private final double health;
 
-    public DelayAction(long ticks) {
-        this.ticks = ticks;
+    public SetHealthAction(double health) {
+        this.health = health;
     }
 
     @Override
     public void execute(ActionContext context) {
-        // Handled specially by ActionExecutor
+        double max = context.getPlayer().getMaxHealth();
+        context.getPlayer().setHealth(Math.max(0, Math.min(health, max)));
     }
 
     @Override
     public ActionType getActionType() {
-        return ActionType.DELAY;
+        return ActionType.SET_HEALTH;
     }
 
     @Override
     public String serialize() {
-        return "delay " + ticks;
+        return "set_health " + health;
     }
 
-    public long getTicks() {
-        return ticks;
-    }
-
-    public static DelayAction parse(String line) {
+    public static SetHealthAction parse(String line) {
         String[] parts = line.split("\\s+");
-        if (parts.length != 2 || !parts[0].equalsIgnoreCase("delay")) return null;
+        if (parts.length != 2 || !parts[0].equalsIgnoreCase("set_health")) return null;
         try {
-            return new DelayAction(Long.parseLong(parts[1]));
+            return new SetHealthAction(Double.parseDouble(parts[1]));
         } catch (NumberFormatException e) {
             return null;
         }

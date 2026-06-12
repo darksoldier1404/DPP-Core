@@ -1,11 +1,21 @@
 package com.darksoldier1404.dppc.builder.action.obj;
 
-import org.bukkit.entity.Player;
-
 public interface Action {
-    void execute(Player player);
+    void execute(ActionContext context);
 
-    ActionType getActionTypeName();
+    ActionType getActionType();
 
     String serialize();
+
+    default String getDisplayText() {
+        return serialize();
+    }
+
+    /**
+     * Flow control actions (IF/ELSE/END_IF/CANCEL) always execute
+     * regardless of current condition state.
+     */
+    default boolean isFlowControl() {
+        return false;
+    }
 }

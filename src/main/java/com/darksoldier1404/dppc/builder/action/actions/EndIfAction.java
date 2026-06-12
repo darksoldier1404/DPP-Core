@@ -4,27 +4,30 @@ import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.builder.action.obj.ActionContext;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 
-public class CloseInventoryAction implements Action {
+public class EndIfAction implements Action {
 
     @Override
     public void execute(ActionContext context) {
-        if (context.getPlayer().isOnline()) {
-            context.getPlayer().closeInventory();
-        }
+        context.popCondition();
+    }
+
+    @Override
+    public boolean isFlowControl() {
+        return true;
     }
 
     @Override
     public ActionType getActionType() {
-        return ActionType.CLOSE_INVENTORY;
+        return ActionType.END_IF;
     }
 
     @Override
     public String serialize() {
-        return "close_inventory";
+        return "end_if";
     }
 
-    public static CloseInventoryAction parse(String line) {
-        if (!line.trim().equalsIgnoreCase("close_inventory")) return null;
-        return new CloseInventoryAction();
+    public static EndIfAction parse(String line) {
+        if (!line.trim().equalsIgnoreCase("end_if")) return null;
+        return new EndIfAction();
     }
 }
