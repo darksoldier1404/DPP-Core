@@ -46,7 +46,8 @@ public class DLang {
 
     public void loadDefaultLangFiles(DPlugin plugin, YamlConfiguration data, String fileName) {
         DLangContext context = new DLangContext(plugin, Locale.forLanguageTag(fileName.split("\\.")[0].replace("_", "-")));
-        for (String key : data.getKeys(false)) {
+        for (String key : data.getKeys(true)) {
+            if (data.isConfigurationSection(key)) continue;
             String value = data.getString(key);
             if (value != null) {
                 if (context.hasValue(key)) {
@@ -68,6 +69,15 @@ public class DLang {
             }
         }
         return "[DLang] Error: Language key not found: " + key;
+    }
+
+    public boolean has(String key) {
+        for (DLangContext context : langContexts) {
+            if (context.getLang().getLanguage().equals(currentLang.getLanguage()) && context.hasValue(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @NotNull
