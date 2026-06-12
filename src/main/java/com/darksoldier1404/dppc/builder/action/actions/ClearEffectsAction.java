@@ -4,27 +4,28 @@ import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.builder.action.obj.ActionContext;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 
-public class CloseInventoryAction implements Action {
+public class ClearEffectsAction implements Action {
 
     @Override
     public void execute(ActionContext context) {
         if (context.getPlayer().isOnline()) {
-            context.getPlayer().closeInventory();
+            context.getPlayer().getActivePotionEffects()
+                    .forEach(e -> context.getPlayer().removePotionEffect(e.getType()));
         }
     }
 
     @Override
     public ActionType getActionType() {
-        return ActionType.CLOSE_INVENTORY;
+        return ActionType.CLEAR_EFFECTS;
     }
 
     @Override
     public String serialize() {
-        return "close_inventory";
+        return "clear_effects";
     }
 
-    public static CloseInventoryAction parse(String line) {
-        if (!line.trim().equalsIgnoreCase("close_inventory")) return null;
-        return new CloseInventoryAction();
+    public static ClearEffectsAction parse(String line) {
+        if (!line.trim().equalsIgnoreCase("clear_effects")) return null;
+        return new ClearEffectsAction();
     }
 }

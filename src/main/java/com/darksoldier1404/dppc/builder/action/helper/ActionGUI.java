@@ -2,6 +2,7 @@ package com.darksoldier1404.dppc.builder.action.helper;
 
 import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
+import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
 import com.darksoldier1404.dppc.data.DPlugin;
@@ -13,9 +14,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
+import java.util.List;
 
-@DPPCoreVersion(since = "5.3.0")
+@DPPCoreVersion(since = "5.4.0")
 public class ActionGUI {
+    static final int PAGE_SIZE = 45;
+
     private final DPlugin plugin;
     private ActionBuilder actionBuilder;
 
@@ -42,51 +46,212 @@ public class ActionGUI {
     }
 
     public void openActionBuilderGUI(Player p) {
-        DInventory inv = new DInventory("Action Builder", 54, plugin);
+        openActionBuilderGUI(p, 0);
+    }
+
+    public void openActionBuilderGUI(Player p, int page) {
+        List<Action> actions = actionBuilder.getActions();
+        int totalPages = (int) Math.ceil(actions.size() / (double) PAGE_SIZE);
+        if (totalPages == 0) totalPages = 1;
+        if (page >= totalPages) page = totalPages - 1;
+        if (page < 0) page = 0;
+
+        DInventory inv = new DInventory("§8[ §6Action Builder §8] §7" + actionBuilder.getActionName(), 54, plugin);
         inv.setChannel(0);
-        if (!actionBuilder.getActions().isEmpty()) {
-            actionBuilder.getActions().forEach(action -> {
-                int index = actionBuilder.getActions().indexOf(action);
-                ItemStack actionItem = new ItemStack(Material.PAPER);
-                ItemMeta actionMeta = actionItem.getItemMeta();
-                actionMeta.setDisplayName("§f[ §e" + index + " §f] §9" + action.getActionTypeName());
-                actionMeta.setLore(Arrays.asList("§aClick to edit", "§cRight click to remove", "", "§f" + action.serialize()));
-                actionItem.setItemMeta(actionMeta);
-                actionItem = NBT.setStringTag(actionItem, "dppc.actionType", action.getActionTypeName().name());
-                actionItem = NBT.setIntTag(actionItem, "dppc.actionIndex", index);
-                inv.addItem(actionItem);
-            });
+
+        int start = page * PAGE_SIZE;
+        int end = Math.min(start + PAGE_SIZE, actions.size());
+
+        for (int i = start; i < end; i++) {
+            Action action = actions.get(i);
+            int slot = i - start;
+
+            ItemStack item = buildActionItem(action, i);
+            inv.setItem(slot, item);
         }
-        if (!(actionBuilder.getActions().size() >= 52)) {
-            ItemStack addAction = new ItemStack(Material.PAPER);
-            ItemMeta im = addAction.getItemMeta();
-            im.setDisplayName("§6Click to add action");
-            addAction.setItemMeta(im);
-            addAction = NBT.setStringTag(addAction, "dppc.action", "add");
-            inv.addItem(addAction);
+
+        // Navigation bar (row 6: slots 45-53)
+        fillNavBar(inv, page, totalPages);
+
+        inv.setObj(this);
+        inv.openInventory(p);
+
+        // Store current page in obj field via a wrapper so handler can access it
+        // We encode page in NBT of the inventory holder's obj (handled in handler via ActionGUI)
+        currentPage = page;
+    }
+
+    // Stored as instance field so the handler can read it
+    int currentPage = 0;
+
+    private ItemStack buildActionItem(Action action, int globalIndex) {
+        ItemStack item = new ItemStack(getActionMaterial(action.getActionType()));
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("§f[§e" + globalIndex + "§f] §b" + action.getActionType().name());
+        meta.setLore(Arrays.asList(
+                "§7" + action.getDisplayText(),
+                "",
+                "§aLeft-click §7to edit",
+                "§cRight-click §7to remove"
+        ));
+        item.setItemMeta(meta);
+        item = NBT.setStringTag(item, "dppc.actionType", action.getActionType().name());
+        item = NBT.setIntTag(item, "dppc.actionIndex", globalIndex);
+        return item;
+    }
+
+    private void fillNavBar(DInventory inv, int page, int totalPages) {
+        // Slot 45: Prev page
+        if (page > 0) {
+            ItemStack prev = new ItemStack(Material.ARROW);
+            ItemMeta m = prev.getItemMeta();
+            m.setDisplayName("§e◄ Previous Page");
+            prev.setItemMeta(m);
+            prev = NBT.setStringTag(prev, "dppc.action", "prev");
+            prev = NBT.setIntTag(prev, "dppc.page", page - 1);
+            inv.setItem(45, prev);
         }
-        ItemStack saveAction = new ItemStack(Material.EMERALD);
-        ItemMeta saveMeta = saveAction.getItemMeta();
-        saveMeta.setDisplayName("§aSave");
-        saveAction.setItemMeta(saveMeta);
-        saveAction = NBT.setStringTag(saveAction, "dppc.action", "save");
-        inv.setItem(53, saveAction);
+
+        // Slot 46: Add action
+        ItemStack addAction = new ItemStack(Material.LIME_DYE);
+        ItemMeta addMeta = addAction.getItemMeta();
+        addMeta.setDisplayName("§a+ Add Action");
+        addAction.setItemMeta(addMeta);
+        addAction = NBT.setStringTag(addAction, "dppc.action", "add");
+        inv.setItem(46, addAction);
+
+        // Slot 49: Page indicator
+        ItemStack pageInfo = new ItemStack(Material.COMPASS);
+        ItemMeta pageMeta = pageInfo.getItemMeta();
+        pageMeta.setDisplayName("§7Page §f" + (page + 1) + " §7/ §f" + totalPages);
+        pageMeta.setLore(Arrays.asList("§7Total actions: §f" + actionBuilder.getActions().size()));
+        pageInfo.setItemMeta(pageMeta);
+        inv.setItem(49, pageInfo);
+
+        // Slot 52: Next page
+        if (page < totalPages - 1) {
+            ItemStack next = new ItemStack(Material.ARROW);
+            ItemMeta m = next.getItemMeta();
+            m.setDisplayName("§eNext Page ►");
+            next.setItemMeta(m);
+            next = NBT.setStringTag(next, "dppc.action", "next");
+            next = NBT.setIntTag(next, "dppc.page", page + 1);
+            inv.setItem(52, next);
+        }
+
+        // Slot 53: Save
+        ItemStack save = new ItemStack(Material.EMERALD);
+        ItemMeta saveMeta = save.getItemMeta();
+        saveMeta.setDisplayName("§a✔ Save");
+        save.setItemMeta(saveMeta);
+        save = NBT.setStringTag(save, "dppc.action", "save");
+        inv.setItem(53, save);
+    }
+
+    public void openActionSelectGUI(Player p) {
+        ActionType[] types = ActionType.values();
+        int size = (int) Math.ceil(types.length / 9.0) * 9;
+        size = Math.max(size, 9);
+        if (size > 54) size = 54;
+
+        DInventory inv = new DInventory("§8[ §6Select Action Type §8]", size, plugin);
+        inv.setChannel(1);
+
+        for (ActionType type : types) {
+            ItemStack item = new ItemStack(getActionMaterial(type));
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName("§b" + type.name());
+            meta.setLore(Arrays.asList("§7" + getActionDescription(type)));
+            item.setItemMeta(meta);
+            item = NBT.setStringTag(item, "dppc.actionTypeSelect", type.name());
+            inv.addItem(item);
+        }
+
         inv.setObj(this);
         inv.openInventory(p);
     }
 
-    public void openActionSelectGUI(Player p) {
-        DInventory inv = new DInventory( "Action Selector", 27, plugin);
-        inv.setChannel(1);
-        for (ActionType name : ActionType.values()) {
-            ItemStack actionItem = new ItemStack(Material.REDSTONE);
-            ItemMeta actionMeta = actionItem.getItemMeta();
-            actionMeta.setDisplayName("§b" + name);
-            actionItem.setItemMeta(actionMeta);
-            actionItem = NBT.setStringTag(actionItem, "dppc.actionTypeSelect", name.name());
-            inv.addItem(actionItem);
+    private Material getActionMaterial(ActionType type) {
+        switch (type) {
+            case DELAY: return Material.CLOCK;
+            case SEND_MESSAGE: return Material.PAPER;
+            case SEND_TITLE: return Material.NAME_TAG;
+            case SEND_ACTIONBAR: return Material.OAK_SIGN;
+            case BROADCAST: return Material.BELL;
+            case BROADCAST_WORLD: return Material.GRASS_BLOCK;
+            case EXECUTE_AS_ADMIN: return Material.COMMAND_BLOCK;
+            case EXECUTE_AS_PLAYER: return Material.WRITABLE_BOOK;
+            case TELEPORT: return Material.ENDER_PEARL;
+            case CLOSE_INVENTORY: return Material.BARRIER;
+            case SET_GAMEMODE: return Material.ELYTRA;
+            case GIVE_EXP: return Material.EXPERIENCE_BOTTLE;
+            case TAKE_EXP: return Material.GLASS_BOTTLE;
+            case SET_HEALTH: return Material.RED_DYE;
+            case SET_HUNGER: return Material.COOKED_BEEF;
+            case KICK: return Material.IRON_BOOTS;
+            case PLAY_SOUND: return Material.NOTE_BLOCK;
+            case PLAY_PARTICLE: return Material.BLAZE_POWDER;
+            case ADD_POTION_EFFECT: return Material.POTION;
+            case REMOVE_POTION_EFFECT: return Material.GLASS_BOTTLE;
+            case CLEAR_EFFECTS: return Material.MILK_BUCKET;
+            case GIVE_ITEM: return Material.CHEST;
+            case TAKE_ITEM: return Material.TRAPPED_CHEST;
+            case SET_VARIABLE: return Material.BOOK;
+            case ADD_VARIABLE: return Material.WRITABLE_BOOK;
+            case RANDOM_NUMBER: return Material.NETHER_STAR;
+            case IF_HAS_PERMISSION:
+            case IF_NOT_PERMISSION: return Material.GOLDEN_APPLE;
+            case IF_VARIABLE_EQUALS:
+            case IF_VARIABLE_NOT_EQUALS:
+            case IF_VARIABLE_GREATER:
+            case IF_VARIABLE_LESS: return Material.COMPARATOR;
+            case ELSE: return Material.REPEATER;
+            case END_IF: return Material.REDSTONE_TORCH;
+            case CANCEL: return Material.BARRIER;
+            case CALL_ACTION: return Material.FIREWORK_ROCKET;
+            default: return Material.PAPER;
         }
-        inv.setObj(this);
-        inv.openInventory(p);
+    }
+
+    private String getActionDescription(ActionType type) {
+        switch (type) {
+            case DELAY: return "delay <ticks>";
+            case SEND_MESSAGE: return "send_message <message>";
+            case SEND_TITLE: return "send_title <title>|<subtitle>|<in>|<stay>|<out>";
+            case SEND_ACTIONBAR: return "send_actionbar <message>";
+            case BROADCAST: return "broadcast <message>";
+            case BROADCAST_WORLD: return "broadcast_world <message>";
+            case EXECUTE_AS_ADMIN: return "execute_as_admin <command>";
+            case EXECUTE_AS_PLAYER: return "execute_as_player <command>";
+            case TELEPORT: return "teleport <world> <x>,<y>,<z>";
+            case CLOSE_INVENTORY: return "close_inventory";
+            case SET_GAMEMODE: return "set_gamemode <SURVIVAL|CREATIVE|...>";
+            case GIVE_EXP: return "give_exp <amount>";
+            case TAKE_EXP: return "take_exp <amount>";
+            case SET_HEALTH: return "set_health <amount>";
+            case SET_HUNGER: return "set_hunger <0-20>";
+            case KICK: return "kick <reason>";
+            case PLAY_SOUND: return "play_sound <sound> [volume] [pitch]";
+            case PLAY_PARTICLE: return "play_particle <type> <count> [ox] [oy] [oz]";
+            case ADD_POTION_EFFECT: return "add_potion_effect <type> <secs> <amp>";
+            case REMOVE_POTION_EFFECT: return "remove_potion_effect <type>";
+            case CLEAR_EFFECTS: return "clear_effects";
+            case GIVE_ITEM: return "give_item <material> <amount>";
+            case TAKE_ITEM: return "take_item <material> <amount>";
+            case SET_VARIABLE: return "set_variable <name> <value>";
+            case ADD_VARIABLE: return "add_variable <name> <amount>";
+            case RANDOM_NUMBER: return "random_number <name> <min> <max>";
+            case IF_HAS_PERMISSION: return "if_has_permission <perm>";
+            case IF_NOT_PERMISSION: return "if_not_permission <perm>";
+            case IF_VARIABLE_EQUALS: return "if_variable_equals <name> <value>";
+            case IF_VARIABLE_NOT_EQUALS: return "if_variable_not_equals <name> <value>";
+            case IF_VARIABLE_GREATER: return "if_variable_greater <name> <num>";
+            case IF_VARIABLE_LESS: return "if_variable_less <name> <num>";
+            case ELSE: return "else";
+            case END_IF: return "end_if";
+            case CANCEL: return "cancel";
+            case CALL_ACTION: return "call_action <action_name>";
+            default: return "";
+        }
     }
 }

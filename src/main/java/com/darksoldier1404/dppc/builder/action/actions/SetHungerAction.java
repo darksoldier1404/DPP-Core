@@ -4,37 +4,33 @@ import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.builder.action.obj.ActionContext;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 
-public class DelayAction implements Action {
-    private final long ticks;
+public class SetHungerAction implements Action {
+    private final int foodLevel;
 
-    public DelayAction(long ticks) {
-        this.ticks = ticks;
+    public SetHungerAction(int foodLevel) {
+        this.foodLevel = foodLevel;
     }
 
     @Override
     public void execute(ActionContext context) {
-        // Handled specially by ActionExecutor
+        context.getPlayer().setFoodLevel(Math.max(0, Math.min(foodLevel, 20)));
     }
 
     @Override
     public ActionType getActionType() {
-        return ActionType.DELAY;
+        return ActionType.SET_HUNGER;
     }
 
     @Override
     public String serialize() {
-        return "delay " + ticks;
+        return "set_hunger " + foodLevel;
     }
 
-    public long getTicks() {
-        return ticks;
-    }
-
-    public static DelayAction parse(String line) {
+    public static SetHungerAction parse(String line) {
         String[] parts = line.split("\\s+");
-        if (parts.length != 2 || !parts[0].equalsIgnoreCase("delay")) return null;
+        if (parts.length != 2 || !parts[0].equalsIgnoreCase("set_hunger")) return null;
         try {
-            return new DelayAction(Long.parseLong(parts[1]));
+            return new SetHungerAction(Integer.parseInt(parts[1]));
         } catch (NumberFormatException e) {
             return null;
         }
