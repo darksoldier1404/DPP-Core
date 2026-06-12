@@ -1,7 +1,9 @@
 package com.darksoldier1404.dppc.builder.action.helper;
 
+import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.annotation.DPPCoreVersion;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
+import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.builder.action.obj.Action;
 import com.darksoldier1404.dppc.builder.action.obj.ActionType;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
@@ -37,6 +39,10 @@ public class ActionGUI {
         return plugin;
     }
 
+    private DLang lang() {
+        return DPPCore.getInstance().getLang();
+    }
+
     public void setActionBuilder(ActionBuilder actionBuilder) {
         this.actionBuilder = actionBuilder;
     }
@@ -56,7 +62,7 @@ public class ActionGUI {
         if (page >= totalPages) page = totalPages - 1;
         if (page < 0) page = 0;
 
-        DInventory inv = new DInventory("§8[ §6Action Builder §8] §7" + actionBuilder.getActionName(), 54, plugin);
+        DInventory inv = new DInventory(lang().getWithArgs("ab.gui.title", actionBuilder.getActionName()), 54, plugin);
         inv.setChannel(0);
 
         int start = page * PAGE_SIZE;
@@ -91,8 +97,8 @@ public class ActionGUI {
         meta.setLore(Arrays.asList(
                 "§7" + action.getDisplayText(),
                 "",
-                "§aLeft-click §7to edit",
-                "§cRight-click §7to remove"
+                lang().get("ab.gui.edit_lore"),
+                lang().get("ab.gui.remove_lore")
         ));
         item.setItemMeta(meta);
         item = NBT.setStringTag(item, "dppc.actionType", action.getActionType().name());
@@ -105,7 +111,7 @@ public class ActionGUI {
         if (page > 0) {
             ItemStack prev = new ItemStack(Material.ARROW);
             ItemMeta m = prev.getItemMeta();
-            m.setDisplayName("§e◄ Previous Page");
+            m.setDisplayName(lang().get("ab.gui.prev_page"));
             prev.setItemMeta(m);
             prev = NBT.setStringTag(prev, "dppc.action", "prev");
             prev = NBT.setIntTag(prev, "dppc.page", page - 1);
@@ -115,7 +121,7 @@ public class ActionGUI {
         // Slot 46: Add action
         ItemStack addAction = new ItemStack(Material.LIME_DYE);
         ItemMeta addMeta = addAction.getItemMeta();
-        addMeta.setDisplayName("§a+ Add Action");
+        addMeta.setDisplayName(lang().get("ab.gui.add_action"));
         addAction.setItemMeta(addMeta);
         addAction = NBT.setStringTag(addAction, "dppc.action", "add");
         inv.setItem(46, addAction);
@@ -123,8 +129,8 @@ public class ActionGUI {
         // Slot 49: Page indicator
         ItemStack pageInfo = new ItemStack(Material.COMPASS);
         ItemMeta pageMeta = pageInfo.getItemMeta();
-        pageMeta.setDisplayName("§7Page §f" + (page + 1) + " §7/ §f" + totalPages);
-        pageMeta.setLore(Arrays.asList("§7Total actions: §f" + actionBuilder.getActions().size()));
+        pageMeta.setDisplayName(lang().getWithArgs("ab.gui.page_indicator", String.valueOf(page + 1), String.valueOf(totalPages)));
+        pageMeta.setLore(Arrays.asList(lang().getWithArgs("ab.gui.total_actions", String.valueOf(actionBuilder.getActions().size()))));
         pageInfo.setItemMeta(pageMeta);
         inv.setItem(49, pageInfo);
 
@@ -132,7 +138,7 @@ public class ActionGUI {
         if (page < totalPages - 1) {
             ItemStack next = new ItemStack(Material.ARROW);
             ItemMeta m = next.getItemMeta();
-            m.setDisplayName("§eNext Page ►");
+            m.setDisplayName(lang().get("ab.gui.next_page"));
             next.setItemMeta(m);
             next = NBT.setStringTag(next, "dppc.action", "next");
             next = NBT.setIntTag(next, "dppc.page", page + 1);
@@ -142,7 +148,7 @@ public class ActionGUI {
         // Slot 53: Save
         ItemStack save = new ItemStack(Material.EMERALD);
         ItemMeta saveMeta = save.getItemMeta();
-        saveMeta.setDisplayName("§a✔ Save");
+        saveMeta.setDisplayName(lang().get("ab.gui.save"));
         save.setItemMeta(saveMeta);
         save = NBT.setStringTag(save, "dppc.action", "save");
         inv.setItem(53, save);
@@ -154,7 +160,7 @@ public class ActionGUI {
         size = Math.max(size, 9);
         if (size > 54) size = 54;
 
-        DInventory inv = new DInventory("§8[ §6Select Action Type §8]", size, plugin);
+        DInventory inv = new DInventory(lang().get("ab.gui.select_title"), size, plugin);
         inv.setChannel(1);
 
         for (ActionType type : types) {

@@ -4,6 +4,7 @@ import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUI;
 import com.darksoldier1404.dppc.builder.action.obj.Action;
+import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,33 +26,34 @@ public class DPPCACommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        DLang lang = plugin.getLang();
         if (!sender.isOp()) {
-            sender.sendMessage("§cYou don't have permission to use this command!");
+            sender.sendMessage(lang.get("g.cmd.permission.denied"));
             return false;
         }
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§cThis command can only be used by players!");
+            sender.sendMessage(lang.get("g.cmd.player_only"));
             return false;
         }
         Player p = (Player) sender;
         if (args.length == 0) {
-            sender.sendMessage("/dppca create <name> - Create a new action");
-            sender.sendMessage("/dppca edit <name> - Edit an existing action");
-            sender.sendMessage("/dppca delete <name> - Delete an action");
-            sender.sendMessage("/dppca list - List all actions");
-            sender.sendMessage("/dppca view - view action script");
-            sender.sendMessage("/dppca test <name> - Test an action");
-            sender.sendMessage("/dppca reload - Reload all actions");
+            sender.sendMessage(lang.get("ab.cmd.help.create"));
+            sender.sendMessage(lang.get("ab.cmd.help.edit"));
+            sender.sendMessage(lang.get("ab.cmd.help.delete"));
+            sender.sendMessage(lang.get("ab.cmd.help.list"));
+            sender.sendMessage(lang.get("ab.cmd.help.view"));
+            sender.sendMessage(lang.get("ab.cmd.help.test"));
+            sender.sendMessage(lang.get("ab.cmd.help.reload"));
             return false;
         }
         if (args[0].equalsIgnoreCase("create")) {
             if (args.length < 2) {
-                sender.sendMessage("§cUsage: /dppca create <name>");
+                sender.sendMessage(lang.get("ab.cmd.usage.create"));
                 return false;
             }
             String name = args[1];
             if (DPPCore.actions.containsKey(name)) {
-                sender.sendMessage("§cAn action with this name already exists!");
+                sender.sendMessage(lang.get("ab.cmd.already_exists"));
                 return false;
             }
             ActionGUI gui = new ActionGUI(plugin, name);
@@ -60,12 +62,12 @@ public class DPPCACommand implements CommandExecutor, TabCompleter {
         }
         if (args[0].equalsIgnoreCase("edit")) {
             if (args.length < 2) {
-                sender.sendMessage("§cUsage: /dppca edit <name>");
+                sender.sendMessage(lang.get("ab.cmd.usage.edit"));
                 return false;
             }
             String name = args[1];
             if (!DPPCore.actions.containsKey(name)) {
-                sender.sendMessage("§cNo action found with this name!");
+                sender.sendMessage(lang.get("ab.cmd.not_found"));
                 return false;
             }
             ActionGUI gui = new ActionGUI(DPPCore.actions.get(name));
@@ -74,39 +76,39 @@ public class DPPCACommand implements CommandExecutor, TabCompleter {
         }
         if (args[0].equalsIgnoreCase("delete")) {
             if (args.length < 2) {
-                sender.sendMessage("§cUsage: /dppca delete <name>");
+                sender.sendMessage(lang.get("ab.cmd.usage.delete"));
                 return false;
             }
             String name = args[1];
             if (!DPPCore.actions.containsKey(name)) {
-                sender.sendMessage("§cNo action found with this name!");
+                sender.sendMessage(lang.get("ab.cmd.not_found"));
                 return false;
             }
             try {
                 DPPCore.actions.remove(name);
-                sender.sendMessage("§aAction deleted successfully!");
+                sender.sendMessage(lang.get("ab.cmd.deleted"));
                 Files.deleteIfExists(Path.of(plugin.getDataFolder() + "/actions/" + name + ".yml"));
             } catch (IOException e) {
-                sender.sendMessage("Failed to delete file for key " + name + ": " + e.getMessage());
+                sender.sendMessage(lang.getWithArgs("ab.cmd.delete_failed", name, String.valueOf(e.getMessage())));
                 return false;
             }
             return false;
         }
         if (args[0].equalsIgnoreCase("list")) {
-            sender.sendMessage("§aAvailable actions:");
+            sender.sendMessage(lang.get("ab.cmd.list_header"));
             for (String action : DPPCore.actions.keySet()) {
-                sender.sendMessage("§a- " + action);
+                sender.sendMessage(lang.getWithArgs("ab.cmd.list_entry", action));
             }
             return false;
         }
         if (args[0].equalsIgnoreCase("view")) {
             if (args.length < 2) {
-                sender.sendMessage("§cUsage: /dppca view <name>");
+                sender.sendMessage(lang.get("ab.cmd.usage.view"));
                 return false;
             }
             String name = args[1];
             if (!DPPCore.actions.containsKey(name)) {
-                sender.sendMessage("§cNo action found with this name!");
+                sender.sendMessage(lang.get("ab.cmd.not_found"));
                 return false;
             }
             ActionBuilder ab = DPPCore.actions.get(name);
@@ -117,12 +119,12 @@ public class DPPCACommand implements CommandExecutor, TabCompleter {
         }
         if (args[0].equalsIgnoreCase("test")) {
             if (args.length < 2) {
-                sender.sendMessage("§cUsage: /dppca test <name>");
+                sender.sendMessage(lang.get("ab.cmd.usage.test"));
                 return false;
             }
             String name = args[1];
             if (!DPPCore.actions.containsKey(name)) {
-                sender.sendMessage("§cNo action found with this name!");
+                sender.sendMessage(lang.get("ab.cmd.not_found"));
                 return false;
             }
             ActionBuilder ab = DPPCore.actions.get(name);
@@ -131,7 +133,7 @@ public class DPPCACommand implements CommandExecutor, TabCompleter {
         }
         if (args[0].equalsIgnoreCase("reload")) {
             PluginUtil.loadAllAction();
-            sender.sendMessage("§aActions reloaded successfully!");
+            sender.sendMessage(lang.get("ab.cmd.reloaded"));
             return false;
         }
         return false;
