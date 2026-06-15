@@ -262,7 +262,7 @@ public class PluginUtil {
                     String currentVersion = plugin.getDescription().getVersion();
                     if (isNewVersion(currentVersion, latestVersion)) {
                         sender.sendMessage("§f[ §bDPP-Core §f] §e" + plugin.getName() + " §f| §cA new version of " + plugin.getName() + " is available: " + latestVersion + ". You are running version " + currentVersion);
-                        sender.sendMessage("§fDownload: §ehttps://dpnw.site/");
+                        sender.sendMessage("§fDownload: §ehttps://dpplugins.com/");
                     } else {
                         sender.sendMessage("§f[ §bDPP-Core §f] §e" + plugin.getName() + " §f| §aYou are running the latest version §f(§a" + currentVersion + "§f)");
                     }
@@ -283,7 +283,7 @@ public class PluginUtil {
                 String currentVersion = plugin.getDescription().getVersion();
                 if (isNewVersion(currentVersion, latestVersion)) {
                     sender.sendMessage("§f[ §bDPP-Core §f] §e" + name + " §f| §cA new version of " + name + " is available: " + latestVersion + ". You are running version " + currentVersion);
-                    sender.sendMessage("§fDownload: §ehttps://dpnw.site/");
+                    sender.sendMessage("§fDownload: §ehttps://dpplugins.com/");
                 } else {
                     sender.sendMessage("§f[ §bDPP-Core §f] §e" + name + " §f| §aYou are running the latest version §f(§a" + currentVersion + "§f)");
                 }
@@ -316,7 +316,7 @@ public class PluginUtil {
                     "§7》》》》》》》 §aVERSION §f: §e" + plugin.getDescription().getVersion() + "\n\n" +
                     "§7》》》》》》》 §cAPI-VERSION §f: §e" + plugin.getDescription().getAPIVersion() + "\n\n" +
                     "§7》》》》》》》 §dSERVER-VERSION §f: §e" + getServer().getBukkitVersion() + " (" + getServer().getVersion() + ")" + "\n\n\n" +
-                    "§7》》》》》》》 §bCheck out our new plugins! §f: §ehttps://dpnw.site\n\n" +
+                    "§7》》》》》》》 §bCheck out our new plugins! §f: §ehttps://dpplugins.com\n\n" +
                     "§7》》》》》》》 §bJoin our Discord Server to get latest update! §f: §ehttps://discord.com/invite/JnMCqkn2FX\n\n\n" +
                     "§7》》》》》》》 §6Plugin installed with DPP-Core §7《《《《《《《\n\n" +
                     loadedPlugins +
