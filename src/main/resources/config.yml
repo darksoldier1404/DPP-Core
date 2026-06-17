@@ -4,6 +4,12 @@ Settings:
 
   prefix: "&f[ &bDPP-Core &f] "
 
+  # Economy backend used by MoneyAPI for all DP-Plugins.
+  # AUTO        - Use EssentialsX if installed, otherwise fall back to Vault.
+  # EssentialsX - Force EssentialsX (falls back to Vault if not installed).
+  # Vault       - Force Vault (falls back to EssentialsX if not installed).
+  economy-provider: AUTO
+
   Log: # Settings for DP-Plugins logging system.
     save_period: 3600  # Time in seconds to save the log file.
     save_integrated: true  # If true, integrated logs will be saved in a single file.
