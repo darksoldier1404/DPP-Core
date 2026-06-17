@@ -13,6 +13,10 @@ gradle.properties
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/copilotDiffState.xml
+.idea/easy-i18n.xml
+.idea/git_toolbox_prj.xml
+.idea/dictionaries/project.xml
 *.iws
 *.iml
 *.ipr

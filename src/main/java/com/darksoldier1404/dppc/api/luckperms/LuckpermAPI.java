@@ -3,6 +3,7 @@ package com.darksoldier1404.dppc.api.luckperms;
 import com.darksoldier1404.dppc.DPPCore;
 import com.darksoldier1404.dppc.api.logger.DLogNode;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.PrefixNode;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 
 public class LuckpermAPI {
     private static final DPPCore plugin = DPPCore.getInstance();
-    private static final LuckPerms lp = (LuckPerms) DPPCore.lp;
+    private static final LuckPerms lp = LuckPermsProvider.get();
     private static final String PREFIX = "[DPP-Core.LuckpermAPI] ";
     private static final String MSG_USER_NOT_FOUND = PREFIX + "User not found.";
     private static final @NotNull DLogNode logger = plugin.getLog();
