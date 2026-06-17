@@ -2,6 +2,7 @@ package com.darksoldier1404.dppc.api.luckperms;
 
 import com.darksoldier1404.dppc.DPPCore;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
@@ -13,7 +14,7 @@ import java.util.UUID;
 
 public class PermissionAPI {
     private final static DPPCore plugin = DPPCore.getInstance();
-    private static final LuckPerms lp = (LuckPerms) DPPCore.lp;
+    private static final LuckPerms lp = LuckPermsProvider.get();
     private static final String prefix = "[DPP-Core.PermissionAPI] ";
 
     public static boolean isPlayerInGroup(Player player, String group) {

@@ -1,6 +1,7 @@
 package com.darksoldier1404.dppc.utils;
 
 import com.darksoldier1404.dppc.DPPCore;
+import com.darksoldier1404.dppc.api.essentials.MoneyAPI;
 import com.darksoldier1404.dppc.api.logger.DLogManager;
 import com.darksoldier1404.dppc.api.placeholder.PlaceholderBuilder;
 import com.darksoldier1404.dppc.builder.action.ActionBuilder;
@@ -103,6 +104,10 @@ public class PluginUtil {
         DPPCore.lp = getPluginInstance("LuckPerms", "PermissionAPI", DependPlugin.LuckPerms);
         getPluginInstance("WorldGuard", "WorldGuardAPI", DependPlugin.WorldGuard);
         getPluginInstance("PlaceholderAPI", "PlaceholderUtils", DependPlugin.PlaceholderAPI);
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            dependPlugins.add(DependPlugin.Vault);
+        }
+        MoneyAPI.init();
     }
 
     public static boolean isDependPluginLoaded(DependPlugin dependPlugin) {
