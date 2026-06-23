@@ -40,6 +40,8 @@ public class PluginUtil {
     // Cache of the latest known version per plugin name, populated by update checks.
     // "0.0.0" means the version could not be verified (API failure / plugin not listed).
     private static final Map<String, String> latestVersionCache = new java.util.concurrent.ConcurrentHashMap<>();
+    // Base of each plugin's GitHub page; the plugin name is appended to form the full URL.
+    private static final String GITHUB_BASE = "https://github.com/DP-Plugins/";
 
     public static void addPlugin(JavaPlugin plugin, int id) {
         loadedPlugins.put(plugin, id);
@@ -270,6 +272,16 @@ public class PluginUtil {
         return latestVersionCache.get(name);
     }
 
+    /** @return the plugin's GitHub page URL ({@code https://github.com/DP-Plugins/<pluginName>}). */
+    public static String getGithubUrl(String pluginName) {
+        return GITHUB_BASE + pluginName;
+    }
+
+    /** @return true once at least one plugin's latest version has been fetched into the cache. */
+    public static boolean hasCachedVersions() {
+        return !latestVersionCache.isEmpty();
+    }
+
     /**
      * Seeds the latest-version cache. Mainly useful for tests; production code populates the cache
      * through {@link #checkUpdateAsync} / {@link #checkAllUpdatesAsync}.
@@ -322,6 +334,7 @@ public class PluginUtil {
                     } else {
                         sender.sendMessage("§f[ §bDPP-Core §f] §e" + plugin.getName() + " §f| §aYou are running the latest version §f(§a" + currentVersion + "§f)");
                     }
+                    sender.sendMessage("§fGitHub: §e" + getGithubUrl(plugin.getName()));
                 }
             }
         });
@@ -344,6 +357,7 @@ public class PluginUtil {
                 } else {
                     sender.sendMessage("§f[ §bDPP-Core §f] §e" + name + " §f| §aYou are running the latest version §f(§a" + currentVersion + "§f)");
                 }
+                sender.sendMessage("§fGitHub: §e" + getGithubUrl(name));
             }
         });
     }

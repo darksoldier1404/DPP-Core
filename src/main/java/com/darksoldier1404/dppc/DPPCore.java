@@ -6,6 +6,7 @@ import com.darksoldier1404.dppc.builder.action.ActionBuilder;
 import com.darksoldier1404.dppc.builder.action.helper.ActionGUIHandler;
 import com.darksoldier1404.dppc.data.DPlugin;
 import com.darksoldier1404.dppc.events.DAnvilInventoryListener;
+import com.darksoldier1404.dppc.events.AdminUpdateNotifyListener;
 import com.darksoldier1404.dppc.events.DPPCPPanelListener;
 import com.darksoldier1404.dppc.events.InventoryEventListener;
 import com.darksoldier1404.dppc.events.PageToolEditorListener;
@@ -65,6 +66,7 @@ public class DPPCore extends DPlugin {
         getServer().getPluginManager().registerEvents(new DAnvilInventoryListener(), this);
         getServer().getPluginManager().registerEvents(new PageToolEditorListener(), this);
         getServer().getPluginManager().registerEvents(new DPPCPPanelListener(), this);
+        getServer().getPluginManager().registerEvents(new AdminUpdateNotifyListener(), this);
         getCommand("dppc").setExecutor(new DPPCCommand());
         getCommand("dppca").setExecutor(new DPPCACommand());
         getCommand("dppcp").setExecutor(new DPPCPCommand().getExecutor());

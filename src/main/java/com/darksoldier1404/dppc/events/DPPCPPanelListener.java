@@ -98,6 +98,7 @@ public class DPPCPPanelListener implements Listener {
             }
             if (plugin != null) {
                 p.sendMessage(prefix() + "§e" + name + " §f| " + statusText(plugin));
+                p.sendMessage(prefix() + "§fGitHub: §e" + PluginUtil.getGithubUrl(name));
             }
         });
     }

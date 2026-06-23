@@ -10,6 +10,10 @@ Settings:
   # Vault       - Force Vault (falls back to EssentialsX if not installed).
   economy-provider: AUTO
 
+  # If true, admins (dppc.admin) are shown a list of outdated plugins 5 seconds after they join.
+  # Set to false to disable this join notification.
+  notify_admins_on_join: true
+
   DInventory: # Settings for the shared DInventory paging system.
     # The default page tool bar (the bottom row of paged inventories) is fully editable in-game.
     # Run "/dppcdi edit" to open a GUI editor where you can place any items in the 9 tool slots

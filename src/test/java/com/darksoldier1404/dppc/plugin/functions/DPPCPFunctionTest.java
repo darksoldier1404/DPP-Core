@@ -95,6 +95,11 @@ class DPPCPFunctionTest extends PluginTest {
     }
 
     @Test
+    void githubUrlUsesPluginName() {
+        assertEquals("https://github.com/DP-Plugins/DP-PlayerMarket", PluginUtil.getGithubUrl("DP-PlayerMarket"));
+    }
+
+    @Test
     void listItemCarriesPluginNameForRouting() {
         DInventory list = DPPCPFunction.buildListInventory();
         String openTarget = null;
