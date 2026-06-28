@@ -74,7 +74,7 @@ class ActionExecuteStateTest extends MockServerTest {
     void randomNumberWithinRange() {
         PlayerMock p = spawnPlayerInWorld("Steve");
         ActionContext context = ctx(p);
-        new RandomNumberAction("roll", 1, 6).execute(context);
+        new RandomTempNumberAction("roll", 1, 6).execute(context);
         int value = Integer.parseInt(context.getVariable("roll"));
         assertTrue(value >= 1 && value <= 6, "value=" + value);
     }

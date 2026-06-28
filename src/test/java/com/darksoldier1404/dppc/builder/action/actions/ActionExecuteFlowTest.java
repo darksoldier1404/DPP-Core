@@ -23,12 +23,12 @@ class ActionExecuteFlowTest extends MockServerTest {
     void ifVariableGreater() {
         ActionContext c = ctx();
         c.setVariable("a", "10");
-        new IfVariableGreaterAction("a", 5).execute(c);
+        new IfTempVariableGreaterAction("a", 5).execute(c);
         assertTrue(c.shouldExecute());
 
         ActionContext c2 = ctx();
         c2.setVariable("a", "3");
-        new IfVariableGreaterAction("a", 5).execute(c2);
+        new IfTempVariableGreaterAction("a", 5).execute(c2);
         assertFalse(c2.shouldExecute());
     }
 
@@ -36,7 +36,7 @@ class ActionExecuteFlowTest extends MockServerTest {
     void ifVariableLess() {
         ActionContext c = ctx();
         c.setVariable("a", "3");
-        new IfVariableLessAction("a", 5).execute(c);
+        new IfTempVariableLessAction("a", 5).execute(c);
         assertTrue(c.shouldExecute());
     }
 
@@ -44,7 +44,7 @@ class ActionExecuteFlowTest extends MockServerTest {
     void ifVariableGreaterWithNonNumericIsFalse() {
         ActionContext c = ctx();
         c.setVariable("a", "abc");
-        new IfVariableGreaterAction("a", 5).execute(c);
+        new IfTempVariableGreaterAction("a", 5).execute(c);
         assertFalse(c.shouldExecute());
     }
 
@@ -52,12 +52,12 @@ class ActionExecuteFlowTest extends MockServerTest {
     void ifVariableNotEquals() {
         ActionContext c = ctx();
         c.setVariable("a", "x");
-        new IfVariableNotEqualsAction("a", "y").execute(c);
+        new IfTempVariableNotEqualsAction("a", "y").execute(c);
         assertTrue(c.shouldExecute());
 
         ActionContext c2 = ctx();
         c2.setVariable("a", "same");
-        new IfVariableNotEqualsAction("a", "same").execute(c2);
+        new IfTempVariableNotEqualsAction("a", "same").execute(c2);
         assertFalse(c2.shouldExecute());
     }
 

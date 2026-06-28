@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class IfVariableEqualsActionTest extends MockServerTest {
+class IfTempVariableEqualsActionTest extends MockServerTest {
 
     private ActionContext contextWithPlayer() {
         WorldMock world = server.addSimpleWorld("world");
@@ -25,7 +25,7 @@ class IfVariableEqualsActionTest extends MockServerTest {
     void pushesTrueWhenVariableMatches() {
         ActionContext ctx = contextWithPlayer();
         ctx.setVariable("a", "5");
-        new IfVariableEqualsAction("a", "5").execute(ctx);
+        new IfTempVariableEqualsAction("a", "5").execute(ctx);
         assertTrue(ctx.shouldExecute());
     }
 
@@ -33,20 +33,21 @@ class IfVariableEqualsActionTest extends MockServerTest {
     void pushesFalseWhenVariableDiffers() {
         ActionContext ctx = contextWithPlayer();
         ctx.setVariable("a", "5");
-        new IfVariableEqualsAction("a", "6").execute(ctx);
+        new IfTempVariableEqualsAction("a", "6").execute(ctx);
         assertFalse(ctx.shouldExecute());
     }
 
     @Test
     void isFlowControl() {
-        assertTrue(new IfVariableEqualsAction("a", "b").isFlowControl());
+        assertTrue(new IfTempVariableEqualsAction("a", "b").isFlowControl());
     }
 
     @Test
     void getActionTypeAndSerializeAndParse() {
-        IfVariableEqualsAction a = new IfVariableEqualsAction("a", "b");
-        org.junit.jupiter.api.Assertions.assertEquals(ActionType.IF_VARIABLE_EQUALS, a.getActionType());
-        org.junit.jupiter.api.Assertions.assertEquals("if_variable_equals a b", a.serialize());
-        assertNull(IfVariableEqualsAction.parse("if_variable_equals onlyname"));
+        IfTempVariableEqualsAction a = new IfTempVariableEqualsAction("a", "b");
+        org.junit.jupiter.api.Assertions.assertEquals(ActionType.IF_TEMP_VARIABLE_EQUALS, a.getActionType());
+        org.junit.jupiter.api.Assertions.assertEquals("if_temp_variable_equals a b", a.serialize());
+        assertNull(IfTempVariableEqualsAction.parse("if_temp_variable_equals onlyname"));
+        assertNull(IfTempVariableEqualsAction.parse("if_variable_equals a b"));
     }
 }
