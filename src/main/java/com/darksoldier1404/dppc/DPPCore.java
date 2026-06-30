@@ -90,5 +90,6 @@ public class DPPCore extends DPlugin {
             variables.saveAll();
         }
         saveAllData();
+        closeAllData();
     }
 }
