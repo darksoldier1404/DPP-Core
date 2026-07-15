@@ -8,6 +8,7 @@ import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.NBT;
 import com.darksoldier1404.dppc.utils.Tuple;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
@@ -38,12 +41,42 @@ public class ActionGUIHandler implements Listener {
         ActionGUI ag = (ActionGUI) inv.getObj();
         if (!inv.isValidHandler(ag.getPlugin())) return;
 
+        Player p = (Player) e.getWhoClicked();
+
+        // --- Item register GUI (channel 2) ---
+        if (inv.isValidChannel(2)) {
+            if (e.getRawSlot() == ActionGUI.ITEM_REGISTER_SLOT) {
+                return; // allow normal item placement/removal in the register slot
+            }
+            e.setCancelled(true);
+            ItemStack clicked = e.getCurrentItem();
+            if (clicked == null || !NBT.hasTagKey(clicked, "dppc.itemRegisterAction")) return;
+
+            String buttonAction = NBT.getStringTag(clicked, "dppc.itemRegisterAction");
+            if (buttonAction.equals("confirm")) {
+                ItemStack registered = e.getInventory().getItem(ActionGUI.ITEM_REGISTER_SLOT);
+                if (registered == null || registered.getType() == Material.AIR) {
+                    p.sendMessage(lang().get("ab.msg.item_register_empty"));
+                    return;
+                }
+                if (ag.getPendingItemActionType() == ActionType.TAKE_MATCHED_ITEM) {
+                    ag.getActionBuilder().takeMatchedItem(registered.clone());
+                } else {
+                    ag.getActionBuilder().ifHasItem(registered.clone());
+                }
+                ag.openActionBuilderGUI(p, ag.currentPage);
+            } else if (buttonAction.equals("cancel")) {
+                ag.getActionBuilder().setEditing(false);
+                ag.openActionBuilderGUI(p, ag.currentPage);
+            }
+            return;
+        }
+
         e.setCancelled(true);
 
         if (e.getCurrentItem() == null) return;
         if (e.getInventory().getType() == InventoryType.PLAYER) return;
 
-        Player p = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
 
         // --- Navigation / control buttons ---
@@ -84,6 +117,10 @@ public class ActionGUIHandler implements Listener {
                 ActionType actionType = ActionType.valueOf(NBT.getStringTag(item, "dppc.actionType"));
                 ag.getActionBuilder().setCurrentEditIndex(globalIndex);
                 ag.getActionBuilder().setEditing(true);
+                if (actionType == ActionType.IF_HAS_ITEM || actionType == ActionType.TAKE_MATCHED_ITEM) {
+                    ag.openItemRegisterGUI(p, actionType);
+                    return;
+                }
                 pendingInput.put(p.getUniqueId(), Tuple.of(ag, actionType));
                 sendInputPrompt(p, actionType);
                 p.closeInventory();
@@ -102,9 +139,47 @@ public class ActionGUIHandler implements Listener {
                 return;
             }
 
+            if (actionType == ActionType.IF_HAS_ITEM || actionType == ActionType.TAKE_MATCHED_ITEM) {
+                ag.openItemRegisterGUI(p, actionType);
+                return;
+            }
+
             pendingInput.put(p.getUniqueId(), Tuple.of(ag, actionType));
             sendInputPrompt(p, actionType);
             p.closeInventory();
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent e) {
+        if (!(e.getInventory().getHolder() instanceof DInventory)) return;
+        DInventory inv = (DInventory) e.getInventory().getHolder();
+        if (!(inv.getObj() instanceof ActionGUI)) return;
+        if (!inv.isValidChannel(2)) return;
+
+        int topSize = e.getView().getTopInventory().getSize();
+        for (int rawSlot : e.getRawSlots()) {
+            if (rawSlot < topSize && rawSlot != ActionGUI.ITEM_REGISTER_SLOT) {
+                e.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent e) {
+        if (!(e.getInventory().getHolder() instanceof DInventory)) return;
+        DInventory inv = (DInventory) e.getInventory().getHolder();
+        if (!(inv.getObj() instanceof ActionGUI)) return;
+        if (!inv.isValidChannel(2)) return;
+
+        ItemStack registered = e.getInventory().getItem(ActionGUI.ITEM_REGISTER_SLOT);
+        if (registered == null || registered.getType() == Material.AIR) return;
+
+        Player p = (Player) e.getPlayer();
+        Map<Integer, ItemStack> leftover = p.getInventory().addItem(registered);
+        for (ItemStack extra : leftover.values()) {
+            p.getWorld().dropItemNaturally(p.getLocation(), extra);
         }
     }
 
@@ -330,6 +405,15 @@ public class ActionGUIHandler implements Listener {
                         return false;
                     }
                     ag.getActionBuilder().randomGlobalNumber(rp[0], Integer.parseInt(rp[1]), Integer.parseInt(rp[2]));
+                    break;
+                }
+                case IF_HAS_MATERIAL: {
+                    String[] ip = input.split("\\s+");
+                    if (ip.length < 2) {
+                        p.sendMessage(lang().get("ab.format.item"));
+                        return false;
+                    }
+                    ag.getActionBuilder().ifHasMaterial(ip[0], Integer.parseInt(ip[1]));
                     break;
                 }
                 case IF_HAS_PERMISSION:

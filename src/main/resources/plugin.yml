@@ -23,3 +23,9 @@ commands:
   dppca:
   dppcp:
   dppcdi:
+  dppcloc:
+    description: Visually test LocationUtil functions with particles.
+    usage: /dppcloc <function> [args...] [PARTICLE]
+  dppcpacket:
+    description: Manually test the ProtocolLib-backed packet API (requires ProtocolLib).
+    usage: /dppcpacket <fakeblock|team|sound> [args...]
