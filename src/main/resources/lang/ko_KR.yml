@@ -23,6 +23,7 @@ ab: # ActionBuilder
       list: "/dppca list - 모든 액션 목록"
       view: "/dppca view <이름> - 액션 스크립트 보기"
       test: "/dppca test <이름> - 액션 테스트"
+      testsudo: "/dppca testsudo <이름> - 액션 테스트 (모든 유저 사용 가능)"
       reload: "/dppca reload - 모든 액션 리로드"
     usage:
       create: "&c사용법: /dppca create <이름>"
@@ -30,6 +31,7 @@ ab: # ActionBuilder
       delete: "&c사용법: /dppca delete <이름>"
       view: "&c사용법: /dppca view <이름>"
       test: "&c사용법: /dppca test <이름>"
+      testsudo: "&c사용법: /dppca testsudo <이름>"
     already_exists: "&c이미 같은 이름의 액션이 존재합니다!"
     not_found: "&c해당 이름의 액션을 찾을 수 없습니다!"
     deleted: "&a액션이 삭제되었습니다!"

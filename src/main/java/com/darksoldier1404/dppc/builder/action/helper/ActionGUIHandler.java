@@ -15,11 +15,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -45,30 +47,7 @@ public class ActionGUIHandler implements Listener {
 
         // --- Item register GUI (channel 2) ---
         if (inv.isValidChannel(2)) {
-            if (e.getRawSlot() == ActionGUI.ITEM_REGISTER_SLOT) {
-                return; // allow normal item placement/removal in the register slot
-            }
-            e.setCancelled(true);
-            ItemStack clicked = e.getCurrentItem();
-            if (clicked == null || !NBT.hasTagKey(clicked, "dppc.itemRegisterAction")) return;
-
-            String buttonAction = NBT.getStringTag(clicked, "dppc.itemRegisterAction");
-            if (buttonAction.equals("confirm")) {
-                ItemStack registered = e.getInventory().getItem(ActionGUI.ITEM_REGISTER_SLOT);
-                if (registered == null || registered.getType() == Material.AIR) {
-                    p.sendMessage(lang().get("ab.msg.item_register_empty"));
-                    return;
-                }
-                if (ag.getPendingItemActionType() == ActionType.TAKE_MATCHED_ITEM) {
-                    ag.getActionBuilder().takeMatchedItem(registered.clone());
-                } else {
-                    ag.getActionBuilder().ifHasItem(registered.clone());
-                }
-                ag.openActionBuilderGUI(p, ag.currentPage);
-            } else if (buttonAction.equals("cancel")) {
-                ag.getActionBuilder().setEditing(false);
-                ag.openActionBuilderGUI(p, ag.currentPage);
-            }
+            handleItemRegisterClick(e, ag, p);
             return;
         }
 
@@ -150,6 +129,66 @@ public class ActionGUIHandler implements Listener {
         }
     }
 
+    /**
+     * Item register GUI (IF_HAS_ITEM / TAKE_MATCHED_ITEM). Only the decoration and the two
+     * control buttons are locked: the player's own inventory and the register slot stay
+     * interactive, otherwise the item to register could never be picked up in the first place.
+     */
+    private void handleItemRegisterClick(InventoryClickEvent e, ActionGUI ag, Player p) {
+        // Double-click collect would vacuum the filler panes (and the registered item) into the cursor.
+        if (e.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+            e.setCancelled(true);
+            return;
+        }
+
+        Inventory clickedInv = e.getClickedInventory();
+        if (clickedInv == null || clickedInv.getType() == InventoryType.PLAYER) {
+            // Shift-click is redirected by hand: the vanilla move would merge into the filler panes.
+            if (e.isShiftClick()) {
+                e.setCancelled(true);
+                moveToRegisterSlot(e);
+            }
+            return;
+        }
+
+        if (e.getRawSlot() == ActionGUI.ITEM_REGISTER_SLOT) {
+            return; // allow normal item placement/removal in the register slot
+        }
+
+        e.setCancelled(true);
+        ItemStack clicked = e.getCurrentItem();
+        if (clicked == null || !NBT.hasTagKey(clicked, "dppc.itemRegisterAction")) return;
+
+        String buttonAction = NBT.getStringTag(clicked, "dppc.itemRegisterAction");
+        if (buttonAction.equals("confirm")) {
+            ItemStack registered = e.getInventory().getItem(ActionGUI.ITEM_REGISTER_SLOT);
+            if (registered == null || registered.getType() == Material.AIR) {
+                p.sendMessage(lang().get("ab.msg.item_register_empty"));
+                return;
+            }
+            if (ag.getPendingItemActionType() == ActionType.TAKE_MATCHED_ITEM) {
+                ag.getActionBuilder().takeMatchedItem(registered.clone());
+            } else {
+                ag.getActionBuilder().ifHasItem(registered.clone());
+            }
+            ag.openActionBuilderGUI(p, ag.currentPage);
+        } else if (buttonAction.equals("cancel")) {
+            ag.getActionBuilder().setEditing(false);
+            ag.openActionBuilderGUI(p, ag.currentPage);
+        }
+    }
+
+    /** Moves the shift-clicked stack into the register slot, unless an item is already registered. */
+    private void moveToRegisterSlot(InventoryClickEvent e) {
+        ItemStack moving = e.getCurrentItem();
+        if (moving == null || moving.getType() == Material.AIR) return;
+        Inventory top = e.getView().getTopInventory();
+        ItemStack registered = top.getItem(ActionGUI.ITEM_REGISTER_SLOT);
+        if (registered != null && registered.getType() != Material.AIR) return;
+        top.setItem(ActionGUI.ITEM_REGISTER_SLOT, moving.clone());
+        e.setCurrentItem(null);
+    }
+
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent e) {
         if (!(e.getInventory().getHolder() instanceof DInventory)) return;
@@ -172,6 +211,10 @@ public class ActionGUIHandler implements Listener {
         DInventory inv = (DInventory) e.getInventory().getHolder();
         if (!(inv.getObj() instanceof ActionGUI)) return;
         if (!inv.isValidChannel(2)) return;
+
+        // Leaving the register GUI abandons the edit; a pending index would otherwise overwrite
+        // an unrelated action the next time one is added.
+        ((ActionGUI) inv.getObj()).getActionBuilder().setEditing(false);
 
         ItemStack registered = e.getInventory().getItem(ActionGUI.ITEM_REGISTER_SLOT);
         if (registered == null || registered.getType() == Material.AIR) return;

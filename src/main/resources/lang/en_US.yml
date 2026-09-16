@@ -23,6 +23,7 @@ ab: # ActionBuilder
       list: "/dppca list - List all actions"
       view: "/dppca view <name> - View an action script"
       test: "/dppca test <name> - Test an action"
+      testsudo: "/dppca testsudo <name> - Test an action (usable by any player)"
       reload: "/dppca reload - Reload all actions"
     usage:
       create: "&cUsage: /dppca create <name>"
@@ -30,6 +31,7 @@ ab: # ActionBuilder
       delete: "&cUsage: /dppca delete <name>"
       view: "&cUsage: /dppca view <name>"
       test: "&cUsage: /dppca test <name>"
+      testsudo: "&cUsage: /dppca testsudo <name>"
     already_exists: "&cAn action with this name already exists!"
     not_found: "&cNo action found with this name!"
     deleted: "&aAction deleted successfully!"
