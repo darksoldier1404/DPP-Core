@@ -62,6 +62,7 @@ dependencies {
 
     // DPP-ModCore wire format (design §6.4). Shaded without relocation, so every plugin on the server sees one copy.
     implementation "com.darksoldier1404.dppmc:dppmc-protocol:${dppmc_protocol_version}"
+    testImplementation testFixtures("com.darksoldier1404.dppmc:dppmc-protocol:${dppmc_protocol_version}")
 
     compileOnly 'com.bukkit:craftbukkit:' + api_version
     compileOnly 'com.bukkit:spigot:' + api_version
