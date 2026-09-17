@@ -100,6 +100,7 @@ jar {
 shadowJar {
     dependencies {
         include(dependency('com.google.code.gson:gson:2.13.1'))
+        include(dependency("com.darksoldier1404.dppmc:dppmc-protocol"))
     }
     archiveFileName.set("DPP-Core-${version}-SNAPSHOT.jar")
     destinationDirectory.set(file("$rootDir/jars"))
