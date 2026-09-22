@@ -25,7 +25,7 @@ def api_version = isLatest ? V21 : V20
 // DPP-ModCore's wire format, served by the Nexus maven-public group (REPO_PUBLIC) and bundled by shadowJar
 // below. This is the one line to change when the core is released: ModCore Phase 8c publishes 0.1.0 without the
 // SNAPSHOT, and until it does, the snapshot is the only version that resolves.
-def dppmc_protocol_version = "0.1.0-SNAPSHOT"
+def dppmc_protocol_version = "1.0.0"
 
 repositories {
     mavenCentral()
