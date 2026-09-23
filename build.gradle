@@ -70,9 +70,19 @@ dependencies {
     compileOnly 'com.bukkit:spigot:' + api_version
 }
 
+java {
+    toolchain {
+        // Paper/Spigot 1.20.1-1.21.x run on Java 21. Without this the jar is compiled at whatever
+        // JDK the build happens to run on, and a jar built on a newer one fails to load with
+        // "Unsupported class file major version" - on the server, not here.
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 compileJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    options.release = 21
 }
 
 test {
