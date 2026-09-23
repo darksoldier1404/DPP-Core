@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -28,6 +29,7 @@ public final class ServerChannel {
     private final FrameEncoder encoder = new FrameEncoder(FrameLimits.CLIENTBOUND);
     private final Map<Class<?>, BiConsumer<Player, Object>> handlers = new ConcurrentHashMap<>();
     private volatile ModRequirement requirement = ModRequirement.optional();
+    private volatile BiPredicate<Player, Object> gate = (player, packet) -> true;
 
     ServerChannel(ModBridge.Runtime runtime, Plugin plugin, ProtocolSpec spec) {
         this.runtime = runtime;
@@ -91,6 +93,19 @@ public final class ServerChannel {
         return runtime.isReady(player.getUniqueId(), spec.namespace());
     }
 
+    /**
+     * Runs after a packet decodes and before its handler, for every C2S packet on this channel.
+     * Returning false drops the packet silently.
+     *
+     * <p>This is where a rate limit belongs. A modified client can send as fast as it likes, and a
+     * check inside each handler is one that a later handler forgets; one gate cannot be forgotten.
+     * It runs on the main thread, so keep it cheap, and note that it sees the decoded packet — the
+     * cost of decoding is already paid.
+     */
+    public void gate(BiPredicate<Player, Object> gate) {
+        this.gate = Objects.requireNonNull(gate, "gate");
+    }
+
     public ModRequirement requirement() {
         return requirement;
     }
@@ -118,6 +133,9 @@ public final class ServerChannel {
             // Expected input: any client can open this channel and send arbitrary bytes.
             plugin.getLogger().fine("dropped a malformed " + spec.channel() + " frame from " + player.getName()
                     + ": " + e.getMessage());
+            return;
+        }
+        if (!gate.test(player, packet)) {
             return;
         }
         BiConsumer<Player, Object> handler = handlers.get(packet.getClass());
