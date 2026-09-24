@@ -29,7 +29,8 @@ import java.util.function.Supplier;
  * verdict counts as news for events and kicks.
  *
  * <p>This channel is read before any handshake, so anyone can send on it: it reassembles at most
- * {@link #MAX_HELLO_BYTES} one transfer at a time, and answers a player at most once per
+ * {@link CoreProtocol#MAX_MESSAGE_BYTES} one transfer at a time ({@link CoreProtocol#SERVERBOUND_LIMITS}; the
+ * largest hello, 256 mods with the longest names, is about 135 KB), and answers a player at most once per
  * {@link #MIN_HELLO_GAP_MILLIS}. A client retries once a second; a faster stream of hellos, alternating versions
  * to flip a verdict back and forth, would otherwise fire a ready event, and whatever a plugin sends on it, each time.
  */
@@ -43,22 +44,14 @@ final class ServerHandshake {
                   Map<ModOffer, Verdict> newlyRefused) {
     }
 
-    /**
-     * The largest hello reassembled: one offering 256 mods with the longest names and versions is about 135 KB.
-     * The same limits as {@code CoreProtocol.SERVERBOUND_LIMITS} from dppmc-protocol 1.1.0; use that constant once
-     * the pin moves past 1.0.1.
-     */
-    static final int MAX_HELLO_BYTES = 256 * 1024;
-    static final FrameLimits CORE_LIMITS = new FrameLimits(FrameLimits.SERVERBOUND.maxFrameBytes(), MAX_HELLO_BYTES,
-            FrameLimits.SERVERBOUND.compressionThreshold(), 1, FrameLimits.SERVERBOUND.transferTimeoutMillis());
     /** Half the client's retry interval ({@code CoreProtocol.HELLO_INTERVAL_TICKS}, one second). */
     static final long MIN_HELLO_GAP_MILLIS = 500;
 
     private final Supplier<Map<String, ProtocolSpec>> boundSpecs;
     private final String bridgeVersion;
-    private final FrameDecoder<UUID> decoder = new FrameDecoder<>(CORE_LIMITS);
+    private final FrameDecoder<UUID> decoder = new FrameDecoder<>(CoreProtocol.SERVERBOUND_LIMITS);
     private final Map<UUID, Long> lastAnswer = new ConcurrentHashMap<>();
-    private final FrameEncoder encoder = new FrameEncoder(FrameLimits.CLIENTBOUND);
+    private final FrameEncoder encoder = new FrameEncoder(CoreProtocol.CLIENTBOUND_LIMITS);
     private final Map<UUID, ModSession> sessions = new ConcurrentHashMap<>();
 
     /** @param boundSpecs the specs bound on this server right now, keyed by namespace */
