@@ -39,7 +39,7 @@ class ServerHandshakeTest {
     }
 
     private static HelloAck ack(ServerHandshake.Answer answer) {
-        FrameDecoder<String> decoder = new FrameDecoder<>(FrameLimits.CLIENTBOUND);
+        FrameDecoder<String> decoder = new FrameDecoder<>(CoreProtocol.CLIENTBOUND_LIMITS);   // as the client reads it
         byte[] message = null;
         for (byte[] frame : answer.ackFrames()) {
             message = decoder.accept("server", frame, 0);
@@ -127,15 +127,16 @@ class ServerHandshakeTest {
             answer = handshake.accept(PLAYER, frame, 0).orElse(null);
         }
         assertEquals(Hello.MAX_MODS, answer.session().mods().size());
+        assertEquals(Hello.MAX_MODS, ack(answer).verdicts().size(), "and the answer fits the client's core limits");
 
         // A frame of a few hundred bytes that inflates to one byte past the limit is refused before inflating.
         FrameEncoder generous = new FrameEncoder(FrameLimits.SERVERBOUND);
-        byte[] fits = generous.encode(new byte[ServerHandshake.MAX_HELLO_BYTES]).get(0);
-        byte[] over = generous.encode(new byte[ServerHandshake.MAX_HELLO_BYTES + 1]).get(0);
-        FrameDecoder<UUID> decoder = new FrameDecoder<>(ServerHandshake.CORE_LIMITS);
-        assertEquals(ServerHandshake.MAX_HELLO_BYTES, decoder.accept(PLAYER, fits, 0).length);
+        byte[] fits = generous.encode(new byte[CoreProtocol.MAX_MESSAGE_BYTES]).get(0);
+        byte[] over = generous.encode(new byte[CoreProtocol.MAX_MESSAGE_BYTES + 1]).get(0);
+        FrameDecoder<UUID> decoder = new FrameDecoder<>(CoreProtocol.SERVERBOUND_LIMITS);
+        assertEquals(CoreProtocol.MAX_MESSAGE_BYTES, decoder.accept(PLAYER, fits, 0).length);
         assertTrue(over.length < 1024, "over is " + over.length);
         ProtocolException refused = assertThrows(ProtocolException.class, () -> handshake.accept(PLAYER, over, 1_000));
-        assertTrue(refused.getMessage().contains("out of range 0.." + ServerHandshake.MAX_HELLO_BYTES), refused.getMessage());
+        assertTrue(refused.getMessage().contains("out of range 0.." + CoreProtocol.MAX_MESSAGE_BYTES), refused.getMessage());
     }
 }
