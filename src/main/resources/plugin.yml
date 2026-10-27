@@ -26,6 +26,9 @@ commands:
   dppcloc:
     description: Visually test LocationUtil functions with particles.
     usage: /dppcloc <function> [args...] [PARTICLE]
+  dppcvfx:
+    description: Send a test particle effect to nearby DPP-ModCore 1.13.0 clients.
+    usage: /dppcvfx <burst|beam|sparks|clear>
   dppcpacket:
     description: Manually test the ProtocolLib-backed packet API (requires ProtocolLib).
     usage: /dppcpacket <fakeblock|team|sound> [args...]

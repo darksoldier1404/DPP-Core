@@ -12,10 +12,12 @@ import com.darksoldier1404.dppc.events.DPPCPPanelListener;
 import com.darksoldier1404.dppc.events.InventoryEventListener;
 import com.darksoldier1404.dppc.events.PageToolEditorListener;
 import com.darksoldier1404.dppc.events.VariableStoreListener;
+import com.darksoldier1404.dppc.api.vfx.VfxAPI;
 import com.darksoldier1404.dppc.modbridge.ModBridge;
 import com.darksoldier1404.dppc.plugin.commands.DPPCACommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCCommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCDICommand;
+import com.darksoldier1404.dppc.plugin.commands.DPPCVfxTestCommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCLocTestCommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCPCommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCPacketTestCommand;
@@ -84,13 +86,16 @@ public class DPPCore extends DPlugin {
         getCommand("dppcp").setExecutor(new DPPCPCommand().getExecutor());
         getCommand("dppcloc").setExecutor(new DPPCLocTestCommand());
         getCommand("dppcpacket").setExecutor(new DPPCPacketTestCommand());
+        getCommand("dppcvfx").setExecutor(new DPPCVfxTestCommand());
         DPPCDICommand.init();
         ModBridge.enable(this);
+        VfxAPI.enable(this);
         PluginUtil.showBanner();
     }
 
     @Override
     public void onDisable() {
+        VfxAPI.disable();
         ModBridge.disable();
         DLogManager.saveIntegratedLog();
         if (variables != null) {
