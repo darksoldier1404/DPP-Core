@@ -51,13 +51,28 @@ final class ServerHandshake {
     private final String bridgeVersion;
     private final FrameDecoder<UUID> decoder = new FrameDecoder<>(CoreProtocol.SERVERBOUND_LIMITS);
     private final Map<UUID, Long> lastAnswer = new ConcurrentHashMap<>();
-    private final FrameEncoder encoder = new FrameEncoder(CoreProtocol.CLIENTBOUND_LIMITS);
+    private final FrameLimits clientbound;
+    private final FrameEncoder encoder;
     private final Map<UUID, ModSession> sessions = new ConcurrentHashMap<>();
 
     /** @param boundSpecs the specs bound on this server right now, keyed by namespace */
     ServerHandshake(Supplier<Map<String, ProtocolSpec>> boundSpecs, String bridgeVersion) {
+        this(boundSpecs, bridgeVersion, ClientboundFrames.limits());
+    }
+
+    /**
+     * @param clientbound the limits of the frames this server sends: what the ack advertises, and what the ack
+     *                    itself is framed within
+     */
+    ServerHandshake(Supplier<Map<String, ProtocolSpec>> boundSpecs, String bridgeVersion, FrameLimits clientbound) {
         this.boundSpecs = boundSpecs;
         this.bridgeVersion = bridgeVersion;
+        this.clientbound = clientbound;
+        FrameLimits core = CoreProtocol.CLIENTBOUND_LIMITS;
+        // The ack goes through the same messenger as everything else: no frame of it may be larger either.
+        this.encoder = new FrameEncoder(new FrameLimits(Math.min(core.maxFrameBytes(), clientbound.maxFrameBytes()),
+                core.maxMessageBytes(), core.compressionThreshold(), core.maxConcurrentTransfers(),
+                core.transferTimeoutMillis()));
     }
 
     /**
@@ -78,7 +93,7 @@ final class ServerHandshake {
             throw new ProtocolException("expected a Hello on " + CoreProtocol.SPEC.channel());
         }
         Map<String, ProtocolSpec> specs = boundSpecs.get();
-        HelloAck ack = HandshakeRules.answer(hello, specs, bridgeVersion, FrameLimits.SERVERBOUND, FrameLimits.CLIENTBOUND);
+        HelloAck ack = HandshakeRules.answer(hello, specs, bridgeVersion, FrameLimits.SERVERBOUND, clientbound);
         Map<String, Verdict> verdicts = new LinkedHashMap<>();
         for (ModVerdict verdict : ack.verdicts()) {
             verdicts.put(verdict.modId(), verdict.verdict());

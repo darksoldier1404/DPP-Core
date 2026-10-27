@@ -204,8 +204,9 @@ public final class ModBridge {
                 }
                 long ticks = Math.max(1L, requirement.grace().toMillis() / 50L);
                 Bukkit.getScheduler().runTaskLater(core, () -> {
+                    // Only this connection: after a quick rejoin the same UUID is a new Player whose grace started later.
                     Player online = Bukkit.getPlayer(id);
-                    if (online != null && online.isOnline()) {
+                    if (online == player && online.isOnline()) {
                         enforce(online, channel);
                     }
                 }, ticks);
