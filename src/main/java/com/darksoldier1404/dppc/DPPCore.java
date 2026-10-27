@@ -90,6 +90,7 @@ public class DPPCore extends DPlugin {
         DPPCDICommand.init();
         ModBridge.enable(this);
         VfxAPI.enable(this);
+        VfxAPI.loadEffects(new java.io.File(getDataFolder(), "vfx"));
         PluginUtil.showBanner();
     }
 
