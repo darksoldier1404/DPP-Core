@@ -12,6 +12,7 @@ import com.darksoldier1404.dppc.events.DPPCPPanelListener;
 import com.darksoldier1404.dppc.events.InventoryEventListener;
 import com.darksoldier1404.dppc.events.PageToolEditorListener;
 import com.darksoldier1404.dppc.events.VariableStoreListener;
+import com.darksoldier1404.dppc.api.vfx.VfxAPI;
 import com.darksoldier1404.dppc.modbridge.ModBridge;
 import com.darksoldier1404.dppc.plugin.commands.DPPCACommand;
 import com.darksoldier1404.dppc.plugin.commands.DPPCCommand;
@@ -86,11 +87,13 @@ public class DPPCore extends DPlugin {
         getCommand("dppcpacket").setExecutor(new DPPCPacketTestCommand());
         DPPCDICommand.init();
         ModBridge.enable(this);
+        VfxAPI.enable(this);
         PluginUtil.showBanner();
     }
 
     @Override
     public void onDisable() {
+        VfxAPI.disable();
         ModBridge.disable();
         DLogManager.saveIntegratedLog();
         if (variables != null) {

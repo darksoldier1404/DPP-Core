@@ -26,12 +26,21 @@ def api_version = isLatest ? V21 : V20
 // below. This is the one line to change when the core is released: ModCore Phase 8c publishes 0.1.0 without the
 // SNAPSHOT, and until it does, the snapshot is the only version that resolves.
 def dppmc_protocol_version = "1.1.0"
+// DPP-ModCore 1.13.0's particle effects: the engine (EmitterSpec, the builders) and the dppmc_vfx wire format, shaded
+// like dppmc-protocol. Until 1.13.0 is on Nexus they come from mavenLocal (DPP-ModCore: publishToMavenLocal).
+def dppmc_vfx_version = "1.13.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
     maven {
         url System.getenv("REPO_PUBLIC") ?: getProperty("REPO_PUBLIC")
         allowInsecureProtocol = true
+    }
+    mavenLocal {
+        content {
+            includeModule('com.darksoldier1404.dppmc', 'dppmc-vfx')
+            includeModule('com.darksoldier1404.dppmc', 'dppmc-vfx-protocol')
+        }
     }
     maven {
         name = "nexomcReleases"
@@ -74,6 +83,11 @@ dependencies {
     // DPP-ModCore wire format (design §6.4). Shaded without relocation, so every plugin on the server sees one copy.
     implementation "com.darksoldier1404.dppmc:dppmc-protocol:${dppmc_protocol_version}"
     testImplementation testFixtures("com.darksoldier1404.dppmc:dppmc-protocol:${dppmc_protocol_version}")
+    // dppmc-vfx-protocol was built against the same wire format; DPP-Core keeps the dppmc-protocol it pins above.
+    implementation("com.darksoldier1404.dppmc:dppmc-vfx-protocol:${dppmc_vfx_version}") {
+        exclude group: 'com.darksoldier1404.dppmc', module: 'dppmc-protocol'
+    }
+    implementation "com.darksoldier1404.dppmc:dppmc-vfx:${dppmc_vfx_version}"
 
     compileOnly 'com.bukkit:craftbukkit:' + api_version
     compileOnly 'com.bukkit:spigot:' + api_version
@@ -124,6 +138,8 @@ shadowJar {
         // 'libraries:' block and resolved by the server's runtime library loader.
         include(dependency('com.google.code.gson:gson:2.13.1'))
         include(dependency("com.darksoldier1404.dppmc:dppmc-protocol"))
+        include(dependency("com.darksoldier1404.dppmc:dppmc-vfx-protocol"))
+        include(dependency("com.darksoldier1404.dppmc:dppmc-vfx"))
     }
     archiveFileName.set("DPP-Core-${version}-SNAPSHOT.jar")
     destinationDirectory.set(file("$rootDir/jars"))
