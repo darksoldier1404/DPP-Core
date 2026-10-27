@@ -48,6 +48,26 @@ class ServerHandshakeTest {
     }
 
     @Test
+    void theAckAdvertisesTheFrameSizeThisServerReallySends() {
+        // Minecraft 1.20.1: Bukkit refuses a plugin message over 32766 bytes.
+        ServerHandshake old = new ServerHandshake(() -> bound, "5.4.2", ClientboundFrames.limits(32766));
+
+        ServerHandshake.Answer answer = old.accept(PLAYER, helloFrame(SHOP), 0).orElseThrow();
+
+        assertEquals(32766, ack(answer).maxClientboundFrame());
+        for (byte[] frame : answer.ackFrames()) {
+            assertTrue(frame.length <= 32766);
+        }
+    }
+
+    @Test
+    void theAckOfTheRunningServerAdvertisesItsOwnFrameSize() {
+        ServerHandshake.Answer answer = handshake.accept(PLAYER, helloFrame(SHOP), 0).orElseThrow();
+
+        assertEquals(ClientboundFrames.limits().maxFrameBytes(), ack(answer).maxClientboundFrame());
+    }
+
+    @Test
     void helloIsAnsweredWithVerdictsAndLimits() {
         ServerHandshake.Answer answer = handshake.accept(PLAYER, helloFrame(SHOP, PAINT), 0).orElseThrow();
 

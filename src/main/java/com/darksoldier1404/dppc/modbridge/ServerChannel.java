@@ -29,7 +29,7 @@ public final class ServerChannel {
     private final Plugin plugin;
     private final ProtocolSpec spec;
     private final FrameDecoder<UUID> decoder = new FrameDecoder<>(FrameLimits.SERVERBOUND);
-    private final FrameEncoder encoder = new FrameEncoder(FrameLimits.CLIENTBOUND);
+    private final FrameEncoder encoder = new FrameEncoder(ClientboundFrames.limits());
     private final Map<Class<?>, BiConsumer<Player, Object>> handlers = new ConcurrentHashMap<>();
     private volatile ModRequirement requirement = ModRequirement.optional();
     private volatile BiPredicate<Player, Object> gate = (player, packet) -> true;
