@@ -27,7 +27,7 @@ def api_version = isLatest ? V21 : V20
 // SNAPSHOT, and until it does, the snapshot is the only version that resolves.
 def dppmc_protocol_version = "1.1.0"
 // DPP-ModCore 1.13.0's particle effects: the engine (EmitterSpec, the builders) and the dppmc_vfx wire format, shaded
-// like dppmc-protocol. Until 1.13.0 is on Nexus they come from mavenLocal (DPP-ModCore: publishToMavenLocal).
+// like dppmc-protocol, from the Nexus maven-public group. Change to 1.13.0 when DPP-ModCore releases it.
 def dppmc_vfx_version = "1.13.0-SNAPSHOT"
 
 repositories {
@@ -35,12 +35,6 @@ repositories {
     maven {
         url System.getenv("REPO_PUBLIC") ?: getProperty("REPO_PUBLIC")
         allowInsecureProtocol = true
-    }
-    mavenLocal {
-        content {
-            includeModule('com.darksoldier1404.dppmc', 'dppmc-vfx')
-            includeModule('com.darksoldier1404.dppmc', 'dppmc-vfx-protocol')
-        }
     }
     maven {
         name = "nexomcReleases"
