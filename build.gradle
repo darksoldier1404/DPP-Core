@@ -26,9 +26,9 @@ def api_version = isLatest ? V21 : V20
 // below. This is the one line to change when the core is released: ModCore Phase 8c publishes 0.1.0 without the
 // SNAPSHOT, and until it does, the snapshot is the only version that resolves.
 def dppmc_protocol_version = "1.1.0"
-// DPP-ModCore 1.13.0's particle effects: the engine (EmitterSpec, the builders) and the dppmc_vfx wire format, shaded
+// DPP-ModCore 1.13.0's particle effects (1.14.0 adds editor uploads): the engine (EmitterSpec, the builders) and the dppmc_vfx wire format, shaded
 // like dppmc-protocol, from the Nexus maven-public group. Change to 1.13.0 when DPP-ModCore releases it.
-def dppmc_vfx_version = "1.13.0-SNAPSHOT"
+def dppmc_vfx_version = "1.14.0-SNAPSHOT"
 
 repositories {
     mavenCentral()

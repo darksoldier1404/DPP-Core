@@ -60,7 +60,30 @@ public final class VfxAPI {
         VfxAPI.core = core;
         if (channel == null) {
             channel = ModBridge.bind(core, VfxProtocol.SPEC);
+            // the DPP-ModCore editor uploads effects (1.14.0, protocol 3); the answer goes back to the uploader
+            channel.on(VfxProtocol.Upload.class, (player, upload) -> send(player, handleUpload(player, upload)));
         }
+    }
+
+    /** The permission an editor upload needs; default op. */
+    public static final String EDIT_PERMISSION = "dppc.vfx.edit";
+
+    /**
+     * Stores one editor upload under {@code plugins/DPP-Core/vfx} and, when stored, registers it so {@link #play}
+     * finds it at once. Logs who uploaded what and how it went.
+     */
+    static VfxProtocol.UploadResult handleUpload(Player player, VfxProtocol.Upload upload) {
+        JavaPlugin plugin = core;
+        if (plugin == null) {
+            return new VfxProtocol.UploadResult(upload.id(), VfxProtocol.UploadResult.Status.UNSUPPORTED, "");
+        }
+        VfxProtocol.UploadResult result = VfxUploads.handle(new File(plugin.getDataFolder(), "vfx"),
+                player.hasPermission(EDIT_PERMISSION), upload);
+        if (result.status() == VfxProtocol.UploadResult.Status.OK) {
+            registerEffect(upload.id(), upload.json());
+        }
+        plugin.getLogger().info("vfx upload by " + player.getName() + ": " + upload.id() + " -> " + result.status());
+        return result;
     }
 
     /** Called by DPP-Core's onDisable, before the mod bridge. */

@@ -148,4 +148,41 @@ class VfxAPIEffectsTest extends PluginTest {
         assertEquals(0, VfxAPI.loadEffects(new File(folder, "nope")));
         assertTrue(VfxAPI.effectIds().isEmpty());
     }
+
+    private static String uploadedJson() {
+        return com.darksoldier1404.dppmc.vfx.protocol.EffectJson.write(
+                com.darksoldier1404.dppmc.vfx.effect.EffectSpec.of(
+                        com.darksoldier1404.dppmc.vfx.effect.EmitterSpec.defaultBurst()));
+    }
+
+    @Test
+    void aPermittedUploadRegistersTheEffectSoPlayWorks() {
+        modded.addAttachment(plugin, VfxAPI.EDIT_PERMISSION, true);
+        VfxProtocol.UploadResult r = VfxAPI.handleUpload(modded,
+                new VfxProtocol.Upload("editor/boom", true, uploadedJson()));
+        assertEquals(VfxProtocol.UploadResult.Status.OK, r.status());
+        assertTrue(VfxAPI.effectIds().contains("editor/boom"));
+        assertTrue(new File(plugin.getDataFolder(), "vfx/editor/boom.json").isFile());
+        assertEquals(1, VfxAPI.play(new Location(world, 1, 65, 1), "editor/boom"));
+    }
+
+    @Test
+    void aPlayerWithoutThePermissionGetsNoPermissionAndNoEffect() {
+        VfxProtocol.UploadResult r = VfxAPI.handleUpload(modded,
+                new VfxProtocol.Upload("editor/nope", true, uploadedJson()));
+        assertEquals(VfxProtocol.UploadResult.Status.NO_PERMISSION, r.status());
+        assertFalse(VfxAPI.effectIds().contains("editor/nope"));
+        assertFalse(new File(plugin.getDataFolder(), "vfx/editor/nope.json").exists());
+    }
+
+    @Test
+    void anUploadSentOnTheChannelReachesTheHandler() {
+        modded.addAttachment(plugin, VfxAPI.EDIT_PERMISSION, true);
+        byte[] message = VfxProtocol.SPEC.encode(Direction.C2S,
+                new VfxProtocol.Upload("editor/wire", true, uploadedJson()));
+        for (byte[] frame : new FrameEncoder(FrameLimits.SERVERBOUND).encode(message)) {
+            server.getMessenger().dispatchIncomingMessage(modded, VfxProtocol.SPEC.channel(), frame);
+        }
+        assertTrue(VfxAPI.effectIds().contains("editor/wire"));
+    }
 }
